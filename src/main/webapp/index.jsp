@@ -4,14 +4,43 @@
     Author     : maisarahabjalil
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
-    </head>
-    <body>
-        <h1>Hello World!</h1>
-    </body>
+<html lang="en">
+<head>
+    <title>SEMS | Login</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- JS -->
+    <script defer src="js/main.js"></script>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>Student Enrollment Management System</h1>
+
+        <form action="LoginServlet" method="post" class="login-form">
+            <label>Username</label>
+            <input type="text" name="username" required>
+
+            <label>Password</label>
+            <input type="password" name="password" required>
+
+            <button type="submit">Login</button>
+
+            <%-- Error message from servlet --%>
+            <%
+                String error = (String) request.getAttribute("error");
+                if (error != null) {
+            %>
+                <p class="error"><%= error %></p>
+            <%
+                }
+            %>
+        </form>
+    </div>
+
+</body>
 </html>
