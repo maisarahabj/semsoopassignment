@@ -67,3 +67,21 @@ body {
     margin-top: 10px;
     text-align: center;
 }
+
+.dashboard {
+    padding: 30px;
+}
+
+.dashboard-menu {
+    list-style: none;
+    margin-top: 20px;
+}
+
+.dashboard-menu li {
+    margin: 10px 0;
+}
+
+.dashboard-menu a {
+    text-decoration: none;
+    color: #007bff;
+}
