@@ -1,30 +1,35 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.sems.util;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-
+import java.sql.*;
 /**
  *
  * @author maisarahabjalil
  */
 public class DatabaseConnection {
-    public static void main(String[] args) {
-        String url = "jdbc:mysql://localhost:3306/sems_db";
-        String user = "root";
-        String password = "Rockie.69";
 
+    private static final String URL = "jdbc:mysql://localhost:3306/sems_db";
+    private static final String USER = "root";
+    private static final String PASS = "Rockie.69";
+
+    public static Connection getConnection() throws SQLException {
+        
         try {
-            Connection conn = DriverManager.getConnection(url, user, password);
-            System.out.println("MySQL JDBC Driver is working!");
-            conn.close();
-        } catch (Exception e) {
-            System.out.println("Connection failed");
-            e.printStackTrace();
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            System.out.println("Driver not found: " + e.getMessage());
+        }
+        return DriverManager.getConnection(URL, USER, PASS);
+    }
+
+    public static void closeResources(AutoCloseable... resources) {
+        for (AutoCloseable resource : resources) {
+            if (resource != null) {
+                try {
+                    resource.close();
+                } catch (Exception e) {
+                    System.out.println("Error closing resource: " + e.getMessage());
+                }
+            }
         }
     }
-    
 }

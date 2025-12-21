@@ -6,15 +6,15 @@ import java.sql.Timestamp;
  */
 
 public class Enrollment {
-    private int enrollmentId;      // enrollment_id
-    private int studentId;         // student_id (Foreign Key)
-    private int courseId;          // course_id (Foreign Key)
-    private String status;         // status (ENUM: enrolled, dropped, etc.)
-    private Timestamp enrollmentDate; // enrollment_date
+    private int enrollmentId;      
+    private int studentId;         
+    private int courseId;          
+    private String status;         
+    private Timestamp enrollmentDate; 
 
     // Constructors
     public Enrollment() {
-        this.status = "enrolled";  // Matches SQL DEFAULT 'enrolled'
+        this.status = "enrolled";  
     }
 
     public Enrollment(int studentId, int courseId) {

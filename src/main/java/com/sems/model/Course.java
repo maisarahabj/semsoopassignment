@@ -5,20 +5,20 @@ package com.sems.model;
  */
 
 public class Course {
-    private int courseId;          // course_id
-    private String courseCode;     // course_code
-    private String courseName;     // course_name
-    private int credits;           // credits
-    private String department;     // department
-    private int capacity;          // capacity
-    private int enrolledCount;     // enrolled_count
-    private boolean isActive;      // is_active
+    private int courseId;        
+    private String courseCode;    
+    private String courseName;     
+    private int credits;         
+    private String department;     
+    private int capacity;         
+    private int enrolledCount;    
+    private boolean isActive;     
 
     // Constructors
     public Course() {
-        this.capacity = 30;        // Matches SQL DEFAULT 30
-        this.enrolledCount = 0;    // Matches SQL DEFAULT 0
-        this.isActive = true;      // Matches SQL DEFAULT TRUE
+        this.capacity = 30;        
+        this.enrolledCount = 0;   
+        this.isActive = true;     
     }
 
     public Course(String courseCode, String courseName, int credits, String department) {
