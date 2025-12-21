@@ -13,6 +13,9 @@ public class Course {
     private int capacity;         
     private int enrolledCount;    
     private boolean isActive;     
+    // Added fields for schedule
+    private String courseDay;
+    private String courseTime;
 
     // Constructors
     public Course() {
@@ -54,7 +57,13 @@ public class Course {
     public boolean isIsActive() { return isActive; }
     public void setIsActive(boolean isActive) { this.isActive = isActive; }
 
-   
+    // Added Getters and Setters for schedule
+    public String getCourseDay() { return courseDay; }
+    public void setCourseDay(String courseDay) { this.courseDay = courseDay; }
+
+    public String getCourseTime() { return courseTime; }
+    public void setCourseTime(String courseTime) { this.courseTime = courseTime; }
+
     @Override
     public String toString() {
         return "Course [" + courseCode + " - " + courseName + "]";

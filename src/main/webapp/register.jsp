@@ -1,5 +1,5 @@
 <%-- 
-    Document   : index
+    Document   : register page
     Created on : 18 Dec 2025, 2:58:51 am
     Author     : maisarahabjalil
 --%>

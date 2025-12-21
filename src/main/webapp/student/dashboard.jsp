@@ -52,7 +52,7 @@
             </div>
 
             <div class="classes-section">
-                <h3 style="margin-bottom: 15px;">My Classes</h3>
+                <h3 style="margin-bottom: 15px;">Today's Classes</h3>
                 <div class="class-grid">
                     <div class="class-card bg-java">
                         <h4>Java Intro</h4>
