@@ -3,41 +3,149 @@
     Author     : maisarahabjalil
 */
 
-.dashboard-body {
+/* Layout Core */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body, html {
+    height: 100%;
+    /* Your requested pastel gradient */
     background: linear-gradient(135deg, #e0eafc, #cfdef3);
     font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+.dashboard-wrapper {
+    display: flex;
     min-height: 100vh;
     padding: 20px;
-    margin: 0;
 }
 
-/* Header styling */
-.dashboard-header {
+/* Section 1: Sidebar */
+.sidebar {
+    width: 260px;
     background: white;
-    padding: 15px 40px;
-    border-radius: 10px;
+    border-radius: 20px;
+    padding: 30px 20px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    margin-bottom: 25px;
+    flex-direction: column;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.03);
+    margin-right: 20px;
 }
 
-.university-name {
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-size: 22px;
     font-weight: 800;
+    margin-bottom: 40px;
     color: #333;
 }
 
-.btn-logout {
-    background-color: #007bff; /* Primary blue */
-    color: white;
-    padding: 10px 25px;
-    border: 2px solid #007bff;
-    border-radius: 6px;
+.nav-menu { list-style: none; flex-grow: 1; }
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    color: #7d8da1;
     text-decoration: none;
+    border-radius: 12px;
+    margin-bottom: 5px;
+    transition: 0.3s;
+}
+
+.nav-link.active, .nav-link:hover {
+    background: #f0f7ff;
+    color: #007bff;
     font-weight: 600;
-    transition: all 0.3s ease;
+}
+
+/* CGPA Circular Progress Box */
+.cgpa-container {
+    background: #f8fbff;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Section 2: Main Middle Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.welcome-banner {
+    background: white;
+    border-radius: 25px;
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+}
+
+.btn-enroll {
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+/* Classes Grid */
+.class-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.class-card {
+    padding: 25px;
+    border-radius: 20px;
+    color: white;
+    min-height: 150px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.bg-java { background: linear-gradient(135deg, #5b86e5, #36d1dc); }
+.bg-db { background: linear-gradient(135deg, #8e2de2, #4a00e0); }
+.bg-web { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+
+/* Section 3: Right Profile Panel */
+.right-panel {
+    width: 320px;
+    background: white;
+    border-radius: 25px;
+    padding: 30px;
+    margin-left: 20px;
+    text-align: center;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.03);
+}
+
+.profile-img-placeholder {
+    width: 100px;
+    height: 100px;
+    background: #eef2f6;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+}
+
+.btn-logout {
+    display: block;
+    margin-top: 30px;
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
 }
 
 .btn-logout:hover {
@@ -45,65 +153,3 @@
     color: black;
     border: 2px solid black;
 }
-
-.dashboard-grid {
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
-}
-
-.col-left { flex: 1; }
-.col-right { flex: 1.5; } /* Slightly wider */
-
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-}
-
-.card-header {
-    font-size: 16px;
-    font-weight: bold;
-    color: #555;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* Course Table Styling */
-.course-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.course-table th {
-    text-align: left;
-    padding: 10px;
-    border-bottom: 2px solid #f0f0f0;
-    color: #888;
-}
-
-.course-table td {
-    padding: 15px 10px;
-    border-bottom: 1px solid #f9f9f9;
-}
-
-.btn-action {
-    display: inline-block;
-    background: #2c3e50;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    margin-top: 10px;
-    font-size: 14px;
-}
-
-.status-label {
-    font-weight: bold;
-    font-size: 12px;
-}
-.full { color: #e74c3c; }
-.open { color: #2ecc71; }
