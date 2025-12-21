@@ -30,6 +30,33 @@ public class StudentDAO {
             "UPDATE students SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ?, gpa = ?, dob = ? WHERE student_id = ?";
 
 
+    // check if username or email is already taken in the system
+public boolean isUserExists(String username, String email) {
+    String sql = "SELECT (SELECT count(*) FROM users WHERE username = ?) + " +
+                 "(SELECT count(*) FROM students WHERE email = ?)";
+    Connection conn = null;
+    PreparedStatement pstmt = null;
+    ResultSet rs = null;
+    
+    try {
+        conn = DatabaseConnection.getConnection();
+        pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, username);
+        pstmt.setString(2, email);
+        
+        rs = pstmt.executeQuery();
+        if (rs.next()) {
+            // If the sum of counts from both tables is > 0, the user/email exists
+            return rs.getInt(1) > 0;
+        }
+    } catch (SQLException e) {
+        LOGGER.log(Level.SEVERE, "Error checking if user exists", e);
+    } finally {
+        DatabaseConnection.closeResources(rs, pstmt, conn);
+    }
+    return false;
+}
+    
     //new student profile linked to a user account
     public boolean createStudent(Student student) {
         Connection conn = null;
@@ -112,10 +139,8 @@ public class StudentDAO {
         }
         return null;
     }
-
-
+    
     // map SQL Result to Student Model
-
     private Student extractStudentFromResultSet(ResultSet rs) throws SQLException {
         Student student = new Student();
         student.setStudentId(rs.getInt("student_id"));

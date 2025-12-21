@@ -3,153 +3,65 @@
     Author     : maisarahabjalil
 */
 
-/* Layout Core */
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* ... Keep Sidebar and Banner styles from before ... */
 
-body, html {
-    height: 100%;
-    /* Your requested pastel gradient */
-    background: linear-gradient(135deg, #e0eafc, #cfdef3);
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-}
-
-.dashboard-wrapper {
-    display: flex;
-    min-height: 100vh;
-    padding: 20px;
-}
-
-/* Section 1: Sidebar */
-.sidebar {
-    width: 260px;
+.schedule-container {
     background: white;
-    border-radius: 20px;
-    padding: 30px 20px;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 10px 0 30px rgba(0,0,0,0.03);
-    margin-right: 20px;
-}
-
-.logo-section {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 22px;
-    font-weight: 800;
-    margin-bottom: 40px;
-    color: #333;
-}
-
-.nav-menu { list-style: none; flex-grow: 1; }
-.nav-link {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 12px 15px;
-    color: #7d8da1;
-    text-decoration: none;
-    border-radius: 12px;
-    margin-bottom: 5px;
-    transition: 0.3s;
-}
-
-.nav-link.active, .nav-link:hover {
-    background: #f0f7ff;
-    color: #007bff;
-    font-weight: 600;
-}
-
-/* CGPA Circular Progress Box */
-.cgpa-container {
-    background: #f8fbff;
-    padding: 20px;
-    border-radius: 15px;
-    text-align: center;
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.02);
     margin-top: 20px;
 }
 
-/* Section 2: Main Middle Content */
-.main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.welcome-banner {
-    background: white;
-    border-radius: 25px;
-    padding: 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.02);
-}
-
-.btn-enroll {
-    background: linear-gradient(to right, #6a11cb, #2575fc);
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 15px;
-}
-
-/* Classes Grid */
-.class-grid {
+/* This is the magic part that creates the columns */
+.timetable-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-}
-
-.class-card {
-    padding: 25px;
-    border-radius: 20px;
-    color: white;
-    min-height: 150px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-}
-
-.bg-java { background: linear-gradient(135deg, #5b86e5, #36d1dc); }
-.bg-db { background: linear-gradient(135deg, #8e2de2, #4a00e0); }
-.bg-web { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
-
-/* Section 3: Right Profile Panel */
-.right-panel {
-    width: 320px;
-    background: white;
-    border-radius: 25px;
-    padding: 30px;
-    margin-left: 20px;
-    text-align: center;
-    box-shadow: -10px 0 30px rgba(0,0,0,0.03);
-}
-
-.profile-img-placeholder {
-    width: 100px;
-    height: 100px;
-    background: #eef2f6;
-    border-radius: 50%;
-    margin: 0 auto 15px;
-}
-
-.btn-logout {
-    display: block;
-    margin-top: 30px;
-    background-color: #007bff;
-    color: white;
-    padding: 10px;
-    border: 2px solid #007bff;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.btn-logout:hover {
+    grid-template-columns: 80px repeat(7, 1fr); /* 1 fixed for time, 7 for days */
+    border: 1px solid #eef2f6;
+    border-radius: 12px;
+    overflow: hidden;
     background-color: white;
-    color: black;
-    border: 2px solid black;
+}
+
+.grid-header {
+    background: #f8fbff;
+    padding: 15px 5px;
+    text-align: center;
+    font-weight: bold;
+    color: #007bff;
+    border-bottom: 2px solid #eef2f6;
+    border-right: 1px solid #eef2f6;
+    font-size: 14px;
+}
+
+.time-col {
+    background: #fdfdfe;
+    padding: 15px 5px;
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    border-right: 1px solid #eef2f6;
+    border-bottom: 1px solid #eef2f6;
+    height: 100px; /* Consistent height for rows */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slot {
+    border-right: 1px solid #f4f7f9;
+    border-bottom: 1px solid #f4f7f9;
+    min-height: 100px;
+    padding: 5px;
+    background-color: #fff;
+}
+
+.course-entry {
+    background: #fff9db; 
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 11px;
+    height: 100%;
+    border-left: 4px solid #f1c40f;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }

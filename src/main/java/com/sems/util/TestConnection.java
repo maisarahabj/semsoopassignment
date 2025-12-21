@@ -1,33 +1,48 @@
 package com.sems.util;
 
-import com.sems.dao.CourseDAO;
-import com.sems.model.Course;
-import java.util.List;
+import com.sems.dao.*;
+import com.sems.model.*;
+import java.sql.*;
 
 public class TestConnection {
     public static void main(String[] args) {
+        // Initialize DAOs
+        EnrollmentDAO enrollmentDAO = new EnrollmentDAO();
         CourseDAO courseDAO = new CourseDAO();
         
-        // John Doe's ID is 1 according to our previous SQL setup
-        int testStudentId = 1; 
+        // Configuration
+        int testStudentId = 5; // The ID you just verified in SQL
+        int testCourseId = 1;  // Ensure this ID exists in your 'courses' table
         
-        System.out.println("======= TESTING ENROLLMENT FOR STUDENT ID: " + testStudentId + " =======");
-        
-        List<Course> myClasses = courseDAO.getCoursesByStudentId(testStudentId);
-        
-        if (myClasses.isEmpty()) {
-            System.out.println("No courses found for this student. Check your SQL enrollments!");
-        } else {
-            for (Course c : myClasses) {
-                System.out.println("-------------------------------------------");
-                System.out.println("Code:     " + c.getCourseCode());
-                System.out.println("Name:     " + c.getCourseName());
-                System.out.println("Credits:  " + c.getCredits());
-                System.out.println("Schedule: " + c.getCourseDay() + " at " + c.getCourseTime());
-                System.out.println("Status:   " + (c.getEnrolledCount() >= c.getCapacity() ? "FULL" : "OPEN"));
-                System.out.println("Capacity: " + c.getEnrolledCount() + "/" + c.getCapacity());
+        System.out.println("--- STARTING ENROLLMENT SYNC TEST ---");
+        System.out.println("Target: Student " + testStudentId + " -> Course " + testCourseId);
+
+        try {
+            // STEP 1: Attempt Enrollment
+            // This checks the 'enrollments' table
+            boolean enrollmentSuccess = enrollmentDAO.enrollStudent(testStudentId, testCourseId);
+
+            if (enrollmentSuccess) {
+                System.out.println("Step 1 SUCCESS: Student added to enrollment table.");
+                
+                // STEP 2: Only increment if Step 1 worked
+                // This updates the 'courses' table
+                boolean countUpdated = courseDAO.incrementEnrolledCount(testCourseId);
+                
+                if (countUpdated) {
+                    System.out.println("Step 2 SUCCESS: Course enrolled_count increased by 1.");
+                    System.out.println("\n--- FULL TEST PASSED ---");
+                } else {
+                    System.out.println("Step 2 FAILED: Enrollment succeeded but count failed to update.");
+                }
+            } else {
+                System.out.println("Step 1 FAILED: Likely a duplicate enrollment or missing Student/Course ID.");
+                System.out.println("RESULT: Step 2 was skipped automatically. Database is safe!");
             }
+
+        } catch (Exception e) {
+            System.err.println("TEST ERROR: " + e.getMessage());
+            e.printStackTrace();
         }
-        System.out.println("=================================================");
     }
 }

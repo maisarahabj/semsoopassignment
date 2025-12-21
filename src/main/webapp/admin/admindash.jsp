@@ -1,5 +1,5 @@
 <%-- 
-    Document   : dashboard
+    Document   : Admin dashboard
     Created on : 18 Dec 2025, 12:33:30 pm
     Author     : maisarahabjalil
 --%>
