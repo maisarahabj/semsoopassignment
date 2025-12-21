@@ -3,6 +3,11 @@
     Created on : 18 Dec 2025, 12:33:38 pm
     Author     : maisarahabjalil
 --%>
+
+<%-- imports for the models and list --%>
+<%@page import="java.util.List"%>
+<%@page import="com.sems.model.Course"%>
+<%@page import="com.sems.model.Student"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -18,6 +23,14 @@
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
+
+        // EDITED: Retrieving data passed from DashboardServlet
+        List<Course> displayCourses = (List<Course>) request.getAttribute("courses");
+        String sectionTitle = (String) request.getAttribute("sectionTitle");
+        
+        // EDITED: Getting student object for personalized name display
+        Student student = (Student) session.getAttribute("student");
+        String fullName = (student != null) ? student.getFirstName() + " " + student.getLastName() : "Student";
     %>
 
     <div class="dashboard-wrapper">
@@ -28,7 +41,8 @@
             </div>
 
             <nav class="nav-menu">
-                <a href="#" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
+                <%-- EDITED: Link now points to the Servlet mapping --%>
+                <a href="${pageContext.request.contextPath}/dashboard" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
                 <a href="#" class="nav-link"><i class="fas fa-chalkboard"></i> Classroom</a>
                 <a href="#" class="nav-link"><i class="fas fa-play-circle"></i> Live Lessons</a>
                 <a href="#" class="nav-link"><i class="fas fa-plus-square"></i> Add Subjects</a>
@@ -44,7 +58,8 @@
         <main class="main-content">
             <div class="welcome-banner">
                 <div>
-                    <h1>Welcome back, <span style="color: #007bff;">Stella Walton</span>!</h1>
+                    <%-- EDITED: Displaying dynamic name from student object --%>
+                    <h1>Welcome back, <span style="color: #007bff;"><%= fullName %></span>!</h1>
                     <p style="color: #666; margin-top: 10px;">New Java classes available. Explore advanced concepts now.</p>
                     <button class="btn-enroll">Enroll Now</button>
                 </div>
@@ -52,23 +67,28 @@
             </div>
 
             <div class="classes-section">
-                <h3 style="margin-bottom: 15px;">Today's Classes</h3>
+                <%-- EDITED: Section title is now dynamic (Today vs Next Class) --%>
+                <h3 style="margin-bottom: 15px;"><%= sectionTitle %></h3>
                 <div class="class-grid">
-                    <div class="class-card bg-java">
-                        <h4>Java Intro</h4>
-                        <p style="font-size: 13px; opacity: 0.8;">Unit III - OOP Concepts</p>
-                        <div style="margin-top: 40px;"><i class="fas fa-file"></i> 10 Files</div>
-                    </div>
-                    <div class="class-card bg-db">
-                        <h4>Database</h4>
-                        <p style="font-size: 13px; opacity: 0.8;">Unit II - SQL Queries</p>
-                        <div style="margin-top: 40px;"><i class="fas fa-file"></i> 15 Files</div>
-                    </div>
-                    <div class="class-card bg-web">
-                        <h4>Web Dev</h4>
-                        <p style="font-size: 13px; opacity: 0.8;">Unit I - HTML/CSS</p>
-                        <div style="margin-top: 40px;"><i class="fas fa-file"></i> 8 Files</div>
-                    </div>
+                    <%-- EDITED: Added loop to display courses from the database --%>
+                    <% 
+                        if (displayCourses != null && !displayCourses.isEmpty()) {
+                            for (Course course : displayCourses) { 
+                    %>
+                        <div class="class-card bg-java">
+                            <h4><%= course.getCourseName() %></h4>
+                            <p style="font-size: 13px; opacity: 0.8;"><%= course.getCourseCode() %></p>
+                            <div style="margin-top: 40px;">
+                                <i class="fas fa-clock"></i> <%= course.getCourseTime().substring(0, 5) %>
+                            </div>
+                        </div>
+                    <% 
+                            } 
+                        } else { 
+                    %>
+                        <p style="color: #888;">No classes scheduled at the moment.</p>
+                    <% } %>
+                    <%-- END EDITED SECTION --%>
                 </div>
             </div>
         </main>
