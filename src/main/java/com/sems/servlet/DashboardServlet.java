@@ -1,8 +1,3 @@
-/**
- *
- * @author maisarahabjalil
- */
-
 package com.sems.servlet; 
 
 import com.sems.dao.CourseDAO;
@@ -25,34 +20,34 @@ public class DashboardServlet extends HttpServlet {
         
         HttpSession session = request.getSession();
         
-        // 1. Session Security Check
+        // Session Security Check
         if (session.getAttribute("username") == null) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
 
-        // 2. Get Student Data
+        // Get Student Data
         Student student = (Student) session.getAttribute("student");
         int studentId = (student != null) ? student.getStudentId() : 1; 
         
-        // 3. Logic for "Today's Day" vs "Next Class"
+        // Logic for "Today's Day"
         CourseDAO courseDAO = new CourseDAO();
         String today = LocalDate.now().getDayOfWeek().name(); 
         today = today.substring(0, 1) + today.substring(1).toLowerCase(); 
 
+        // fetching today's courses only.
         List<Course> displayCourses = courseDAO.getCoursesByDay(studentId, today);
         String sectionTitle = "Today's Classes";
 
-        if (displayCourses.isEmpty() || today.equals("Sunday") || today.equals("Saturday")) {
-            displayCourses = courseDAO.getCoursesByDay(studentId, "Monday");
-            sectionTitle = "Your Next Classes (Monday)";
-        }
-
-        // 4. ATTACH THE DATA to the request so the JSP can see it
+        //ATTACH THE DATA to the request so the JSP can see it
         request.setAttribute("courses", displayCourses);
         request.setAttribute("sectionTitle", sectionTitle);
         
-        // 5. Forward to JSP
+        //Forward to JSP
         request.getRequestDispatcher("/student/dashboard.jsp").forward(request, response);
+        
+        
+        
+        
     }
 }
