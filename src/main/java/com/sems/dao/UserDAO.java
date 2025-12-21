@@ -31,9 +31,7 @@ public class UserDAO {
     private static final String DELETE_USER = 
             "DELETE FROM users WHERE user_id = ?";
 
-    /**
-     * Create a new user and return the generated ID
-     */
+    //Create a new user and return the generated ID
     public int createUser(User user) {
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -64,13 +62,10 @@ public class UserDAO {
         return -1;
     }
 
-    /**
-     * Authenticate user (verify credentials)
-     */
+    //Authenticate user (verify credentials)     
     public User authenticate(String username, String passwordHash) {
         User user = getUserByUsername(username);
-        
-        // Matches your model's field names
+                
         if (user != null && user.isIsActive() && user.getPasswordHash().equals(passwordHash)) {
             return user;
         }
@@ -99,9 +94,8 @@ public class UserDAO {
         return null;
     }
 
-    /**
-     * Helper to map SQL Result to your User Model
-     */
+
+    //Helper to map SQL Result to  User Model
     private User extractUserFromResultSet(ResultSet rs) throws SQLException {
         User user = new User();
         user.setUserId(rs.getInt("user_id"));
@@ -112,4 +106,8 @@ public class UserDAO {
         user.setIsActive(rs.getBoolean("is_active"));
         return user;
     }
+public UserDAO() {
+    // This empty constructor allows the Test class to instantiate it
+}
+
 }
