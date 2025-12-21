@@ -1,9 +1,3 @@
-<%-- 
-    Document   : login
-    Created on : 21 Dec 2025, 1:16:02 pm
-    Author     : maisarahabjalil
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -19,7 +13,7 @@
                 <div class="temp-logo">SEMS</div>
             </div>
 
-            <form action="${pageContext.request.contextPath}/LoginServlet" method="POST">
+            <form action="LoginServlet" method="POST">
                 <div class="input-group">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" placeholder="Username" required>
@@ -32,7 +26,7 @@
                 
                 <% 
                     String error = (String) request.getAttribute("errorMessage");
-                        if (error != null) { 
+                    if (error != null) { 
                 %>
                     <p style="color: #ff4d4f; font-size: 14px; margin-bottom: 15px; font-weight: bold; text-align: center;">
                         <%= error %>

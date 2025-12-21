@@ -12,26 +12,19 @@
     </head>
     <body>
         <%
-            // 1. Check if the user is actually logged in by looking at the session
+            // CHANGES HERE: Using a more robust session check
             String username = (String) session.getAttribute("username");
             
-            // 2. If no session exists, kick them back to the login page
             if (username == null) {
-                response.sendRedirect("../login.jsp");
+                // CHANGES HERE: Using Context Path for safer redirect if session is missing
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
+                return; 
             }
         %>
 
         <h1>Welcome to the Dashboard!</h1>
         <p>You are logged in as: <strong><%= username %></strong></p>
-        
         <hr>
-        
-        <h3>Quick Actions:</h3>
-        <ul>
-            <li><a href="#">View My Profile</a></li>
-            <li><a href="#">Enroll in Courses</a></li>
-            <li><a href="${pageContext.request.contextPath}/LogoutServlet">Logout</a></li>
-        </ul>
-        
+        <p>Your login was successful.</p>
     </body>
 </html>

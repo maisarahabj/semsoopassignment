@@ -2,33 +2,40 @@ package com.sems.util;
 
 import com.sems.dao.UserDAO;
 import java.sql.Connection;
+import java.util.Scanner; // CHANGES HERE: Added Scanner for input
 
 public class TestConnection {
     public static void main(String[] args) {
         System.out.println("=== Starting Database Connection Test ===");
         
-        // Test 1: Physical Connection
+        // 1. Physical Connection Test
         try (Connection conn = DatabaseConnection.getConnection()) {
             if (conn != null) {
-                System.out.println("SUCCESS: Connected to the database successfully!");
-            } else {
-                System.out.println("FAILED: Connection is null.");
+                System.out.println("SUCCESS: Connected to the database!");
             }
         } catch (Exception e) {
-            System.out.println("FAILED: Error during connection.");
-            e.printStackTrace();
+            System.out.println("FAILED: Connection Error: " + e.getMessage());
+            return; // Stop if connection fails
         }
 
-        // Test 2: DAO Logic Test
-        System.out.println("\n=== Testing UserDAO.validateUser ===");
+        // 2. Interactive Login Test
+        // CHANGES HERE: Simulating the Login Form behavior in the console
         UserDAO dao = new UserDAO();
-        // Use the exact dummy credentials you inserted in SQL
-        boolean result = dao.validateUser("johndoe", "password123");
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("\n--- SIMULATING LOGIN FORM ---");
+        System.out.print("Enter Username: ");
+        String testUser = scanner.nextLine();
         
-        if (result) {
-            System.out.println("SUCCESS: User 'johndoe' validated correctly!");
+        System.out.print("Enter Password: ");
+        String testPass = scanner.nextLine();
+
+        boolean isValid = dao.validateUser(testUser, testPass);
+
+        if (isValid) {
+            System.out.println("\nSUCCESS: User validated! The Servlet SHOULD be redirecting.");
         } else {
-            System.out.println("FAILED: Could not validate 'johndoe'. Check column names or table data.");
+            System.out.println("\nFAILED: Invalid credentials. Check MySQL table data.");
         }
     }
 }

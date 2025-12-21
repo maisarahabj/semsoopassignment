@@ -1,8 +1,3 @@
-
-/**
- *
- * @author maisarahabjalil
- */
 package com.sems.servlet;
 
 import com.sems.dao.UserDAO;
@@ -14,16 +9,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
-
- //Servlet to handle User Login authentication.
-
 @WebServlet(name = "LoginServlet", urlPatterns = {"/LoginServlet"})
 public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         response.sendRedirect("login.jsp");
     }
 
@@ -31,30 +22,34 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        //Capture the data from the JSP form
         String user = request.getParameter("username");
         String pass = request.getParameter("password");
 
-        //Initialize the DAO to talk to SQL
+        //CHANGES HERE: Added server-side logging to see exactly what is being received
+        System.out.println("DEBUG: Servlet received Username: [" + user + "]");
+        System.out.println("DEBUG: Servlet received Password: [" + pass + "]");
+
         UserDAO userDAO = new UserDAO();
-        
-        // Check if the user exists and the password matches
         boolean isValid = userDAO.validateUser(user, pass); 
+        
+        //CHANGES HERE: Logging the result of the database check
+        System.out.println("DEBUG: Database validation result: " + isValid);
 
         if (isValid) {
             HttpSession session = request.getSession();
-            session.setAttribute("username", user); 
-            String path = request.getContextPath() + "/student/dashboard.jsp";
-            System.out.println("Redirecting to: " + path); // This will show in your GlassFish logs
-            response.sendRedirect(path); 
+            session.setAttribute("username", user);
+            String contextPath = request.getContextPath();
+            String target = contextPath + "/student/dashboard.jsp";
+            System.out.println("DEBUG: Redirecting to " + target); // Check this in GlassFish logs!
+            response.sendRedirect(target);
         } else {
-            // FAILURE sending the user back to login.jsp
+            //CHANGES HERE: Logging the failure for debugging
+            System.out.println("DEBUG: Validation failed. Forwarding back to login.jsp");
             request.setAttribute("errorMessage", "Invalid username or password.");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
-
     }
-    
+
     @Override
     public String getServletInfo() {
         return "Handles User Login Authentication";
