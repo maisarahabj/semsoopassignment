@@ -106,8 +106,29 @@ public class UserDAO {
         user.setIsActive(rs.getBoolean("is_active"));
         return user;
     }
-public UserDAO() {
+    
+    //log in check - matches login.jsp
+    public boolean validateUser(String username, String password) {
+        String sql = "SELECT * FROM users WHERE username = ? AND password_hash = ? AND is_active = 1";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next(); // Returns true if a match is found (User exists and is active)
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error validating user credentials", e);
+            return false;
+        }
+    }
+    
+    public UserDAO() {
     // This empty constructor allows the Test class to instantiate it
-}
+    }
+      
+
 
 }
