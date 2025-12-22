@@ -49,7 +49,14 @@
 
                 <div class="input-group" id="studentIdGroup">
                     <label for="studentRegId">Student ID Number</label>
-                    <input type="text" name="studentRegId" id="studentRegId" placeholder="e.g. STU12345">
+                    <input type="number" 
+                           name="studentRegId" 
+                           id="studentRegId" 
+                           step="1" 
+                           min="1"
+                           placeholder="e.g. 12345"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '');" 
+                           >
                 </div>
 
                 <hr>
