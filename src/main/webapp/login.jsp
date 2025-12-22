@@ -41,7 +41,7 @@
             </div>
             
             <footer class="footer">
-                &copy; 2025 SEMS 
+                &copy; 2025 Barfact University 
             </footer>
         </div>
         <script src="${pageContext.request.contextPath}/js/main.js"></script>

@@ -3,6 +3,7 @@
  * @author maisarahabjalil
  */
 package com.sems.dao;
+
 import com.sems.model.User;
 import com.sems.util.DatabaseConnection;
 import java.sql.*;
@@ -13,12 +14,9 @@ public class UserDAO {
     
     private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
     
-    private static final String SELECT_USER_BY_USERNAME = 
-            "SELECT * FROM users WHERE username = ?";
-
+    // 1. Validate Credentials only
     public User validateUser(String username, String password) {
-        // Updated SQL to match your table column 'password_hash'
-        String sql = "SELECT * FROM users WHERE username = ? AND password_hash = ? AND is_active = 1";
+        String sql = "SELECT * FROM users WHERE username = ? AND password_hash = ?";
         
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -28,38 +26,42 @@ public class UserDAO {
             
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    // Use your existing helper method to build the User object
-                    User user = extractUserFromResultSet(rs);
-                    System.out.println("DEBUG (DAO): User validated successfully. Role: " + user.getRole());
-                    return user; 
+                    return extractUserFromResultSet(rs);
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error validating user credentials", e);
+            LOGGER.log(Level.SEVERE, "Error validating user", e);
         }
-        
-        System.out.println("DEBUG (DAO): Validation failed for username: " + username);
-        return null; // Return null if user not found or password incorrect
+        return null; 
     }
 
-    public User getUserByUsername(String username) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        try {
-            conn = DatabaseConnection.getConnection();
-            pstmt = conn.prepareStatement(SELECT_USER_BY_USERNAME);
-            pstmt.setString(1, username);
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return extractUserFromResultSet(rs);
+    // 2. Register New User (Returns the new User ID)
+    public int registerUser(User user) {
+        String sql = "INSERT INTO users (username, password_hash, role, is_active, status) VALUES (?, ?, ?, ?, ?)";
+        int generatedId = -1;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            
+            pstmt.setString(1, user.getUsername());
+            pstmt.setString(2, user.getPasswordHash());
+            pstmt.setString(3, user.getRole());
+            pstmt.setBoolean(4, false); // is_active
+            pstmt.setString(5, "PENDING"); // status
+
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows > 0) {
+                try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        generatedId = rs.getInt(1);
+                    }
+                }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching user", e);
-        } finally {
-            DatabaseConnection.closeResources(rs, pstmt, conn);
+            LOGGER.log(Level.SEVERE, "Error inserting new user", e);
         }
-        return null;
+        return generatedId;
     }
 
     private User extractUserFromResultSet(ResultSet rs) throws SQLException {
@@ -69,8 +71,7 @@ public class UserDAO {
         user.setPasswordHash(rs.getString("password_hash"));
         user.setRole(rs.getString("role"));
         user.setIsActive(rs.getBoolean("is_active"));
+        user.setStatus(rs.getString("status"));
         return user;
     }
-    
-    public UserDAO() {}
 }

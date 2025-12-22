@@ -13,11 +13,13 @@ public class User {
     private String role; 
     private Timestamp createdAt;
     private boolean isActive;
+    private String status;
 
     // Constructors
    
     public User() {
-        this.isActive = true; 
+        this.isActive = true;
+        this.status = "PENDING";
     }
     
     public User(String username, String passwordHash, String role) {
@@ -46,6 +48,8 @@ public class User {
     public boolean isIsActive() { return isActive; }
     public void setIsActive(boolean isActive) { this.isActive = isActive; }
 
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
     
     // Checks if user is admin - used for Role-Based Access Control
     public boolean isAdmin() {

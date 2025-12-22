@@ -1,0 +1,87 @@
+/* 
+    Created on : 23 Dec 2025, 1:57:07 am
+    Author     : maisarahabjalil
+*/
+
+/* only display student id input field when student is selected */
+#studentIdGroup {
+    display: none;
+    -webkit-appearance: none;
+}
+
+/* Force visible class for Safari */
+.show-group {
+    display: block !important;
+}
+
+/* Styling for the Registration Container */
+.register-container {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    width: 400px;
+    text-align: center;
+    margin: 20px auto; /* Centers the box horizontally */
+}
+
+/* Layout for First Name and Last Name side-by-side */
+.form-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* Role Dropdown Styling */
+select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: white;
+    outline: none;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Horizontal Line Separator */
+hr {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 25px 0;
+}
+
+/* BIG CALENDAR STYLING */
+input[type="date"] {
+    width: 100%;
+    padding: 15px; /* Increased padding */
+    font-size: 16px; /* Larger font */
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-family: inherit;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* Customizing the calendar icon and picker behavior for Chrome/Safari */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    transform: scale(1.5);
+    cursor: pointer;
+}
+
+/* Make Email input matches the Big Calendar style */
+input[type="email"] {
+    width: 100%;
+    padding: 15px; /* Matches the date picker padding */
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-sizing: border-box;
+    margin-top: 10px; /* Space from the name fields above */
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+input[type="email"]:focus {
+    border-color: #91d5ff; /* Matches your login field focus color */
+}
