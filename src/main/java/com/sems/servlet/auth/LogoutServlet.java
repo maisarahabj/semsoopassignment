@@ -3,7 +3,7 @@
  * @author maisarahabjalil
  */
 
-package com.sems.servlet;
+package com.sems.servlet.auth;
 
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet(name = "LogoutServlet", urlPatterns = {"/LogoutServlet"})
+@WebServlet(name = "LogoutServlet", urlPatterns = {"/auth/LogoutServlet"})
 public class LogoutServlet extends HttpServlet {
 
     @Override
@@ -36,7 +36,7 @@ public class LogoutServlet extends HttpServlet {
 
         // Redirect to login page
         // Since we haven't built the UI yet, this will 404 for now, 
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("../login.jsp");
     }
 
     @Override

@@ -13,7 +13,7 @@
                 <div class="temp-logo">SEMS</div>
             </div>
 
-            <form action="LoginServlet" method="POST">
+            <form action="${pageContext.request.contextPath}/auth/LoginServlet" method="POST">
                 <div class="input-group">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" placeholder="Username" required>

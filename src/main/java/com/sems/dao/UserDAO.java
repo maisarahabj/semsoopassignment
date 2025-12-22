@@ -16,8 +16,8 @@ public class UserDAO {
     private static final String SELECT_USER_BY_USERNAME = 
             "SELECT * FROM users WHERE username = ?";
 
-    //CHANGES HERE: Fixed column name to 'password_hash' and added debug logging
-    public boolean validateUser(String username, String password) {
+    public User validateUser(String username, String password) {
+        // Updated SQL to match your table column 'password_hash'
         String sql = "SELECT * FROM users WHERE username = ? AND password_hash = ? AND is_active = 1";
         
         try (Connection conn = DatabaseConnection.getConnection();
@@ -26,16 +26,20 @@ public class UserDAO {
             pstmt.setString(1, username);
             pstmt.setString(2, password);
             
-            ResultSet rs = pstmt.executeQuery();
-            boolean found = rs.next();
-            
-            //CHANGES HERE: Debugging print for DAO level
-            System.out.println("DEBUG (DAO): Query executed. User found: " + found);
-            return found; 
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    // Use your existing helper method to build the User object
+                    User user = extractUserFromResultSet(rs);
+                    System.out.println("DEBUG (DAO): User validated successfully. Role: " + user.getRole());
+                    return user; 
+                }
+            }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error validating user credentials", e);
-            return false;
         }
+        
+        System.out.println("DEBUG (DAO): Validation failed for username: " + username);
+        return null; // Return null if user not found or password incorrect
     }
 
     public User getUserByUsername(String username) {

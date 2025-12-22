@@ -106,7 +106,7 @@
                 <p style="font-size: 12px; color: #666;">December 2025</p>
             </div>
 
-            <a href="${pageContext.request.contextPath}/LogoutServlet" class="btn-logout">Log Out</a>
+            <a href="${pageContext.request.contextPath}/auth/LogoutServlet" class="btn-logout">Log Out</a>
         </aside>
     </div>
 </body>

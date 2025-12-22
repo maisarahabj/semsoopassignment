@@ -2,12 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.sems.servlet;
+package com.sems.servlet.admin;
 
 /**
  *
  * @author maisarahabjalil
  */
-public class EditStudentServlet {
+public class AddStudentServlet {
     
 }

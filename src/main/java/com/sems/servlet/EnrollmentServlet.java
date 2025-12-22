@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/EnrollmentServlet")
+@WebServlet("/student/EnrollmentServlet")
 public class EnrollmentServlet extends HttpServlet {
 
     private EnrollmentDAO enrollmentDAO = new EnrollmentDAO();

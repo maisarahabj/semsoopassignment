@@ -8,6 +8,6 @@ package com.sems.servlet;
  *
  * @author maisarahabjalil
  */
-public class AdminDashServlet {
+public class DropCourseServlet {
     
 }

@@ -140,6 +140,33 @@ public boolean isUserExists(String username, String email) {
         return null;
     }
     
+    
+    public int getStudentIdByUserId(int userId) {
+        int studentId = -1; // Default to -1 (not found)
+        String sql = "SELECT student_id FROM students WHERE user_id = ?";
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = DatabaseConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, userId);
+            
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                studentId = rs.getInt("student_id");
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching student ID", e);
+        } finally {
+            DatabaseConnection.closeResources(rs, pstmt, conn);
+        }
+        return studentId;
+    }
+    
     // map SQL Result to Student Model
     private Student extractStudentFromResultSet(ResultSet rs) throws SQLException {
         Student student = new Student();
