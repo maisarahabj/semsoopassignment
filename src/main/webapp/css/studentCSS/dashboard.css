@@ -7,7 +7,8 @@
 .dashboard-wrapper {
     display: flex;
     min-height: 100vh;
-    background-color: #f4f7f9;
+    background: linear-gradient(135deg, #f0f2f5 0%, #e6f7ff 25%, #fff0f6 50%, #f6ffed 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .sidebar {
@@ -44,7 +45,7 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.02);
 }
 
-/* FIXED: Timetable Grid System */
+/* Timetable Grid System */
 .schedule-container {
     background: white;
     border-radius: 25px;
@@ -116,12 +117,17 @@
 .bg-db { background: #f3f0ff; border-left-color: #7048e8; }
 
 .btn-logout {
-    display: block;
-    margin-top: 50px;
+    width: 100%;
     padding: 12px;
-    background: #fff0f0;
-    color: #ff4d4d;
-    text-decoration: none;
+    border: none;
     border-radius: 10px;
+    background: linear-gradient(to right, #1890ff, #eb2f96);
+    color: white;
+    font-size: 16px;
     font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: opacity 0.3s;
+    text-decoration: none;
 }
+
