@@ -121,4 +121,43 @@ public class EnrollmentDAO {
         enrollment.setStatus(rs.getString("status"));
         return enrollment;
     }
+    
+    /**
+ * Fetches the actual Course objects for a specific student.
+ * Useful for displaying the course list on the dashboard.
+ */
+public List<com.sems.model.Course> getEnrolledCourseDetails(int studentId) {
+    List<com.sems.model.Course> courses = new ArrayList<>();
+    String sql = "SELECT c.* FROM courses c " +
+                 "JOIN enrollments e ON c.course_id = e.course_id " +
+                 "WHERE e.student_id = ?";
+    
+    Connection conn = null;
+    PreparedStatement pstmt = null;
+    ResultSet rs = null;
+    
+    try {
+        conn = DatabaseConnection.getConnection();
+        pstmt = conn.prepareStatement(sql);
+        pstmt.setInt(1, studentId);
+        rs = pstmt.executeQuery();
+        
+        while (rs.next()) {
+            com.sems.model.Course course = new com.sems.model.Course();
+            course.setCourseId(rs.getInt("course_id"));
+            course.setCourseCode(rs.getString("course_code"));
+            course.setCourseName(rs.getString("course_name"));
+            course.setCredits(rs.getInt("credits"));
+            course.setDepartment(rs.getString("department"));
+            // Add any other course fields you have in your model
+            courses.add(course);
+        }
+    } catch (SQLException e) {
+        LOGGER.log(Level.SEVERE, "Error fetching enrolled course details", e);
+    } finally {
+        DatabaseConnection.closeResources(rs, pstmt, conn);
+    }
+    return courses;
 }
+}
+

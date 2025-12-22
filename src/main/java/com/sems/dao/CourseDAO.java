@@ -2,7 +2,6 @@
  *
  * @author maisarahabjalil
  */
-
 package com.sems.dao;
 
 import com.sems.model.Course;
@@ -31,33 +30,55 @@ public class CourseDAO {
     
     private static final String SELECT_COURSE_BY_ID = 
             "SELECT * FROM courses WHERE course_id = ?";
+
+    private static final String SELECT_ID_BY_CODE = 
+            "SELECT course_id FROM courses WHERE course_code = ?";
     
     private static final String UPDATE_INCREMENT_ENROLLED = 
             "UPDATE courses SET enrolled_count = enrolled_count + 1 WHERE course_id = ? AND enrolled_count < capacity";
 
-    // NEW CONSTANT: For dropping courses
     private static final String UPDATE_DECREMENT_ENROLLED = 
             "UPDATE courses SET enrolled_count = enrolled_count - 1 WHERE course_id = ? AND enrolled_count > 0";
 
     /**
-     * Adding new courses to the system (Admin feature)
+     * Helper method to find the course_id based on a course_code.
      */
-    public boolean createCourse(Course course) {
+    public int getCourseIdByCode(String courseCode) {
+        int id = -1;
         Connection conn = null;
         PreparedStatement pstmt = null;
+        ResultSet rs = null;
         
         try {
             conn = DatabaseConnection.getConnection();
-            pstmt = conn.prepareStatement(INSERT_COURSE);
+            pstmt = conn.prepareStatement(SELECT_ID_BY_CODE);
+            pstmt.setString(1, courseCode);
+            rs = pstmt.executeQuery();
             
+            if (rs.next()) {
+                id = rs.getInt("course_id");
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error finding course ID by code: " + courseCode, e);
+        } finally {
+            DatabaseConnection.closeResources(rs, pstmt, conn);
+        }
+        return id;
+    }
+
+    public boolean createCourse(Course course) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = DatabaseConnection.getConnection();
+            pstmt = conn.prepareStatement(INSERT_COURSE);
             pstmt.setString(1, course.getCourseCode());
             pstmt.setString(2, course.getCourseName());
             pstmt.setInt(3, course.getCredits());
             pstmt.setInt(4, course.getCapacity());
-            pstmt.setInt(5, 0); // New courses start with 0 students
+            pstmt.setInt(5, 0); 
             pstmt.setString(6, course.getCourseDay());
             pstmt.setString(7, course.getCourseTime());
-            
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error creating course", e);
@@ -67,20 +88,15 @@ public class CourseDAO {
         return false;
     }
 
-    /**
-     * Retrieve all available courses
-     */
     public List<Course> getAllCourses() {
         List<Course> courses = new ArrayList<>();
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
-        
         try {
             conn = DatabaseConnection.getConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(SELECT_ALL_COURSES);
-            
             while (rs.next()) {
                 courses.add(extractCourseFromResultSet(rs));
             }
@@ -91,22 +107,16 @@ public class CourseDAO {
         }
         return courses;
     }
-    
-    /**
-     * Retrieve courses for a specific student via Enrollment table
-     */
+
     public List<Course> getCoursesByStudentId(int studentId) {
         List<Course> enrolledCourses = new ArrayList<>();
         String sql = "SELECT c.* FROM courses c " +
                      "JOIN enrollments e ON c.course_id = e.course_id " +
                      "WHERE e.student_id = ? AND e.status = 'enrolled'";
-        
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
             pstmt.setInt(1, studentId);
             ResultSet rs = pstmt.executeQuery();
-            
             while (rs.next()) {
                 enrolledCourses.add(extractCourseFromResultSet(rs));
             }
@@ -116,51 +126,38 @@ public class CourseDAO {
         return enrolledCourses;
     }
 
-    /**
-     * Increment the enrollment count when a student registers
-     */
     public boolean incrementEnrolledCount(int courseId) {
         Connection conn = null;
         PreparedStatement pstmt = null;
-        
         try {
             conn = DatabaseConnection.getConnection();
             pstmt = conn.prepareStatement(UPDATE_INCREMENT_ENROLLED);
             pstmt.setInt(1, courseId);
-            
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error incrementing course count", e);
+            LOGGER.log(Level.SEVERE, "Error incrementing count", e);
         } finally {
             DatabaseConnection.closeResources(null, pstmt, conn);
         }
         return false;
     }
 
-    /**
-     * NEW METHOD: Decrement the enrollment count when a student drops
-     */
     public boolean decrementEnrolledCount(int courseId) {
         Connection conn = null;
         PreparedStatement pstmt = null;
-        
         try {
             conn = DatabaseConnection.getConnection();
             pstmt = conn.prepareStatement(UPDATE_DECREMENT_ENROLLED);
             pstmt.setInt(1, courseId);
-            
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error decrementing course count", e);
+            LOGGER.log(Level.SEVERE, "Error decrementing count", e);
         } finally {
             DatabaseConnection.closeResources(null, pstmt, conn);
         }
         return false;
     }
 
-    /**
-     * Retrieve courses for a specific student on a specific day
-     */
     public List<Course> getCoursesByDay(int studentId, String day) {
         List<Course> list = new ArrayList<>();
         String sql = "SELECT c.* FROM courses c " +
@@ -179,7 +176,24 @@ public class CourseDAO {
         }
         return list;
     }
-    
+
+    public boolean deleteCourse(int courseId) {
+        String sql = "DELETE FROM courses WHERE course_id = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = DatabaseConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, courseId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error deleting course", e);
+        } finally {
+            DatabaseConnection.closeResources(null, pstmt, conn);
+        }
+        return false;
+    }
+
     private Course extractCourseFromResultSet(ResultSet rs) throws SQLException {
         Course course = new Course();
         course.setCourseId(rs.getInt("course_id"));
@@ -192,4 +206,4 @@ public class CourseDAO {
         course.setCourseTime(rs.getString("course_time"));
         return course;
     }
-}
+} 
