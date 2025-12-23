@@ -1,11 +1,8 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
-*/
 /* 
     Created on : 22 Dec 2025, 1:47:15 am
     Author     : maisarahabjalil
 */
+
 
 @import url("admindash.css");
 @import url("admincourse.css"); /* Reusing the modal styles we just perfected */
@@ -21,3 +18,126 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 .main-content {
     padding-bottom: 80px; /* Fixing the awkward cut-off at the bottom */
 }
+
+/* --- ADDED: MANUAL ADD STUDENT STYLES --- */
+
+.btn-add-manual {
+    background: #e6fffa;
+    color: #38a169;
+    border: 1px solid #b2f5ea;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-add-manual:hover {
+    background: #38a169;
+    color: white;
+}
+
+/* Form Layout inside the Modal */
+.modal-form-grid {
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 15px; 
+    text-align: left;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group.full-width {
+    grid-column: span 2;
+}
+
+.input-group label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #4a5568;
+    margin-bottom: 5px;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.modal-input:focus {
+    border-color: #38a169;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.1);
+}
+
+.btn-save-student {
+    background: #38a169;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-save-student:hover {
+    background: #2f855a;
+}
+
+/* START -- Profile View Styling */
+.view-data {
+    background: #f8fbff;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #2d3748;
+    border-left: 3px solid #007bff;
+    margin-top: 2px;
+}
+
+/* Ensure buttons in the table row are side-by-side */
+.action-form {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+/* Styling for the 'View' button to match the theme */
+.btn-approve {
+    background: #f0f7ff; /* Very light blue background */
+    color: #007bff;      /* Professional blue text */
+    padding: 8px 15px;
+    border: 1px solid #d0e7ff; /* Soft blue border */
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    margin: 0 5px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-approve i {
+    font-size: 14px;
+}
+
+/* Hover state: gets slightly darker to show interactivity */
+.btn-approve:hover {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+    opacity: 1; /* Override the 0.8 opacity if you have a global hover rule */
+}
+/* -- END -- /* Profile View Styling */
