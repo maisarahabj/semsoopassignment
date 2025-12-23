@@ -42,7 +42,7 @@ public class RegisterServlet extends HttpServlet {
             conn.setAutoCommit(false);
 
             // 2. Insert into users table
-            String userSql = "INSERT INTO users (username, password_hash, role, is_active) VALUES (?, ?, ?, 0)";
+            String userSql = "INSERT INTO users (username, password_hash, role, status) VALUES (?, ?, ?, 'PENDING')";
             PreparedStatement userSt = conn.prepareStatement(userSql, Statement.RETURN_GENERATED_KEYS);
             userSt.setString(1, user);
             userSt.setString(2, pass);
@@ -74,7 +74,7 @@ public class RegisterServlet extends HttpServlet {
             }
 
             conn.commit();
-            response.sendRedirect("../pending_approval.jsp?user=" + user);
+            response.sendRedirect(request.getContextPath() + "/login.jsp?registered=true");
 
         } catch (Exception e) {
             if (conn != null) try { conn.rollback(); } catch (SQLException ex) {}

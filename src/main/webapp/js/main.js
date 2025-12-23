@@ -1,9 +1,9 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
+/* * main.js - Barfact University SEMS
+ * Author: maisarahabjalil
  */
 
-// --------- START: STUDENT ID WHEN STUDENT IS SELECTED -------------
+// --------- 1. ROLE SELECTION LOGIC (Registration Page) -------------
+// This handles showing/hiding the Student ID field based on the dropdown
 window.onload = function() {
     const roleSelect = document.getElementById('role');
     const studentIdGroup = document.getElementById('studentIdGroup');
@@ -13,33 +13,56 @@ window.onload = function() {
             const val = roleSelect.value.toLowerCase();
             
             if (val === 'student') {
-                // Instead of .style.display, we toggle a class
+                // Toggles the class to show the input field
                 studentIdGroup.classList.add('show-group');
             } else {
                 studentIdGroup.classList.remove('show-group');
             }
         }
 
+        // Initial check on load
         toggleStudentId();
+        // Check every time the user changes the selection
         roleSelect.addEventListener('change', toggleStudentId);
     }
 };
 
-// --------- END: STUDENT ID WHEN STUDENT IS SELECTED -------------
-
+// --------- 2. PAGE LOAD LOGIC (Registration Success & Validation) -------------
 document.addEventListener("DOMContentLoaded", () => {
+    
+    // --- A. REGISTRATION SUCCESS POPUP ---
+    // Looks for ?registered=true in the URL (sent by RegisterServlet)
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.has('registered')) {
+        // Show the alert requested
+        alert("Submitted! Please await approval from admin.");
+        
+        // This line cleans the URL (removes ?registered=true) so the 
+        // popup doesn't appear again if the user refreshes the page manually.
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // --- B. FORM VALIDATION LOGIC ---
+    // Handles empty field checks for any form with the "login-form" class
     const form = document.querySelector(".login-form");
 
     if (form) {
         form.addEventListener("submit", (e) => {
             const inputs = form.querySelectorAll("input");
+            let isValid = true;
 
             for (let input of inputs) {
-                if (input.value.trim() === "") {
-                    alert("Please fill in all fields");
-                    e.preventDefault();
-                    return;
+                // We skip hidden inputs (like the studentId in modals)
+                if (input.type !== "hidden" && input.value.trim() === "") {
+                    isValid = false;
+                    break;
                 }
+            }
+
+            if (!isValid) {
+                alert("Please fill in all fields");
+                e.preventDefault(); // Stop the form from submitting
             }
         });
     }
