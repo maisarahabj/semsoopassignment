@@ -36,11 +36,18 @@ public class AdminManageStudentServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         if ("DELETE".equals(action)) {
-            int studentId = Integer.parseInt(request.getParameter("studentId"));
-            // Note: You may need to add a deleteStudent method to your StudentDAO
-            // studentDAO.deleteStudent(studentId);
+            String idStr = request.getParameter("studentId");
+            if (idStr != null && !idStr.isEmpty()) {
+                try {
+                    int id = Integer.parseInt(idStr);
+                    studentDAO.deleteStudent(id);
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
+        // This refreshes the page so the deleted student disappears from the table
         response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet");
     }
 }

@@ -176,6 +176,20 @@ public class StudentDAO {
         return list;
     }
 
+    // ADMIN DELETE STUDENT
+    public boolean deleteStudent(int studentId) {
+        String sql = "DELETE FROM students WHERE student_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, studentId);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // map SQL Result to Student Model
     private Student extractStudentFromResultSet(ResultSet rs) throws SQLException {
         Student student = new Student();
