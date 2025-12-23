@@ -7,3 +7,17 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     Author     : maisarahabjalil
 */
 
+@import url("admindash.css");
+@import url("admincourse.css"); /* Reusing the modal styles we just perfected */
+
+/* Specific Grid Layout for Student Table */
+.admin-table th:nth-child(1) { width: 8%; }  /* ID */
+.admin-table th:nth-child(2) { width: 25%; } /* Full Name */
+.admin-table th:nth-child(3) { width: 25%; } /* Email */
+.admin-table th:nth-child(4) { width: 15%; } /* Phone */
+.admin-table th:nth-child(5) { width: 10%; } /* GPA */
+.admin-table th:nth-child(6) { width: 17%; text-align: center; } /* Action */
+
+.main-content {
+    padding-bottom: 80px; /* Fixing the awkward cut-off at the bottom */
+}

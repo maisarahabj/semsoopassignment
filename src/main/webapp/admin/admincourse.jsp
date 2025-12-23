@@ -23,7 +23,7 @@
                 <nav class="nav-menu">
                     <a href="${pageContext.request.contextPath}/DashboardServlet" class="nav-link"><i class="fas fa-chart-line"></i> Overview</a>
                     <a href="${pageContext.request.contextPath}/CourseServlet?action=manage" class="nav-link active"><i class="fas fa-book-open"></i> Manage Courses</a>
-                    <a href="${pageContext.request.contextPath}/admin/adminstudent.jsp" class="nav-link"><i class="fas fa-user-graduate"></i> Manage Students</a>
+                    <a href="${pageContext.request.contextPath}/AdminManageStudentServlet" class="nav-link"><i class="fas fa-user-graduate"></i> Manage Students</a>
                     <a href="${pageContext.request.contextPath}/auth/AdminPendingServlet" class="nav-link"><i class="fas fa-clock"></i> Pending Approvals</a>
                 </nav>
             </aside>

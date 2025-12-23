@@ -39,7 +39,7 @@
                     <i class="fas fa-book-open"></i> Manage Courses
                 </a>
                 
-                <a href="${pageContext.request.contextPath}/admin/adminstudent.jsp" class="nav-link">
+                <a href="${pageContext.request.contextPath}/AdminManageStudentServlet" class="nav-link">
                     <i class="fas fa-user-graduate"></i> Manage Students
                 </a>
 
