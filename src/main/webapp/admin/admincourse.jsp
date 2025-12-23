@@ -52,7 +52,7 @@
                             <option value="Friday">Friday</option>
                         </select>
                         <input type="time" name="courseTime" required style="padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
-                        <button type="submit" class="btn-approve" style="background: #007bff; color: white; padding: 8px 15px;">Add Course</button>
+                        <button type="submit" class="btn-approve" style="background: #007bff; color: white; padding: 8px 15px; border-radius: 10px; ">Add Course</button>
                     </form>
                 </div>
 
