@@ -36,18 +36,24 @@ public class AdminManageStudentServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         if ("DELETE".equals(action)) {
-            String idStr = request.getParameter("studentId");
-            if (idStr != null && !idStr.isEmpty()) {
+            String studentIdStr = request.getParameter("studentId");
+            String userIdStr = request.getParameter("userId"); // Captured from the hidden input in JSP
+
+            if (studentIdStr != null && !studentIdStr.isEmpty() && userIdStr != null && !userIdStr.isEmpty()) {
                 try {
-                    int id = Integer.parseInt(idStr);
-                    studentDAO.deleteStudent(id);
+                    int sId = Integer.parseInt(studentIdStr);
+                    int uId = Integer.parseInt(userIdStr);
+
+                    // Call the double-delete method in your DAO
+                    studentDAO.deleteStudent(sId, uId);
+
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
             }
         }
 
-        // This refreshes the page so the deleted student disappears from the table
+        // Redirect refreshes the list so the UI stays in sync
         response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet");
     }
 }

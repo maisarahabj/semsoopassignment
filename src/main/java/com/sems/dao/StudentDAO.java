@@ -177,16 +177,43 @@ public class StudentDAO {
     }
 
     // ADMIN DELETE STUDENT
-    public boolean deleteStudent(int studentId) {
-        String sql = "DELETE FROM students WHERE student_id = ?";
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+    public boolean deleteStudent(int studentId, int userId) {
+        String deleteStudentSql = "DELETE FROM students WHERE student_id = ?";
+        String deleteUserSql = "DELETE FROM users WHERE user_id = ?";
 
-            ps.setInt(1, studentId);
-            return ps.executeUpdate() > 0;
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false); // Start transaction
 
+            // 1. Delete Student Profile
+            try (PreparedStatement ps1 = conn.prepareStatement(deleteStudentSql)) {
+                ps1.setInt(1, studentId);
+                ps1.executeUpdate();
+            }
+
+            // 2. Delete User Credentials
+            try (PreparedStatement ps2 = conn.prepareStatement(deleteUserSql)) {
+                ps2.setInt(1, userId);
+                ps2.executeUpdate();
+            }
+
+            conn.commit(); // Save both deletions
+            return true;
         } catch (SQLException e) {
+            if (conn != null) try {
+                conn.rollback();
+            } catch (SQLException ex) {
+            }
             e.printStackTrace();
             return false;
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+            }
         }
     }
 

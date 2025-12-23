@@ -83,14 +83,14 @@
                                         </button>
 
                                         <button type="button" class="btn-reject" 
-                                                onclick="showDeleteModal('<%= s.getStudentId()%>', '<%= s.getFirstName()%>', '<%= s.getLastName()%>')">
+                                                onclick="showDeleteModal('<%= s.getStudentId()%>', '<%= s.getUserId()%>', '<%= s.getFirstName()%>', '<%= s.getLastName()%>')">
                                             <i class="fas fa-user-minus"></i>
                                         </button>
                                     </div>
                                 </td>
                             </tr>
                             <% }
-                            }%>
+                                }%>
                         </tbody>
                     </table>
                 </div>
@@ -152,6 +152,8 @@
                     <form action="${pageContext.request.contextPath}/AdminManageStudentServlet" method="POST">
                         <input type="hidden" name="action" value="DELETE">
                         <input type="hidden" name="studentId" id="modalStudentId">
+                        <input type="hidden" name="userId" id="modalUserId"> 
+
                         <button type="submit" class="btn-confirm">Permanently Remove</button>
                     </form>
                 </div>
