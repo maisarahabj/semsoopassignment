@@ -67,26 +67,31 @@ public class CourseDAO {
     }
 
     public boolean createCourse(Course course) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        try {
-            conn = DatabaseConnection.getConnection();
-            pstmt = conn.prepareStatement(INSERT_COURSE);
-            pstmt.setString(1, course.getCourseCode());
-            pstmt.setString(2, course.getCourseName());
-            pstmt.setInt(3, course.getCredits());
-            pstmt.setInt(4, course.getCapacity());
-            pstmt.setInt(5, 0); 
-            pstmt.setString(6, course.getCourseDay());
-            pstmt.setString(7, course.getCourseTime());
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error creating course", e);
-        } finally {
-            DatabaseConnection.closeResources(null, pstmt, conn);
-        }
-        return false;
+    Connection conn = null;
+    PreparedStatement pstmt = null;
+    try {
+        conn = DatabaseConnection.getConnection();
+        pstmt = conn.prepareStatement(INSERT_COURSE);
+        
+        pstmt.setString(1, course.getCourseCode());
+        pstmt.setString(2, course.getCourseName());
+        
+        // Mapping the new integer fields
+        pstmt.setInt(3, course.getCredits());
+        pstmt.setInt(4, course.getCapacity());
+        
+        pstmt.setInt(5, 0); // New courses start with 0 enrolled
+        pstmt.setString(6, course.getCourseDay());
+        pstmt.setString(7, course.getCourseTime());
+        
+        return pstmt.executeUpdate() > 0;
+    } catch (SQLException e) {
+        LOGGER.log(Level.SEVERE, "Error creating course", e);
+    } finally {
+        DatabaseConnection.closeResources(null, pstmt, conn);
     }
+    return false;
+}
 
     public List<Course> getAllCourses() {
         List<Course> courses = new ArrayList<>();

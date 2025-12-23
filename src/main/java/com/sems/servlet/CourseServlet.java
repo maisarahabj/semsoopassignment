@@ -1,12 +1,21 @@
 /**
  *
  * @author maisarahabjalil
- * 
+ *
  * handles the display and management of the course data
  * addcourse jsp doGet to get list of courses
  * admincourse jsp doPost to add new course
- * 
+ *
  * student view: can ONLY VIEW the damn list
+ * admin view: can view, add, remove any course
+ */
+/**
+ *
+ * @author maisarahabjalil
+ * * handles the display and management of the course data
+ * addcourse jsp doGet to get list of courses
+ * admincourse jsp doPost to add new course
+ * * student view: can ONLY VIEW the damn list
  * admin view: can view, add, remove any course
  */
 package com.sems.servlet;
@@ -21,66 +30,79 @@ import java.util.List;
 
 @WebServlet("/CourseServlet")
 public class CourseServlet extends HttpServlet {
+
     private CourseDAO courseDAO = new CourseDAO();
-    
-    
-    @Override
-protected void doGet(HttpServletRequest request, HttpServletResponse response) 
-        throws ServletException, IOException {
-    
-    String action = request.getParameter("action");
-    
-    // --- ADMIN REMOVE COURSE ROW FOR ---
-    if ("delete".equals(action)) {
-        int courseId = Integer.parseInt(request.getParameter("courseId"));
-        
-        boolean isDeleted = courseDAO.deleteCourse(courseId);
-        
-        if (isDeleted) {
-            response.sendRedirect("CourseServlet?action=manage&status=deleted");
-        } else {
-            response.sendRedirect("CourseServlet?action=manage&status=error");
-        }
-        return;
-    }
-
-    // --- ADMIN n STU DISPLAY COURSES ---
-    List<Course> allCourses = courseDAO.getAllCourses();
-    request.setAttribute("courses", allCourses);
-
-    if ("manage".equals(action)) {
-        request.getRequestDispatcher("/admin/admincourse.jsp").forward(request, response);
-    } else {
-        request.getRequestDispatcher("/addcourse.jsp").forward(request, response);
-    }
-}
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
+        String action = request.getParameter("action");
+        HttpSession session = request.getSession(false);
+        String role = (session != null) ? (String) session.getAttribute("role") : "";
+
+        // --- ADMIN REMOVE COURSE ROW ---
+        if ("delete".equals(action)) {
+            int courseId = Integer.parseInt(request.getParameter("courseId"));
+            boolean isDeleted = courseDAO.deleteCourse(courseId);
+
+            // Redirect back to the manage view so the list refreshes
+            response.sendRedirect(request.getContextPath() + "/CourseServlet?action=manage&status=" + (isDeleted ? "deleted" : "error"));
+            return;
+        }
+
+        // --- FETCH DATA FOR BOTH VIEWS ---
+        List<Course> allCourses = courseDAO.getAllCourses();
+        request.setAttribute("courses", allCourses);
+        request.setAttribute("allCourses", allCourses);
+
+        // --- SMART ROUTING ---
+        // If action is 'manage' OR if the user is an admin, show the admin page
+        if ("manage".equals(action) || "admin".equalsIgnoreCase(role)) {
+            request.getRequestDispatcher("/admin/admincourse.jsp").forward(request, response);
+        } else {
+            request.getRequestDispatcher("/student/addcourse.jsp").forward(request, response);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         // ADMIN FEATURE: Adding a brand new course to the system
         String courseCode = request.getParameter("courseCode");
         String courseName = request.getParameter("courseName");
+
+        // Captured the new parameters
         int credits = Integer.parseInt(request.getParameter("credits"));
         int capacity = Integer.parseInt(request.getParameter("capacity"));
+
         String day = request.getParameter("courseDay");
         String time = request.getParameter("courseTime");
 
         Course newCourse = new Course();
         newCourse.setCourseCode(courseCode);
         newCourse.setCourseName(courseName);
+
+        // Set the new values into the object
         newCourse.setCredits(credits);
         newCourse.setCapacity(capacity);
+
         newCourse.setCourseDay(day);
-        newCourse.setCourseTime(time);
+
+        // Standardize time format for MySQL (HH:mm:ss)
+        if (time != null && time.length() == 5) {
+            newCourse.setCourseTime(time + ":00");
+        } else {
+            newCourse.setCourseTime(time);
+        }
 
         boolean success = courseDAO.createCourse(newCourse);
-        
+
         if (success) {
-            response.sendRedirect("CourseServlet?action=manage&msg=added");
+            response.sendRedirect(request.getContextPath() + "/CourseServlet?action=manage&msg=added");
         } else {
-            response.sendRedirect("CourseServlet?action=manage&msg=error");
+            response.sendRedirect(request.getContextPath() + "/CourseServlet?action=manage&msg=error");
         }
     }
 }
