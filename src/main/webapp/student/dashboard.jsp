@@ -45,7 +45,7 @@
                 <a href="${pageContext.request.contextPath}/student/addcourse.jsp" class="nav-link">
                     <i class="fas fa-plus-square"></i> Add Subjects
                 </a>
-                <a href="${pageContext.request.contextPath}/student/viewprofile.jsp" class="nav-link">
+                <a href="${pageContext.request.contextPath}/ProfileServlet" class="nav-link">
                     <i class="fas fa-user"></i> Profile
                 </a>
             </nav>
