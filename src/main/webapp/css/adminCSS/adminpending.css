@@ -6,3 +6,61 @@
     Approving pending new users
 */
 
+/* Table Styling for Admin Pages */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 15px;
+    background: #f8fbff;
+    color: #007bff;
+    font-size: 14px;
+    border-bottom: 2px solid #eef2f6;
+}
+
+.admin-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eef2f6;
+    font-size: 14px;
+    color: #444;
+}
+
+.role-badge {
+    background: #f0f7ff;
+    color: #007bff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* Action Buttons */
+.btn-approve, .btn-reject {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    margin: 0 5px;
+    transition: opacity 0.3s;
+}
+
+.btn-approve {
+    background: #e6fffa;
+    color: #38a169;
+}
+
+.btn-reject {
+    background: #fff5f5;
+    color: #e53e3e;
+}
+
+.btn-approve:hover, .btn-reject:hover {
+    opacity: 0.8;
+}

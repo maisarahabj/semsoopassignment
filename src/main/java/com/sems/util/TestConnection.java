@@ -1,8 +1,7 @@
 package com.sems.util;
 
-import com.sems.dao.*;
-import com.sems.model.*;
-import java.sql.*;
+import com.sems.dao.UserDAO;
+import com.sems.model.User;
 import java.util.List;
 import java.util.Scanner;
 
@@ -10,58 +9,44 @@ public class TestConnection {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        
         UserDAO userDAO = new UserDAO();
-        StudentDAO studentDAO = new StudentDAO();
-        CourseDAO courseDAO = new CourseDAO();
 
-        try {
-            System.out.println("=== SIMULATED LOGIN & DASHBOARD FLOW ===");
-            System.out.print("Username: ");
-            String username = sc.nextLine();
-            System.out.print("Password: ");
-            String pass = sc.nextLine();
+        System.out.println("=== SEMS ADMIN CONSOLE LOGIN ===");
+        System.out.print("Enter Admin Username: ");
+        String username = sc.nextLine();
+        System.out.print("Enter Admin Password: ");
+        String password = sc.nextLine();
 
-            // STEP 1: LOGIN (Simulating LoginServlet)
-            User user = userDAO.validateUser(username, pass);
+        // 1. Simulate LoginServlet Authentication
+        User adminUser = userDAO.validateUser(username, password);
 
-            if (user != null && "ACTIVE".equalsIgnoreCase(user.getStatus())) {
-                System.out.println("\n[STEP 1 SUCCESS] User Authenticated. Role: " + user.getRole());
+        if (adminUser != null && "admin".equalsIgnoreCase(adminUser.getRole())) {
+            System.out.println("\n[SUCCESS] Welcome, Admin: " + adminUser.getUsername());
+            System.out.println("Status: " + adminUser.getStatus());
+            
+            // 2. Simulate AdminPendingServlet Data Loading
+            System.out.println("\n--- Fetching Registration Queue (Pending Users) ---");
+            List<User> pendingList = userDAO.getPendingUsers();
 
-                if ("student".equalsIgnoreCase(user.getRole())) {
-                    
-                    // STEP 2: RESOLVE STUDENT ID (Simulating LoginServlet Logic)
-                    int studentId = studentDAO.getStudentIdByUserId(user.getUserId());
-                    
-                    if (studentId != -1) {
-                        System.out.println("[STEP 2 SUCCESS] Student Profile Found. ID: " + studentId);
-
-                        // STEP 3: LOAD DATA (Simulating DashboardServlet Logic)
-                        System.out.println("\n--- LOADING DASHBOARD DATA ---");
-                        Student profile = studentDAO.getStudentByUserId(user.getUserId());
-                        List<Course> enrolled = courseDAO.getCoursesByStudentId(studentId);
-
-                        System.out.println("Welcome, " + profile.getFirstName() + " " + profile.getLastName());
-                        System.out.println("Enrolled Courses count: " + enrolled.size());
-                        
-                        // Displaying the Grid Data
-                        System.out.println("\nYour Weekly Schedule Data:");
-                        for (Course c : enrolled) {
-                            System.out.println(" > " + c.getCourseDay() + " at " + c.getCourseTime() + " : " + c.getCourseName());
-                        }
-
-                        System.out.println("\n[FINAL VERDICT] The Dashboard data is ready to be sent to JSP!");
-
-                    } else {
-                        System.out.println("[REDIRECT] No profile found. Redirecting to Profile Creation...");
-                    }
-                }
+            if (pendingList.isEmpty()) {
+                System.out.println("Queue is empty. No pending registrations found.");
             } else {
-                System.out.println("[FAILED] Invalid credentials or account NOT ACTIVE.");
+                System.out.println("Found " + pendingList.size() + " users waiting for approval:");
+                System.out.println("--------------------------------------------------");
+                System.out.printf("%-10s | %-15s | %-10s%n", "User ID", "Username", "Role");
+                System.out.println("--------------------------------------------------");
+                
+                for (User u : pendingList) {
+                    System.out.printf("%-10d | %-15s | %-10s%n", 
+                        u.getUserId(), u.getUsername(), u.getRole());
+                }
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else if (adminUser != null) {
+            System.out.println("[DENIED] User authenticated but is NOT an admin. Current role: " + adminUser.getRole());
+        } else {
+            System.out.println("[FAILED] Invalid admin credentials.");
         }
+        
+        sc.close();
     }
 }

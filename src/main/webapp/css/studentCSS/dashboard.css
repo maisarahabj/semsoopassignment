@@ -3,35 +3,100 @@
     Author     : maisarahabjalil
 */
 
-/* General Layout Structure */
+/* Layout Components */
 .dashboard-wrapper {
     display: flex;
-    min-height: 100vh;
+    height: 100vh; 
+    overflow: hidden; 
     background: linear-gradient(135deg, #f0f2f5 0%, #e6f7ff 25%, #fff0f6 50%, #f6ffed 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0
 }
 
 .sidebar {
     width: 260px;
+    height: 92vh; 
     background: white;
     padding: 30px 20px;
     display: flex;
     flex-direction: column;
     border-right: 1px solid #eef2f6;
+    flex-shrink: 0; 
+    overflow-y: hidden;
 }
 
 .main-content {
     flex: 1;
     padding: 40px;
-    overflow-y: auto;
+    height: 100vh;
+    overflow-y: overlay;
 }
 
 .right-panel {
     width: 300px;
+    height: 100vh;
     background: white;
     padding: 40px 25px;
     border-left: 1px solid #eef2f6;
     text-align: center;
+    box-sizing: border-box;
+}
+
+/* Sidebar Specifics */
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 40px;
+}
+
+.logo-box {
+    width: 35px;
+    height: 35px;
+    background: #007bff;
+    border-radius: 8px;
+}
+
+.logo-text {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #666;
+    transition: color 0.3s;
+}
+
+.nav-link.active {
+    color: #007bff;
+    font-weight: bold;
+}
+
+.cgpa-container {
+    margin-top: auto;
+    background: #f0f7ff;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.cgpa-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.cgpa-label {
+    font-size: 12px;
+    color: #888;
+    margin: 0;
 }
 
 /* Welcome Banner */
@@ -45,7 +110,26 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.02);
 }
 
-/* Timetable Grid System */
+.highlight-blue {
+    color: #007bff;
+}
+
+.banner-icon {
+    width: 150px;
+    height: 100px;
+    background: #e7f3ff;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner-icon i {
+    font-size: 40px;
+    color: #007bff;
+}
+
+/* Timetable Grid */
 .schedule-container {
     background: white;
     border-radius: 25px;
@@ -56,9 +140,7 @@
 
 .timetable-grid {
     display: grid;
-    /* Column 1: Time (100px), Columns 2-6: Weekdays (Equal Fr) */
     grid-template-columns: 100px repeat(5, 1fr); 
-    /* Row 1: Header (50px), Rows 2-12: Hourly slots (80px height) */
     grid-template-rows: 50px repeat(11, 80px); 
     border: 1px solid #eef2f6;
     border-radius: 12px;
@@ -90,10 +172,7 @@
     border-bottom: 1px solid #eef2f6;
 }
 
-/* Individual Class Card in Grid */
 .course-entry {
-    background: #e7f3ff;
-    border-left: 4px solid #007bff;
     border-radius: 8px;
     margin: 5px;
     padding: 10px;
@@ -105,29 +184,76 @@
     z-index: 2;
 }
 
-.course-entry strong {
-    color: #333;
-    font-size: 12px;
-    margin-bottom: 3px;
+.course-time-meta {
+    margin-top: 5px;
+    font-size: 10px;
+    opacity: 0.7;
 }
 
-/* Colors for variety */
-.bg-java { background: #e7f3ff; border-left-color: #007bff; }
-.bg-math { background: #fff0f6; border-left-color: #d6336c; }
-.bg-db { background: #f3f0ff; border-left-color: #7048e8; }
+/* Right Panel Elements */
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background: #eee;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-avatar i {
+    font-size: 30px;
+    color: #ccc;
+}
+
+.profile-name {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.profile-id {
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.term-info-card {
+    background: #f8faff;
+    padding: 20px;
+    border-radius: 20px;
+    margin-top: 30px;
+    text-align: left;
+}
+
+.term-info-card h4 {
+    margin-bottom: 10px;
+}
+
+.term-info-card p {
+    font-size: 12px;
+    color: #666;
+    margin: 5px 0;
+}
 
 .btn-logout {
+    display: block;
     width: 100%;
     padding: 12px;
-    border: none;
     border-radius: 10px;
     background: linear-gradient(to right, #1890ff, #eb2f96);
     color: white;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    margin-top: 10px;
-    transition: opacity 0.3s;
+    margin-top: 30px;
+    text-align: center;
     text-decoration: none;
+    transition: opacity 0.3s;
 }
 
+.btn-logout:hover {
+    opacity: 0.9;
+}
+
+.bg-java { background: #e7f3ff; border-left: 4px solid #007bff; }

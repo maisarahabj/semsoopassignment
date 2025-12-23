@@ -2,7 +2,6 @@
  *
  * @author maisarahabjalil
  */
-
 package com.sems.servlet.auth;
 
 import java.io.IOException;
@@ -19,24 +18,16 @@ public class LogoutServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        //Get current session without creating a new one
+
         HttpSession session = request.getSession(false);
-        
+
         if (session != null) {
-            //See who is logging out in the GlassFish logs
             System.out.println("DEBUG: Logging out user: " + session.getAttribute("username"));
-            
-            //Specifically remove the attribute you set in LoginServlet
-            session.removeAttribute("username");
-            
-            //Destroy the session
-            session.invalidate();
+            session.invalidate(); // This clears all attributes (username, userId, role)
         }
 
-        // Redirect to login page
-        // Since we haven't built the UI yet, this will 404 for now, 
-        response.sendRedirect("../login.jsp");
+        // Use ContextPath to ensure it redirects to the root login.jsp
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
     }
 
     @Override

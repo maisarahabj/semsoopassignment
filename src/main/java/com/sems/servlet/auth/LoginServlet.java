@@ -49,7 +49,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("role", user.getRole());
 
             if ("admin".equalsIgnoreCase(user.getRole())) {
-                response.sendRedirect(request.getContextPath() + "/AdminDashboardServlet"); 
+                response.sendRedirect(request.getContextPath() + "/DashboardServlet"); 
                 
             } else if ("student".equalsIgnoreCase(user.getRole())) {
                 StudentDAO studentDAO = new StudentDAO();
