@@ -7,3 +7,205 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     Author     : maisarahabjalil
 */
 
+@import url("admindash.css");
+
+.dashboard-wrapper {
+    display: -webkit-box;      /* Old WebKit */
+    display: -webkit-flex;     /* New WebKit */
+    display: flex;
+    height: 100vh;
+}
+
+/* Black Overlay */
+.modal-overlay {
+    display: none; 
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+/*.modal-box {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    animation: slideUp 0.3s ease;
+}*/
+
+/* ----- START: MODAL BOX (confirmation delete) ----- */
+
+
+
+/* 1. The Overlay (Background Dimmer) */
+.modal-overlay {
+    display: none; /* Controlled by JS */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Dimmed background */
+    backdrop-filter: blur(4px);    /* Soft blur for focus */
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+/* 2. The Modal Box Container */
+.modal-box {
+    background: white;
+    padding: 40px;
+    border-radius: 20px; /* Matching your card style */
+    width: 450px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    animation: modalSlideUp 0.3s ease-out;
+}
+
+/* 3. Modal Text & Icon Elements */
+.modal-icon {
+    font-size: 48px;
+    color: #e53e3e; /* Matching your reject button color */
+    margin-bottom: 20px;
+}
+
+.modal-box h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 22px;
+}
+
+#deleteMessage {
+    color: #666;
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
+
+#deleteMessage strong {
+    color: #e53e3e; /* Highlight the course code/name in red */
+}
+
+/* 4. Action Buttons (Direct Matches to your Buttons) */
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+/* Cancel Button (Soft Gray) */
+.btn-cancel {
+    background: #f1f3f5;
+    color: #495057;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px; /* Matches your theme */
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #e9ecef;
+}
+
+/* Confirm Button (Matching .btn-reject) */
+.btn-confirm {
+    background: #fff5f5; /* Matching your Reject button */
+    color: #e53e3e;      /* Matching your Reject text */
+    padding: 10px 25px;
+    border: 1px solid #fed7d7; /* Soft border for depth */
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: opacity 0.3s;
+}
+
+.btn-confirm:hover {
+    opacity: 0.8;
+}
+
+/* 5. Animation */
+@keyframes modalSlideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ----- END: MODAL BOX (confirmation delete) ----- */
+
+/* Grid Alignment Fixes */
+
+.admin-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0 8px; /* Room between rows */
+}
+
+.admin-table th {
+    padding: 12px 15px;
+    color: #007bff;
+    background: #f8fbff;
+    font-size: 13px;
+    text-align: left;
+}
+
+.admin-table td {
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #eef2f6;
+    border-bottom: 1px solid #eef2f6;
+}
+
+/* Specific widths for the 7 columns */
+.admin-table th:nth-child(1), .admin-table td:nth-child(1) { width: 10%; } /* Code */
+.admin-table th:nth-child(2), .admin-table td:nth-child(2) { width: 30%; } /* Name */
+.admin-table th:nth-child(3), .admin-table td:nth-child(3) { width: 8%; }  /* Credits */
+.admin-table th:nth-child(4), .admin-table td:nth-child(4) { width: 10%; } /* Capacity */
+.admin-table th:nth-child(5), .admin-table td:nth-child(5) { width: 12%; } /* Day */
+.admin-table th:nth-child(6), .admin-table td:nth-child(6) { width: 12%; } /* Time */
+.admin-table th:nth-child(7), .admin-table td:nth-child(7) { width: 18%; text-align: center; } /* Action */
+
+.schedule-container {
+    background: white;
+    padding: 30px; /* Standardize padding on all sides */
+    border-radius: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    overflow: hidden; /* Keeps the table rounded edges clean */
+}
+
+.btn-reject {
+    background: #fff5f5;
+    color: #e53e3e;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    margin: 0 5px;
+    transition: opacity 0.3s;
+}
+
+.btn-approve:hover, .btn-reject:hover {
+    opacity: 0.8;
+}
+
