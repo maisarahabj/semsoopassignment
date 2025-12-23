@@ -43,7 +43,7 @@
                     <i class="fas fa-user-graduate"></i> Manage Students
                 </a>
 
-                <a href="${pageContext.request.contextPath}/admin/adminpending.jsp" class="nav-link">
+                <a href="${pageContext.request.contextPath}/auth/AdminPendingServlet" class="nav-link">
                     <i class="fas fa-clock"></i> Pending Approvals
                 </a>
             </nav>

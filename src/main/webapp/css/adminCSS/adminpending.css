@@ -64,3 +64,48 @@
 .btn-approve:hover, .btn-reject:hover {
     opacity: 0.8;
 }
+
+.table-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.badge-count {
+    background: #f0f7ff;
+    color: #007bff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* start* /
+
+/* Fix for the misaligned table headers and cells */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    table-layout: fixed; /* Forces columns to stay in their assigned widths */
+}
+
+.admin-table th, 
+.admin-table td {
+    padding: 15px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid #eef2f6;
+}
+
+/* Assign specific widths to each column so they don't jump around */
+.admin-table th:nth-child(1), .admin-table td:nth-child(1) { width: 15%; } /* User ID */
+.admin-table th:nth-child(2), .admin-table td:nth-child(2) { width: 30%; } /* Username */
+.admin-table th:nth-child(3), .admin-table td:nth-child(3) { width: 25%; } /* Role */
+.admin-table th:nth-child(4), .admin-table td:nth-child(4) { width: 30%; text-align: center; } /* Actions */
+
+.action-form {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}

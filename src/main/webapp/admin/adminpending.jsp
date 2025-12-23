@@ -6,15 +6,16 @@
     approving pending neww users
 --%>
 
-<%@page import="com.sems.model.User"%>
+<%@page import="java.util.Map"%>
 <%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Barfact University | Pending Approvals</title>
+    <title>Barfact University | Registration Queue</title>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/admindash.css">
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/adminpending.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -52,7 +53,7 @@
             <div class="welcome-banner">
                 <div class="banner-text">
                     <h1>Registration <span class="highlight-blue">Queue</span></h1>
-                    <p>Approve or reject new account requests to grant system access.</p>
+                    <p>Process pending account requests to grant system access.</p>
                 </div>
                 <div class="banner-icon">
                      <i class="fas fa-user-clock"></i>
@@ -60,29 +61,31 @@
             </div>
 
             <div class="schedule-container">
-                <h3 style="margin-bottom: 20px;">Waiting for Approval</h3>
+                <div class="table-header-flex">
+                    <h3 style="margin-bottom: 20px;">Waiting for Approval</h3>
+                    <span class="badge-count"><%= (request.getAttribute("pendingUsers") != null) ? ((List)request.getAttribute("pendingUsers")).size() : 0 %> Requests</span>
+                </div>
+                
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>User ID</th>
-                            <th>Username</th>
-                            <th>Requested Role</th>
+                            <th>ID</th> <th>Username</th>
+                            <th>Role</th>
                             <th style="text-align: center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <%
-                            List<User> users = (List<User>) request.getAttribute("pendingUsers");
+                            List<Map<String, Object>> users = (List<Map<String, Object>>) request.getAttribute("pendingUsers");
                             if (users != null && !users.isEmpty()) {
-                                for (User u : users) {
+                                for (Map<String, Object> u : users) {
                         %>
                         <tr>
-                            <td>#<%= u.getUserId() %></td>
-                            <td><strong><%= u.getUsername() %></strong></td>
-                            <td><span class="role-badge"><%= u.getRole() %></span></td>
+                            <td>#<%= u.get("studentId") %></td> <td><div class="user-info-cell"><strong><%= u.get("username") %></strong></div></td>
+                            <td><span class="role-badge"><%= u.get("role") %></span></td>
                             <td style="text-align: center;">
-                                <form action="${pageContext.request.contextPath}/auth/AdminPendingServlet" method="POST" style="display:inline;">
-                                    <input type="hidden" name="userId" value="<%= u.getUserId() %>">
+                                <form action="${pageContext.request.contextPath}/auth/AdminPendingServlet" method="POST" class="action-form">
+                                    <input type="hidden" name="userId" value="<%= u.get("userId") %>">
                                     <button name="action" value="APPROVE" class="btn-approve">
                                         <i class="fas fa-check"></i> Approve
                                     </button>
@@ -97,9 +100,9 @@
                             } else {
                         %>
                         <tr>
-                            <td colspan="4" style="text-align:center; padding: 40px; color: #888;">
-                                <i class="fas fa-check-circle" style="font-size: 24px; display: block; margin-bottom: 10px;"></i>
-                                All clear! No pending registrations.
+                            <td colspan="4" class="empty-state">
+                                <i class="fas fa-check-circle"></i>
+                                <p>All clear! No pending registrations.</p>
                             </td>
                         </tr>
                         <% } %>
@@ -109,17 +112,13 @@
         </main>
 
         <aside class="right-panel">
-            <div class="profile-avatar">
-                <i class="fas fa-user-tie"></i>
-            </div>
+            <div class="profile-avatar"><i class="fas fa-user-tie"></i></div>
             <h2 class="profile-name">Administrator</h2>
             <p class="profile-id">Session: <%= adminName %></p>
-            
             <div class="term-info-card">
-                <h4><i class="fas fa-shield-alt"></i> Security Note</h4>
-                <p>Users cannot log in until their status is changed to ACTIVE.</p>
+                <h4><i class="fas fa-shield-alt"></i> Security</h4>
+                <p>Pending users are blocked from logging in until approved.</p>
             </div>
-
             <a href="${pageContext.request.contextPath}/auth/LogoutServlet" class="btn-logout">
                 <i class="fas fa-sign-out-alt"></i> Log Out
             </a>
