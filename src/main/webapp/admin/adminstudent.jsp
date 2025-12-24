@@ -141,9 +141,7 @@
         <div id="profileOverlay" class="modal-overlay">
             <div class="modal-box" style="width: 600px; max-height: 95vh; display: flex; flex-direction: column; position: relative; overflow: hidden; padding: 0;"> 
                 
-                <div class="modal-header-actions" style="position: absolute; top: 20px; left: 20px; z-index: 10;">
-                    <button type="button" onclick="closeProfileModal()" style="background: #fff5f5; color: #e53e3e; border: 1px solid #feb2b2; width: 35px; height: 35px; border-radius: 8px; cursor: pointer;"><i class="fas fa-times"></i></button>
-                </div>
+               
                 <div class="modal-header-actions" style="position: absolute; top: 20px; right: 20px; z-index: 10;">
                     <button type="button" onclick="toggleAdminEdit()" style="background: #e6fffa; color: #38a169; border: 1px solid #b2f5ea; width: 35px; height: 35px; border-radius: 8px; cursor: pointer;"><i class="fas fa-pencil-alt"></i></button>
                 </div>
