@@ -175,7 +175,8 @@
             <div class="modal-box" style="width: 600px;">
                 <div class="modal-icon" style="color: #007bff;"><i class="fas fa-id-card"></i></div>
                 <h3 id="viewFullName">Student Profile</h3>
-                <p id="viewStudentId" style="color: #007bff; font-weight: bold; margin-bottom: 20px;">#ID</p>
+                <p id="viewStudentId" style="color: #007bff; font-weight: bold; margin-bottom: 5px;">#ID</p>
+                <p id="viewRegisteredOn" style="color: #38a169; font-size: 0.85rem; font-weight: 600; margin-top: 2px; margin-bottom: 25px;">Registered on: N/A</p>
 
                 <div class="modal-form-grid">
                     <div class="input-group">
