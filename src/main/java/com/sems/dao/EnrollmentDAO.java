@@ -123,16 +123,17 @@ public class EnrollmentDAO {
     }
 
     /**
-     * Fetches the actual Course objects for a specific student. Useful for
-     * displaying the course list on the dashboard.
+     * fetches the actual Course objects for a specific student
+     * used for both admin/student view
      */
     public List<com.sems.model.Course> getEnrolledCourseDetails(int studentId) {
         List<com.sems.model.Course> courses = new ArrayList<>();
-        // 1. SQL Query (Make sure all columns you want to display are listed here)
-        String sql = "SELECT c.course_id, c.course_code, c.course_name, c.course_day, c.course_time "
+
+        // 1. Added c.credits to the SELECT statement
+        String sql = "SELECT c.course_id, c.course_code, c.course_name, c.credits, c.course_day, c.course_time "
                 + "FROM courses c "
                 + "JOIN enrollments e ON c.course_id = e.course_id "
-                + "WHERE e.student_id = ? AND e.status = 'enrolled'";
+                + "WHERE e.student_id = ? AND (e.status = 'Enrolled' OR e.status = 'enrolled')";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -146,12 +147,13 @@ public class EnrollmentDAO {
 
             while (rs.next()) {
                 com.sems.model.Course course = new com.sems.model.Course();
-                // 2. Mapping ResultSet to the Course Object
                 course.setCourseId(rs.getInt("course_id"));
                 course.setCourseCode(rs.getString("course_code"));
                 course.setCourseName(rs.getString("course_name"));
 
-                // CRITICAL: These two lines fix the "TBA" issue!
+                // 2. Added this line so credits show up in your table!
+                course.setCredits(rs.getInt("credits"));
+
                 course.setCourseDay(rs.getString("course_day"));
                 course.setCourseTime(rs.getString("course_time"));
 

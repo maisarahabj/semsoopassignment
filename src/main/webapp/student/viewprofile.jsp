@@ -37,7 +37,7 @@
                     <a href="${pageContext.request.contextPath}/DashboardServlet" class="nav-link">
                         <i class="fas fa-home"></i> Dashboard
                     </a>
-                    <a href="${pageContext.request.contextPath}/student/mycourse.jsp" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/student/MyCourseServlet" class="nav-link">
                         <i class="fas fa-book"></i> My Classes
                     </a>
                     <a href="${pageContext.request.contextPath}/student/addcourse.jsp" class="nav-link">
