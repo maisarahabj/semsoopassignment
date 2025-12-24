@@ -38,10 +38,10 @@
 
                 <%-- Status Message --%>
                 <% if ("success".equals(request.getParameter("status"))) { %>
-                    <div style="background: #c6f6d5; color: #22543d; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #9ae6b4;">
-                        <i class="fas fa-check-circle"></i> Update successful!
-                    </div>
-                <% } %>
+                <div style="background: #c6f6d5; color: #22543d; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #9ae6b4;">
+                    <i class="fas fa-check-circle"></i> Update successful!
+                </div>
+                <% }%>
 
                 <div class="schedule-container">
                     <div class="table-header-flex">
@@ -50,6 +50,10 @@
                             <span class="badge-count">
                                 <%= (request.getAttribute("studentList") != null) ? ((List) request.getAttribute("studentList")).size() : 0%> Students
                             </span>
+                            <div class="search-box-container">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="studentSearch" placeholder="Search by name, ID or email..." onkeyup="filterStudents()">
+                            </div>
                         </div>
 
                         <button type="button" class="btn-add-manual" onclick="openAddModal()">
@@ -89,7 +93,8 @@
                                     </div>
                                 </td>
                             </tr>
-                            <% } } %>
+                            <% }
+                                } %>
                         </tbody>
                     </table>
                 </div>
@@ -140,8 +145,8 @@
 
         <div id="profileOverlay" class="modal-overlay">
             <div class="modal-box" style="width: 600px; max-height: 95vh; display: flex; flex-direction: column; position: relative; overflow: hidden; padding: 0;"> 
-                
-               
+
+
                 <div class="modal-header-actions" style="position: absolute; top: 20px; right: 20px; z-index: 10;">
                     <button type="button" onclick="toggleAdminEdit()" style="background: #e6fffa; color: #38a169; border: 1px solid #b2f5ea; width: 35px; height: 35px; border-radius: 8px; cursor: pointer;"><i class="fas fa-pencil-alt"></i></button>
                 </div>
@@ -190,7 +195,8 @@
                                             for (com.sems.model.Course c : allCourses) {
                                     %>
                                     <option value="<%= c.getCourseId()%>"><%= c.getCourseCode()%> - <%= c.getCourseName()%></option>
-                                    <% } } %>
+                                    <% }
+                                        }%>
                                 </select>
                                 <button type="button" class="btn-enroll-mini" onclick="enrollStudentAction()">Add</button>
                             </div>

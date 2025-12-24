@@ -250,3 +250,22 @@ function showToast(message) {
         toast.classList.remove('show');
     }, 3000);
 }
+
+/**
+ * Filter student directory table based on search input
+ */
+function filterStudents() {
+    const input = document.getElementById('studentSearch').value.toLowerCase();
+    const tableRows = document.querySelectorAll('.admin-table tbody tr');
+
+    tableRows.forEach(row => {
+        // We get the text content of the whole row (ID, Name, Email, etc.)
+        const rowText = row.textContent.toLowerCase();
+        
+        if (rowText.includes(input)) {
+            row.style.display = ""; // Show row
+        } else {
+            row.style.display = "none"; // Hide row
+        }
+    });
+}

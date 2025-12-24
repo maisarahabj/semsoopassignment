@@ -431,3 +431,36 @@ body.modal-open {
 .hidden {
     display: none !important;
 }
+
+/* Search bar styling for Admin Student Directory */
+.search-box-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.search-box-container i {
+    position: absolute;
+    left: 15px;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.search-box-container input {
+    padding: 8px 15px 8px 40px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    width: 250px;
+    font-size: 0.85rem;
+    outline: none;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+}
+
+.search-box-container input:focus {
+    border-color: #6366f1;
+    width: 320px;
+    background: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
