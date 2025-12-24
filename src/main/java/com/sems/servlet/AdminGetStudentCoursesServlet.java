@@ -28,18 +28,32 @@ public class AdminGetStudentCoursesServlet extends HttpServlet {
         StringBuilder json = new StringBuilder("[");
         for (int i = 0; i < courses.size(); i++) {
             Course c = courses.get(i);
-            // Simplified formatting to ensure it's a clean JSON string
-            json.append(String.format("{\"id\":%d, \"code\":\"%s\", \"name\":\"%s\", \"day\":\"%s\", \"time\":\"%s\"}",
+
+            // 1. Get safe strings for Day and Time
+            String day = (c.getCourseDay() != null) ? c.getCourseDay() : "TBA";
+            String rawTime = (c.getCourseTime() != null) ? c.getCourseTime().toString() : "";
+
+            // 2. Format time (HH:mm) if it exists, otherwise use TBA
+            String formattedTime = "";
+            if (!rawTime.isEmpty() && rawTime.length() >= 5) {
+                formattedTime = rawTime.substring(0, 5);
+            } else {
+                formattedTime = "TBA";
+            }
+
+            // 3. Build the JSON object
+            json.append(String.format(
+                    "{\"id\":%d, \"code\":\"%s\", \"name\":\"%s\", \"day\":\"%s\", \"time\":\"%s\"}",
                     c.getCourseId(),
                     c.getCourseCode(),
                     c.getCourseName(),
-                    c.getCourseDay(),
-                    (c.getCourseTime() != null && c.getCourseTime().length() > 5 ? c.getCourseTime().substring(0, 5) : c.getCourseTime())
+                    day,
+                    formattedTime
             ));
+
             if (i < courses.size() - 1) {
                 json.append(",");
             }
-
         }
         json.append("]");
         response.getWriter().print(json.toString());

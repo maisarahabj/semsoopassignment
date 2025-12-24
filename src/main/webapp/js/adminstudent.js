@@ -38,8 +38,8 @@ function showDeleteModal(studentId, userId, firstName, lastName) {
     document.getElementById('modalUserId').value = userId;
 
     // Update the confirmation text
-    document.getElementById('removeMessage').innerHTML = 
-        `Are you sure you want to permanently remove <strong>${firstName} ${lastName}</strong> and their login account?`;
+    document.getElementById('removeMessage').innerHTML =
+            `Are you sure you want to permanently remove <strong>${firstName} ${lastName}</strong> and their login account?`;
 
     document.getElementById('deleteOverlay').style.display = 'flex';
 }
@@ -54,9 +54,10 @@ function showProfileModal(id, fName, lName, email, phone, address, dob, gpa) {
 
     // Populate Basic Info
     document.getElementById('viewFullName').innerText = fName + " " + lName;
-    
+
     const idElement = document.getElementById('viewStudentIdDisplay') || document.getElementById('viewStudentId');
-    if (idElement) idElement.innerText = "Student ID: #" + id;
+    if (idElement)
+        idElement.innerText = "Student ID: #" + id;
 
     document.getElementById('viewEmail').innerText = email;
     document.getElementById('viewPhone').innerText = (phone && phone !== "null") ? phone : "Not Provided";
@@ -78,34 +79,45 @@ function loadEnrolledCourses(studentId) {
     tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>';
 
     fetch(`${window.contextPath}/AdminGetStudentCoursesServlet?studentId=${studentId}`)
-        .then(response => response.json())
-        .then(data => {
-            tbody.innerHTML = '';
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No courses found.</td></tr>';
-            } else {
-                data.forEach(c => {
-                    // Logic to prevent "null null" display
-                    const scheduleDisplay = (c.day && c.time && c.day !== 'null') ? `${c.day} ${c.time}` : "TBA";
-                    
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><span class="modal-code-badge">${c.code}</span></td>
-                            <td><strong>${c.name}</strong></td>
-                            <td style="color: #64748b;">${scheduleDisplay}</td>
-                            <td style="text-align: right;">
-                                <button type="button" class="btn-drop-mini" onclick="dropCourseAction(${c.id})">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </td>
-                        </tr>`;
-                });
-            }
-        })
-        .catch(err => {
-            console.error("Fetch error:", err);
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Error loading courses.</td></tr>';
-        });
+            .then(response => response.json())
+            .then(data => {
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No courses found.</td></tr>';
+                } else {
+                    data.forEach(c => {
+                        // Improved logic: only show TBA if both day and time are missing/null
+                        let scheduleDisplay = "TBA";
+
+                        const dayValid = c.day && c.day !== 'null' && c.day !== 'undefined';
+                        const timeValid = c.time && c.time !== 'null' && c.time !== 'undefined';
+
+                        if (dayValid && timeValid) {
+                            scheduleDisplay = `${c.day} ${c.time}`;
+                        } else if (dayValid) {
+                            scheduleDisplay = c.day;
+                        } else if (timeValid) {
+                            scheduleDisplay = c.time;
+                        }
+
+                        tbody.innerHTML += `
+        <tr>
+            <td><span class="modal-code-badge">${c.code}</span></td>
+            <td><strong>${c.name}</strong></td>
+            <td style="color: #64748b;">${scheduleDisplay}</td>
+            <td style="text-align: right;">
+                <button type="button" class="btn-drop-mini" onclick="dropCourseAction(${c.id})">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
+        </tr>`;
+                    });
+                }
+            })
+            .catch(err => {
+                console.error("Fetch error:", err);
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Error loading courses.</td></tr>';
+            });
 }
 
 /**
@@ -128,15 +140,15 @@ function enrollStudentAction() {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: params
     })
-    .then(res => res.text())
-    .then(res => {
-        if (res.trim() === "success") {
-            loadEnrolledCourses(currentViewedStudentId); // Refresh table
-            document.getElementById('enrollCourseSelect').value = ""; // Reset dropdown
-        } else {
-            alert("Failed to enroll. Check if course is full or student is already enrolled.");
-        }
-    });
+            .then(res => res.text())
+            .then(res => {
+                if (res.trim() === "success") {
+                    loadEnrolledCourses(currentViewedStudentId); // Refresh table
+                    document.getElementById('enrollCourseSelect').value = ""; // Reset dropdown
+                } else {
+                    alert("Failed to enroll. Check if course is full or student is already enrolled.");
+                }
+            });
 }
 
 /**
@@ -144,7 +156,7 @@ function enrollStudentAction() {
  */
 function dropCourseAction(courseId) {
     pendingDropCourseId = courseId;
-    
+
     const overlay = document.getElementById('unenrollConfirmOverlay');
     if (overlay) {
         overlay.style.display = 'flex';
@@ -153,7 +165,7 @@ function dropCourseAction(courseId) {
     // Link the "Yes" button in the overlay to the execution function
     const confirmBtn = document.getElementById('confirmUnenrollBtn');
     if (confirmBtn) {
-        confirmBtn.onclick = function() {
+        confirmBtn.onclick = function () {
             executeUnenroll();
         };
     }
@@ -173,15 +185,15 @@ function executeUnenroll() {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: params
     })
-    .then(res => res.text())
-    .then(res => {
-        if (res.trim() === "success") {
-            loadEnrolledCourses(currentViewedStudentId); // Refresh table
-            closeUnenrollModal(); // Hide overlay
-        } else {
-            alert("Error: Could not drop the course.");
-        }
-    });
+            .then(res => res.text())
+            .then(res => {
+                if (res.trim() === "success") {
+                    loadEnrolledCourses(currentViewedStudentId); // Refresh table
+                    closeUnenrollModal(); // Hide overlay
+                } else {
+                    alert("Error: Could not drop the course.");
+                }
+            });
 }
 
 // --- Global Click Listener (Closes modals when clicking outside the box) ---
@@ -197,7 +209,8 @@ window.onclick = function (event) {
         if (event.target == overlay) {
             overlay.style.display = 'none';
             // Specific cleanup if unenroll modal is closed
-            if (overlay.id === 'unenrollConfirmOverlay') pendingDropCourseId = null;
+            if (overlay.id === 'unenrollConfirmOverlay')
+                pendingDropCourseId = null;
         }
     });
 };
