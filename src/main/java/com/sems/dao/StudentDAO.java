@@ -34,7 +34,7 @@ public class StudentDAO {
     private static final String SELECT_APPROVED_STUDENTS
             = "SELECT s.*, u.created_at FROM students s "
             + "JOIN users u ON s.user_id = u.user_id "
-            + "WHERE u.status = 'ACTIVE' "
+            + "WHERE u.status = 'ACTIVE' AND u.role = 'student' "
             + "ORDER BY s.last_name, s.first_name";
 
     // to get created_at time stamp - showing when registered
