@@ -98,13 +98,11 @@ public class StudentDAO {
     }
 
     //updating existing student
+    // Inside StudentDAO.java
     public boolean updateStudent(Student student) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
+        String sql = "UPDATE students SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ?, gpa = ?, dob = ? WHERE student_id = ?";
 
-        try {
-            conn = DatabaseConnection.getConnection();
-            pstmt = conn.prepareStatement(UPDATE_STUDENT);
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, student.getFirstName());
             pstmt.setString(2, student.getLastName());
@@ -115,17 +113,11 @@ public class StudentDAO {
             pstmt.setDate(7, student.getDob());
             pstmt.setInt(8, student.getStudentId());
 
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                LOGGER.info("Student ID " + student.getStudentId() + " updated successfully.");
-                return true;
-            }
+            return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error updating student profile", e);
-        } finally {
-            DatabaseConnection.closeResources(null, pstmt, conn);
+            e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
     // getting student details using their User ID (useful for Dashboards)

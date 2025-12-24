@@ -92,7 +92,45 @@ public class AdminManageStudentServlet extends HttpServlet {
                 }
             }
         }
+        if ("UPDATE_STUDENT".equals(action)) {
+            try {
+                // 1. Extract parameters from the Admin Edit Form
+                int studentId = Integer.parseInt(request.getParameter("studentId"));
+                String firstName = request.getParameter("firstName");
+                String lastName = request.getParameter("lastName");
+                String email = request.getParameter("email");
+                String phone = request.getParameter("phone");
+                String address = request.getParameter("address");
+                double gpa = Double.parseDouble(request.getParameter("gpa"));
 
+                // 2. Create Student object and set values
+                Student s = new Student();
+                s.setStudentId(studentId);
+                s.setFirstName(firstName);
+                s.setLastName(lastName);
+                s.setEmail(email);
+                s.setPhone(phone);
+                s.setAddress(address);
+                s.setGpa(gpa);
+
+                // Handle Date of Birth conversion
+                String dobStr = request.getParameter("dob");
+                if (dobStr != null && !dobStr.isEmpty()) {
+                    s.setDob(java.sql.Date.valueOf(dobStr));
+                }
+
+                // 3. Call the master update method in DAO
+                boolean success = studentDAO.updateStudent(s);
+
+                // Optional: Add a status parameter to show a toast/alert on refresh
+                if (success) {
+                    response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet?status=success");
+                    return; // Important: return after redirect
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         // Redirect refreshes the list so the UI stays in sync
         response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet");
     }

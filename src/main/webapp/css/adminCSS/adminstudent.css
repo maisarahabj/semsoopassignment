@@ -282,7 +282,7 @@
     font-size: 11px;
     letter-spacing: 0.05em;
     padding: 12px;
-    text-align: left;
+    text-align: center;
     position: sticky;
     top: 0;
 }
@@ -401,3 +401,33 @@
 }
 
 /* success pop up END  */
+.hidden {
+    display: none !important;
+}
+
+/* 1. Force the modal box to hide scrollbars entirely */
+.modal-box {
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For Internet Explorer/Edge */
+}
+
+.modal-box::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
+}
+
+/* 2. Prevent any internal containers from scrolling */
+.course-list-container, 
+.modal-body-scroll {
+    overflow: visible !important;
+    max-height: none !important;
+}
+
+/* 3. Ensure the background body is locked when modal is open */
+body.modal-open {
+    overflow: hidden !important;
+    touch-action: none; /* Prevents scrolling on mobile/touch screens */
+}
+
+.hidden {
+    display: none !important;
+}

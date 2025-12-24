@@ -70,5 +70,6 @@ public class AdminGetStudentCoursesServlet extends HttpServlet {
         }
 
         response.getWriter().print(success ? "success" : "error");
+    
     }
 }

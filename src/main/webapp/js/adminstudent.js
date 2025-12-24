@@ -4,25 +4,30 @@
  */
 
 // --- Global State ---
-let currentViewedStudentId = null; // Tracks the student currently being viewed in the modal
-let pendingDropCourseId = null;    // Tracks the course ID marked for unenrollment
+let currentViewedStudentId = null; 
+let pendingDropCourseId = null;    
 
 // --- Modal Toggle Functions ---
 
 function openAddModal() {
     document.getElementById('addStudentOverlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Lock background
 }
 
 function closeAddModal() {
     document.getElementById('addStudentOverlay').style.display = 'none';
+    document.body.style.overflow = 'auto'; // Unlock background
 }
 
 function closeDeleteModal() {
     document.getElementById('deleteOverlay').style.display = 'none';
+    document.body.style.overflow = 'auto';
 }
 
 function closeProfileModal() {
     document.getElementById('profileOverlay').style.display = 'none';
+    document.body.style.overflow = 'auto'; // Unlock background
+    resetAdminModalState(); // Reset toggle when closing
 }
 
 function closeUnenrollModal() {
@@ -30,73 +35,129 @@ function closeUnenrollModal() {
     pendingDropCourseId = null;
 }
 
-// --- Student Deletion Logic (Full Account Removal) ---
+// --- Student Deletion Logic ---
 
 function showDeleteModal(studentId, userId, firstName, lastName) {
-    // Fill the hidden inputs that the Main Servlet will read
     document.getElementById('modalStudentId').value = studentId;
     document.getElementById('modalUserId').value = userId;
-
-    // Update the confirmation text
     document.getElementById('removeMessage').innerHTML =
             `Are you sure you want to permanently remove <strong>${firstName} ${lastName}</strong> and their login account?`;
-
     document.getElementById('deleteOverlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
 }
 
-// --- Profile View & Course Management Logic ---
+// --- Profile View & Editing Logic ---
 
 /**
- * Opens the profile modal and populates student details + enrolled courses
+ * Opens the profile modal and populates student details
  */
-
 function showProfileModal(id, fName, lName, email, phone, address, dob, gpa, regOn) {
     currentViewedStudentId = id;
 
-    // Populate Header Info
+    // Populate Header Info (Viewing Mode)
     document.getElementById('viewFullName').innerText = fName + " " + lName;
     document.getElementById('viewStudentId').innerText = "Student ID: #" + id;
 
-    // NEW: Populate Registered On Date
+    // Populate Registered On Date
     const regElement = document.getElementById('viewRegisteredOn');
     if (regElement) {
         regElement.innerText = "Registered on: " + (regOn && regOn !== "null" ? regOn : "N/A");
     }
 
-    // Populate Body Data
+    // Populate Body Data (Viewing Mode)
     document.getElementById('viewEmail').innerText = email;
     document.getElementById('viewPhone').innerText = (phone && phone !== "null") ? phone : "Not Provided";
     document.getElementById('viewDob').innerText = dob;
     document.getElementById('viewGpa').innerText = parseFloat(gpa).toFixed(2);
     document.getElementById('viewAddress').innerText = (address && address !== "null") ? address : "No address on file";
 
+    // --- PRE-FILL INPUT FIELDS (Editing Mode) ---
+    document.getElementById('editStudentId').value = id;
+    document.getElementById('editFName').value = fName;
+    document.getElementById('editLName').value = lName;
+    document.getElementById('editEmail').value = email;
+    document.getElementById('editPhone').value = (phone && phone !== "null") ? phone : "";
+    document.getElementById('editDob').value = dob;
+    document.getElementById('editGpa').value = gpa;
+    document.getElementById('editAddress').value = (address && address !== "null") ? address : "";
+
+    // Reset UI to view-only mode
+    resetAdminModalState();
+
     // Fetch live course data
     loadEnrolledCourses(id);
 
     document.getElementById('profileOverlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Lock background
 }
 
 /**
- * Fetches course list via AJAX and handles the "null null" schedule display
+ * Swaps between the Header Title and the First/Last Name Inputs
  */
+function toggleAdminEdit() {
+    console.log("Pencil clicked! Toggling mode...");
+
+    const nameHeading = document.getElementById('viewFullName');
+    const nameInputs = document.getElementById('editNameContainer');
+    const actions = document.getElementById('adminSaveActions');
+
+    if (!nameHeading || !nameInputs) {
+        console.error("Error: Could not find nameHeading or nameInputs IDs in the JSP!");
+        return;
+    }
+
+    // Toggle Header
+    nameHeading.classList.toggle('hidden');
+    nameInputs.classList.toggle('hidden');
+
+    // Toggle the rest of the form fields
+    const viewData = document.querySelectorAll('#profileOverlay .view-data');
+    const inputs = document.querySelectorAll('#profileOverlay .modal-input');
+
+    viewData.forEach(el => {
+        if (el.id !== 'viewFullName') el.classList.toggle('hidden');
+    });
+    
+    inputs.forEach(el => el.classList.toggle('hidden'));
+    
+    if (actions) actions.classList.toggle('hidden');
+    
+    console.log("Toggle complete.");
+}
+
+/**
+ * Returns modal to View Mode
+ */
+function resetAdminModalState() {
+    const actions = document.getElementById('adminSaveActions');
+    const nameHeading = document.getElementById('viewFullName');
+    const nameInputs = document.getElementById('editNameContainer');
+
+    if (actions) actions.classList.add('hidden');
+    if (nameHeading) nameHeading.classList.remove('hidden');
+    if (nameInputs) nameInputs.classList.add('hidden');
+
+    document.querySelectorAll('#profileOverlay .view-data').forEach(el => el.classList.remove('hidden'));
+    document.querySelectorAll('#profileOverlay .modal-input').forEach(el => el.classList.add('hidden'));
+}
+
+// --- AJAX Course Logic ---
+
 function loadEnrolledCourses(studentId) {
     const tbody = document.getElementById('viewCourseList');
     tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>';
 
     fetch(`${window.contextPath}/AdminGetStudentCoursesServlet?studentId=${studentId}`)
-            .then(res => res.text()) // <--- MUST be .text() now
+            .then(res => res.text())
             .then(html => {
-                tbody.innerHTML = html; // Injects the rows generated by Java
+                tbody.innerHTML = html;
             })
             .catch(err => {
                 console.error("Connection Error:", err);
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Database Connection Error.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Connection Error.</td></tr>';
             });
 }
 
-/**
- * Action function to Enroll a student in a new course
- */
 function enrollStudentAction() {
     const courseId = document.getElementById('enrollCourseSelect').value;
     if (!courseId) {
@@ -114,33 +175,23 @@ function enrollStudentAction() {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: params
     })
-            .then(res => res.text())
-            .then(res => {
-                if (res.trim() === "success") {
-                    loadEnrolledCourses(currentViewedStudentId); // Refresh table
-                    document.getElementById('enrollCourseSelect').value = ""; // Reset dropdown
-                } else {
-                    alert("Failed to enroll. Check if course is full or student is already enrolled.");
-                }
-            });
-    if (res.trim() === "success") {
-        showToast("Student enrolled successfully!");
-        loadEnrolledCourses(currentViewedStudentId);
-    }
+    .then(res => res.text())
+    .then(res => {
+        if (res.trim() === "success") {
+            showToast("Student enrolled successfully!");
+            loadEnrolledCourses(currentViewedStudentId);
+            document.getElementById('enrollCourseSelect').value = "";
+        } else {
+            alert("Failed to enroll.");
+        }
+    });
 }
 
-/**
- * Opens the pretty custom unenrollment overlay
- */
 function dropCourseAction(courseId) {
     pendingDropCourseId = courseId;
-
     const overlay = document.getElementById('unenrollConfirmOverlay');
-    if (overlay) {
-        overlay.style.display = 'flex';
-    }
+    if (overlay) overlay.style.display = 'flex';
 
-    // Link the "Yes" button in the overlay to the execution function
     const confirmBtn = document.getElementById('confirmUnenrollBtn');
     if (confirmBtn) {
         confirmBtn.onclick = function () {
@@ -149,9 +200,6 @@ function dropCourseAction(courseId) {
     }
 }
 
-/**
- * Sends the DROP request to the server after user confirms in the overlay
- */
 function executeUnenroll() {
     const params = new URLSearchParams();
     params.append('action', 'DROP');
@@ -163,22 +211,18 @@ function executeUnenroll() {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: params
     })
-            .then(res => res.text())
-            .then(res => {
-                if (res.trim() === "success") {
-                    loadEnrolledCourses(currentViewedStudentId); // Refresh table
-                    closeUnenrollModal(); // Hide overlay
-                } else {
-                    alert("Error: Could not drop the course.");
-                }
-            });
-    if (res.trim() === "success") {
-        showToast("Course removed successfully!");
-        loadEnrolledCourses(currentViewedStudentId);
-    }
+    .then(res => res.text())
+    .then(res => {
+        if (res.trim() === "success") {
+            showToast("Course removed successfully!");
+            loadEnrolledCourses(currentViewedStudentId);
+            closeUnenrollModal();
+        }
+    });
 }
 
-// --- Global Click Listener (Closes modals when clicking outside the box) ---
+// --- Utility Functions ---
+
 window.onclick = function (event) {
     const overlays = [
         document.getElementById('deleteOverlay'),
@@ -190,9 +234,9 @@ window.onclick = function (event) {
     overlays.forEach(overlay => {
         if (event.target == overlay) {
             overlay.style.display = 'none';
-            // Specific cleanup if unenroll modal is closed
-            if (overlay.id === 'unenrollConfirmOverlay')
-                pendingDropCourseId = null;
+            document.body.style.overflow = 'auto'; // Unlock scroll
+            if (overlay.id === 'profileOverlay') resetAdminModalState();
+            if (overlay.id === 'unenrollConfirmOverlay') pendingDropCourseId = null;
         }
     });
 };
@@ -200,11 +244,8 @@ window.onclick = function (event) {
 function showToast(message) {
     const toast = document.getElementById('successToast');
     const msgSpan = document.getElementById('toastMessage');
-
     msgSpan.innerText = message;
     toast.classList.add('show');
-
-    // Hide it after 3 seconds
     setTimeout(() => {
         toast.classList.remove('show');
     }, 3000);
