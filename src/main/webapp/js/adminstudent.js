@@ -49,23 +49,28 @@ function showDeleteModal(studentId, userId, firstName, lastName) {
 /**
  * Opens the profile modal and populates student details + enrolled courses
  */
-function showProfileModal(id, fName, lName, email, phone, address, dob, gpa) {
-    currentViewedStudentId = id; // Store ID for enrollment/drop actions
 
-    // Populate Basic Info
+function showProfileModal(id, fName, lName, email, phone, address, dob, gpa, regOn) {
+    currentViewedStudentId = id;
+
+    // Populate Header Info
     document.getElementById('viewFullName').innerText = fName + " " + lName;
+    document.getElementById('viewStudentId').innerText = "Student ID: #" + id;
 
-    const idElement = document.getElementById('viewStudentIdDisplay') || document.getElementById('viewStudentId');
-    if (idElement)
-        idElement.innerText = "Student ID: #" + id;
+    // NEW: Populate Registered On Date
+    const regElement = document.getElementById('viewRegisteredOn');
+    if (regElement) {
+        regElement.innerText = "Registered on: " + (regOn && regOn !== "null" ? regOn : "N/A");
+    }
 
+    // Populate Body Data
     document.getElementById('viewEmail').innerText = email;
     document.getElementById('viewPhone').innerText = (phone && phone !== "null") ? phone : "Not Provided";
     document.getElementById('viewDob').innerText = dob;
     document.getElementById('viewGpa').innerText = parseFloat(gpa).toFixed(2);
     document.getElementById('viewAddress').innerText = (address && address !== "null") ? address : "No address on file";
 
-    // Fetch live course data from the server
+    // Fetch live course data
     loadEnrolledCourses(id);
 
     document.getElementById('profileOverlay').style.display = 'flex';

@@ -72,8 +72,15 @@
                                 <td style="text-align: center;">
                                     <div class="action-form">
                                         <button type="button" class="btn-approve" 
-                                                onclick="showProfileModal('<%= s.getStudentId()%>', '<%= s.getFirstName()%>', '<%= s.getLastName()%>', '<%= s.getEmail()%>', '<%= s.getPhone()%>', '<%= s.getAddress()%>', '<%= s.getDob()%>', '<%= s.getGpa()%>')">
-                                            <i class="fas fa-eye"></i> View
+                                                onclick="showProfileModal('<%= s.getStudentId()%>',
+                                                                '<%= s.getFirstName()%>',
+                                                                '<%= s.getLastName()%>',
+                                                                '<%= s.getEmail()%>',
+                                                                '<%= s.getPhone()%>',
+                                                                '<%= s.getAddress()%>',
+                                                                '<%= s.getDob()%>',
+                                                                '<%= s.getGpa()%>',
+                                                                '<%= s.getEnrollmentDate()%>')"> <i class="fas fa-eye"></i> View
                                         </button>
 
                                         <button type="button" class="btn-reject" 

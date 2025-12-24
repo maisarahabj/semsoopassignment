@@ -30,8 +30,9 @@ public class StudentDAO {
             = "UPDATE students SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ?, gpa = ?, dob = ? WHERE student_id = ?";
 
     // SQL to fetch only students who have been approved by the admin
+    // also to see timestamp
     private static final String SELECT_APPROVED_STUDENTS
-            = "SELECT s.* FROM students s "
+            = "SELECT s.*, u.created_at FROM students s "
             + "JOIN users u ON s.user_id = u.user_id "
             + "WHERE u.status = 'ACTIVE' "
             + "ORDER BY s.last_name, s.first_name";
@@ -187,11 +188,17 @@ public class StudentDAO {
     public List<Student> getAllStudents() {
         List<Student> list = new ArrayList<>();
 
-        // Using the new SELECT_APPROVED_STUDENTS constant
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(SELECT_APPROVED_STUDENTS); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                list.add(extractStudentFromResultSet(rs));
+                Student s = extractStudentFromResultSet(rs);
+
+                Timestamp ts = rs.getTimestamp("created_at");
+                if (ts != null) {
+                    s.setEnrollmentDate(new java.sql.Date(ts.getTime()));
+                }
+
+                list.add(s);
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error fetching approved students", e);
