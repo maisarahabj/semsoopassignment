@@ -29,7 +29,14 @@ public class StudentDAO {
     private static final String UPDATE_STUDENT
             = "UPDATE students SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ?, gpa = ?, dob = ? WHERE student_id = ?";
 
-    // check if username or email is already taken in the system
+    // SQL to fetch only students who have been approved by the admin
+    private static final String SELECT_APPROVED_STUDENTS
+            = "SELECT s.* FROM students s "
+            + "JOIN users u ON s.user_id = u.user_id "
+            + "WHERE u.status = 'ACTIVE' "
+            + "ORDER BY s.last_name, s.first_name";
+
+// check if username or email is already taken in the system
     public boolean isUserExists(String username, String email) {
         String sql = "SELECT (SELECT count(*) FROM users WHERE username = ?) + "
                 + "(SELECT count(*) FROM students WHERE email = ?)";
@@ -166,12 +173,15 @@ public class StudentDAO {
     //fetching everything for ADMIN only
     public List<Student> getAllStudents() {
         List<Student> list = new ArrayList<>();
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(SELECT_ALL_STUDENTS); ResultSet rs = ps.executeQuery()) {
+
+        // Using the new SELECT_APPROVED_STUDENTS constant
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(SELECT_APPROVED_STUDENTS); ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 list.add(extractStudentFromResultSet(rs));
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching all students", e);
+            LOGGER.log(Level.SEVERE, "Error fetching approved students", e);
         }
         return list;
     }
