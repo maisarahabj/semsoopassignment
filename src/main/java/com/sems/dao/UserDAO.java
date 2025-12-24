@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class UserDAO {
 
     private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
@@ -94,6 +93,25 @@ public class UserDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * Counts the total number of students with an 'ACTIVE' status
+     *
+     */
+    public int getActiveStudentCount() {
+        int count = 0;
+        String sql = "SELECT COUNT(*) FROM users WHERE role = 'student' AND status = 'ACTIVE'";
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error counting active students", e);
+        }
+        return count;
     }
 
     private User extractUserFromResultSet(ResultSet rs) throws SQLException {

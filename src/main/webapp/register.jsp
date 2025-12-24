@@ -18,7 +18,7 @@
     <body>
         <div class="register-container">
             <div class="logo-area">
-                <div class="temp-logo">SEMS</div>
+                
                 <h2 style="margin-top: 15px; color: #333;">Create Account</h2>
             </div>
 

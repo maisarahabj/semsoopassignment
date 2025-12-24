@@ -19,7 +19,7 @@
     <body>
         <div class="dashboard-wrapper">
             <aside class="sidebar">
-                <div class="logo-section"><div class="logo-box"></div><span class="logo-text">Barfact Admin</span></div>
+                <div class="logo-section"><div class="logo-box"><img src="${pageContext.request.contextPath}/assets/cat.png" class="logo-img"style="width: 50px; height: 50px; "></div><span class="logo-text">Barfact Admin</span></div>
                 <nav class="nav-menu">
                     <a href="${pageContext.request.contextPath}/DashboardServlet" class="nav-link"><i class="fas fa-chart-line"></i> Overview</a>
                     <a href="${pageContext.request.contextPath}/CourseServlet?action=manage" class="nav-link active"><i class="fas fa-book-open"></i> Manage Courses</a>
@@ -58,6 +58,10 @@
 
                 <div class="schedule-container" >
                     <h3>Current Catalog</h3>
+                    <div class="search-box-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="courseSearch" placeholder="Search by name or code..." onkeyup="filterCourses()">
+                    </div>
                     <table class="admin-table">
                         <thead>
                             <tr>
@@ -65,6 +69,7 @@
                                 <th>Name</th> 
                                 <th>Credits</th> <th>Cap</th>     <th>Day</th> 
                                 <th>Time</th>
+                                <th style="text-align: center;">Enrolled List</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
@@ -77,8 +82,18 @@
                             <tr>
                                 <td><strong><%= c.getCourseCode()%></strong></td>
                                 <td><%= c.getCourseName()%></td>
-                                <td><%= c.getCredits()%></td> <td><%= c.getEnrolledCount()%>/<%= c.getCapacity()%></td> <td><%= c.getCourseDay()%></td>
+                                <td><%= c.getCredits()%></td> 
+                                <td><%= c.getEnrolledCount()%>/<%= c.getCapacity()%></td> 
+                                <td><%= c.getCourseDay()%></td>
                                 <td><%= c.getCourseTime().substring(0, 5)%></td>
+
+                                <td style="text-align: center;">
+                                    <button type="button" class="btn-approve" 
+                                            onclick="loadEnrolledStudents('<%= c.getCourseId()%>', '<%= c.getCourseCode().replace("'", "\\'")%>')">
+                                        <i class="fas fa-users"></i> View List
+                                    </button>
+                                </td>
+
                                 <td style="text-align: center;">
                                     <button type="button" class="btn-reject" 
                                             onclick="showDeleteModal('<%= c.getCourseId()%>', '<%= c.getCourseCode()%>', '<%= c.getCourseName()%>')">
@@ -87,7 +102,7 @@
                                 </td>
                             </tr>
                             <% }
-                }%>
+                                }%>
                         </tbody>
                     </table>
                 </div>
@@ -106,6 +121,31 @@
                         <input type="hidden" name="courseId" id="modalCourseId">
                         <button type="submit" class="btn-confirm">Yes, Delete Permanently</button>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="enrolledStudentsOverlay" class="modal-overlay">
+            <div class="modal-box" style="width: 500px;">
+                <div class="modal-icon" style="color: #6366f1;"><i class="fas fa-user-graduate"></i></div>
+                <h3>Enrolled Students</h3>
+                <p id="enrolledCourseTitle" style="font-weight: bold; color: #6366f1; margin-bottom: 20px;">Course Code</p>
+
+                <div style="max-height: 300px; overflow-y: auto; border: 1px solid #f1f5f9; border-radius: 8px;">
+                    <table class="admin-table" style="margin-top: 0;">
+                        <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 1;">
+                            <tr>
+                                <th style="text-align: center;">ID</th>
+                                <th style="text-align: center;">Student Name</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentListBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="modal-actions" style="margin-top: 20px; justify-content: flex-end;">
+                    <button type="button" onclick="closeEnrolledModal()" class="btn-cancel">Close</button>
                 </div>
             </div>
         </div>

@@ -16,6 +16,7 @@ public class DashboardServlet extends HttpServlet {
 
     private StudentDAO studentDAO = new StudentDAO();
     private CourseDAO courseDAO = new CourseDAO();
+    private UserDAO userDAO = new UserDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -40,10 +41,11 @@ public class DashboardServlet extends HttpServlet {
 
             // Fetch the list using the day name string
             List<Course> todayClasses = courseDAO.getTodayCourses(currentDay);
-            
+
+            int activeStudents = userDAO.getActiveStudentCount();
             // Set the attribute so admindash.jsp can see it
             request.setAttribute("todayClasses", todayClasses);
-
+            request.setAttribute("activeStudentCount", activeStudents);
             // Forward to Admin Dashboard
             request.getRequestDispatcher("/admin/admindash.jsp").forward(request, response);
 
@@ -55,7 +57,7 @@ public class DashboardServlet extends HttpServlet {
                 List<Course> enrolledCourses = courseDAO.getCoursesByStudentId(student.getStudentId());
                 request.setAttribute("student", student);
                 request.setAttribute("enrolledCourses", enrolledCourses);
-                
+
                 request.getRequestDispatcher("/student/dashboard.jsp").forward(request, response);
             } else {
                 response.sendRedirect(request.getContextPath() + "/student/create_profile.jsp");
@@ -63,7 +65,7 @@ public class DashboardServlet extends HttpServlet {
         } else {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
         }
-        
+
         // IMPORTANT: Removed the code at the bottom because forwarding is already handled above!
     }
 

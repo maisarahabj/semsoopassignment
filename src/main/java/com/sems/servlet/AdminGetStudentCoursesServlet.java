@@ -7,7 +7,9 @@
 package com.sems.servlet;
 
 import com.sems.dao.EnrollmentDAO;
+import com.sems.dao.StudentDAO;
 import com.sems.model.Course;
+import com.sems.model.Student;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -19,40 +21,59 @@ import java.io.PrintWriter;
 public class AdminGetStudentCoursesServlet extends HttpServlet {
 
     private EnrollmentDAO enrollmentDAO = new EnrollmentDAO();
+    private StudentDAO studentDAO = new StudentDAO();
 
     // 1. Fetching the list for the modal
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int studentId = Integer.parseInt(request.getParameter("studentId"));
-        List<Course> courses = enrollmentDAO.getEnrolledCourseDetails(studentId);
-
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
 
-        if (courses == null || courses.isEmpty()) {
-            out.print("<tr><td colspan='4' style='text-align:center;'>No courses found.</td></tr>");
-            return;
-        }
+        String courseIdStr = request.getParameter("courseId");
+        String studentIdStr = request.getParameter("studentId");
 
-        for (Course c : courses) {
-            // EXACT LOGIC FROM YOUR ADMINCOURSE.JSP
-            String day = c.getCourseDay();
-            String time = "TBA";
+        // --- "View List" ---
+        if (courseIdStr != null) {
+            int courseId = Integer.parseInt(courseIdStr);
+            List<Student> students = studentDAO.getStudentsByCourseId(courseId);
 
-            // Safety check to prevent StringIndexOutOfBoundsException
-            if (c.getCourseTime() != null && c.getCourseTime().length() >= 5) {
-                time = c.getCourseTime().substring(0, 5);
+            if (students == null || students.isEmpty()) {
+                out.print("<tr><td colspan='2' style='text-align:center;'>No students enrolled yet.</td></tr>");
+            } else {
+                for (Student s : students) {
+                    out.println("<tr>");
+                    out.println("  <td>#" + s.getStudentId() + "</td>");
+                    out.println("  <td>" + s.getFirstName() + " " + s.getLastName() + "</td>");
+                    out.println("</tr>");
+                }
+            }
+        } // --- "View Courses" ---
+        else if (studentIdStr != null) {
+            int studentId = Integer.parseInt(studentIdStr);
+            List<Course> courses = enrollmentDAO.getEnrolledCourseDetails(studentId);
+
+            if (courses == null || courses.isEmpty()) {
+                out.print("<tr><td colspan='4' style='text-align:center;'>No courses found.</td></tr>");
+                return;
             }
 
-            out.println("<tr>");
-            out.println("  <td><strong>" + c.getCourseCode() + "</strong></td>");
-            out.println("  <td>" + c.getCourseName() + "</td>");
-            out.println("  <td style='color: #64748b;'>" + (day != null ? day : "TBA") + " " + time + "</td>");
-            out.println("  <td style='text-align: right;'>");
-            out.println("    <button type='button' class='btn-drop-mini' onclick='dropCourseAction(" + c.getCourseId() + ")'>");
-            out.println("      <i class='fas fa-trash-alt'></i>");
-            out.println("    </button>");
-            out.println("  </td>");
-            out.println("</tr>");
+            for (Course c : courses) {
+                String day = c.getCourseDay();
+                String time = "TBA";
+                if (c.getCourseTime() != null && c.getCourseTime().length() >= 5) {
+                    time = c.getCourseTime().substring(0, 5);
+                }
+
+                out.println("<tr>");
+                out.println("  <td><strong>" + c.getCourseCode() + "</strong></td>");
+                out.println("  <td>" + c.getCourseName() + "</td>");
+                out.println("  <td style='color: #64748b;'>" + (day != null ? day : "TBA") + " " + time + "</td>");
+                out.println("  <td style='text-align: right;'>");
+                out.println("    <button type='button' class='btn-drop-mini' onclick='dropCourseAction(" + c.getCourseId() + ")'>");
+                out.println("      <i class='fas fa-trash-alt'></i>");
+                out.println("    </button>");
+                out.println("  </td>");
+                out.println("</tr>");
+            }
         }
     }
 
@@ -70,6 +91,6 @@ public class AdminGetStudentCoursesServlet extends HttpServlet {
         }
 
         response.getWriter().print(success ? "success" : "error");
-    
+
     }
 }

@@ -65,8 +65,13 @@
                     <div class="stat-card">
                         <i class="fas fa-users"></i>
                         <div class="stat-info">
-                            <h3>Total Students</h3>
-                            <p>View and edit all student records</p>
+                            <h3 id="total-stu">
+                                <%= (request.getAttribute("activeStudentCount") != null) ? request.getAttribute("activeStudentCount") : "0"%> 
+                                Total Students
+                            </h3>
+                            <a href="${pageContext.request.contextPath}/AdminManageStudentServlet" class="btn-stat-action">
+                                View All Students 
+                            </a>
                         </div>
                     </div>
                     <div class="stat-card">

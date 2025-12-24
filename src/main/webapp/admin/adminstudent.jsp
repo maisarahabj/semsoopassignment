@@ -118,7 +118,7 @@
                         <div class="input-group"><label>Phone</label><input type="text" name="phone" class="modal-input"></div>
                         <div class="input-group full-width"><label>Address</label><textarea name="address" rows="2" class="modal-input"></textarea></div>
                     </div>
-                    <div class="modal-actions" style="justify-content: flex-end;">
+                    <div class="modal-actions" style="justify-content: flex-end; margin-top: 15px;">
                         <button type="button" onclick="closeAddModal()" class="btn-cancel">Discard</button>
                         <button type="submit" class="btn-save-student">Create Record</button>
                     </div>

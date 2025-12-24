@@ -257,6 +257,8 @@ public class CourseDAO {
         }
         return list;
     }
+    
+    //ADMIN VIEW: see 
 
     private Course extractCourseFromResultSet(ResultSet rs) throws SQLException {
         Course course = new Course();

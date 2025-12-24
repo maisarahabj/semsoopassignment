@@ -265,6 +265,39 @@ public class StudentDAO {
         }
     }
 
+    // ADMIN VIEW: 'View List' popup list of students enrolled in courses
+    public List<Student> getStudentsByCourseId(int courseId) {
+        List<Student> studentList = new ArrayList<>();
+        String sql = "SELECT s.student_id, s.first_name, s.last_name "
+                + "FROM students s "
+                + "JOIN enrollments e ON s.student_id = e.student_id "
+                + "WHERE e.course_id = ? AND e.status = 'Enrolled'";
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, courseId);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Student s = new Student();
+                s.setStudentId(rs.getInt("student_id"));
+                s.setFirstName(rs.getString("first_name"));
+                s.setLastName(rs.getString("last_name"));
+                studentList.add(s);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching students for course: " + courseId, e);
+        } finally {
+            DatabaseConnection.closeResources(rs, pstmt, conn);
+        }
+        return studentList;
+    }
+
     //ADMINview: manual registration
     public boolean createStudentManually(Student student, String username, String password) {
         String userSql = "INSERT INTO users (username, password_hash, role, status) VALUES (?, ?, 'student', 'ACTIVE')";

@@ -10,7 +10,9 @@
     <body>
         <div class="login-container">
             <div class="logo-area">
-                <div class="temp-logo">SEMS</div>
+                <div class="temp-logo" style="padding-bottom: 20px">
+                    <img src="${pageContext.request.contextPath}/assets/cat.png" class="logo-img"style="width: 200%; height: 200%; ">
+                </div>
             </div>
 
             <form action="${pageContext.request.contextPath}/auth/LoginServlet" method="POST">
@@ -18,28 +20,28 @@
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" placeholder="Username" required>
                 </div>
-                
+
                 <div class="input-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" placeholder="Your password" required>
                 </div>
-                
-                <% 
+
+                <%
                     String error = (String) request.getAttribute("errorMessage");
-                    if (error != null) { 
+                    if (error != null) {
                 %>
-                    <p style="color: #ff4d4f; font-size: 14px; margin-bottom: 15px; font-weight: bold; text-align: center;">
-                        <%= error %>
-                    </p>
-                <% } %>
-                
+                <p style="color: #ff4d4f; font-size: 14px; margin-bottom: 15px; font-weight: bold; text-align: center;">
+                    <%= error%>
+                </p>
+                <% }%>
+
                 <button type="submit" class="btn-login">Log In</button>
             </form>
 
             <div class="register-link">
-                <p>Don't have an account? <a href="register.jsp">Register now</a></p>
+                <p>Don't have an account? <a href="${pageContext.request.contextPath}/register.jsp">Register now</a></p>
             </div>
-            
+
             <footer class="footer">
                 &copy; 2025 Barfact University 
             </footer>

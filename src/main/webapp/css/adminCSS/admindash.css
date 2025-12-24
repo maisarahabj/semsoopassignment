@@ -120,3 +120,35 @@
     display: block;
 }
 /* ----- END DASH COURSE LIST ----- */
+
+/* Styling for the Action Buttons in Stat Cards */
+.btn-stat-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0px;
+    padding: 8px 16px;
+    background-color: rgba(99, 102, 241, 0.1); /* Light Indigo tint */
+    color: #6366f1; /* Main Indigo color */
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.btn-stat-action:hover {
+    background-color: #6366f1;
+    color: #ffffff;
+    transform: translateX(5px); /* Subtle slide effect on hover */
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.btn-stat-action i {
+    font-size: 0.75rem;
+}
+
+#total-stu {
+    margin-bottom: 5px;
+}
