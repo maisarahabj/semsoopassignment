@@ -52,3 +52,71 @@
     padding: 15px;
     border-radius: 12px;
 }
+
+/* ----- START DASH COURSE LIST  ----- */
+/* Schedule Section Styling */
+.schedule-container {
+    background: white;
+    margin-top: 30px;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.table-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.badge-count {
+    background: #f0f7ff;
+    color: #007bff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Table Styling */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 12px;
+    color: #007bff;
+    font-size: 0.9rem;
+    border-bottom: 2px solid #f0f4f8;
+}
+
+.admin-table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid #f0f4f8;
+    font-size: 0.95rem;
+}
+
+.time-text { color: #2d3748; font-weight: 700; }
+
+.code-badge {
+    font-family: 'Monaco', monospace;
+    font-weight: bold;
+    color: #4a5568;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px !important;
+    color: #a0aec0;
+}
+
+.empty-state i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+}
+/* ----- END DASH COURSE LIST ----- */

@@ -50,11 +50,11 @@ public class CourseServlet extends HttpServlet {
 
         String action = request.getParameter("action");
 
-        // --- ADMIN REMOVE COURSE ROW --- (Moved to doPost to fix 404)
+        // --- ADMIN REMOVE COURSE ROW --- 
         if ("DELETE".equals(action)) {
             int courseId = Integer.parseInt(request.getParameter("courseId"));
             boolean isDeleted = courseDAO.deleteCourse(courseId);
-            
+
             // Redirect with context path to refresh the list safely
             response.sendRedirect(request.getContextPath() + "/CourseServlet?action=manage&status=" + (isDeleted ? "deleted" : "error"));
             return;

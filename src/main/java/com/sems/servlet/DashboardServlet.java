@@ -7,39 +7,55 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 @WebServlet("/DashboardServlet")
 public class DashboardServlet extends HttpServlet {
+
     private StudentDAO studentDAO = new StudentDAO();
     private CourseDAO courseDAO = new CourseDAO();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
         String role = (String) session.getAttribute("role");
 
+        // 1. Session Check
         if (userId == null) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
 
+        // 2. Role-Based Logic
         if ("admin".equalsIgnoreCase(role)) {
-            // Updated path based on your folder structure
+            // --- ADMIN LOGIC: Get Today's Classes ---
+            String currentDay = LocalDate.now()
+                    .getDayOfWeek()
+                    .getDisplayName(TextStyle.FULL, Locale.ENGLISH); // Result: "Wednesday"
+
+            // Fetch the list using the day name string
+            List<Course> todayClasses = courseDAO.getTodayCourses(currentDay);
+            
+            // Set the attribute so admindash.jsp can see it
+            request.setAttribute("todayClasses", todayClasses);
+
+            // Forward to Admin Dashboard
             request.getRequestDispatcher("/admin/admindash.jsp").forward(request, response);
-            
+
         } else if ("student".equalsIgnoreCase(role)) {
+            // --- STUDENT LOGIC ---
             Student student = studentDAO.getStudentByUserId(userId);
-            
+
             if (student != null) {
                 List<Course> enrolledCourses = courseDAO.getCoursesByStudentId(student.getStudentId());
-                
                 request.setAttribute("student", student);
                 request.setAttribute("enrolledCourses", enrolledCourses);
                 
-                // FIXED PATH: Points to the student folder as seen in your file tree
                 request.getRequestDispatcher("/student/dashboard.jsp").forward(request, response);
             } else {
                 response.sendRedirect(request.getContextPath() + "/student/create_profile.jsp");
@@ -47,10 +63,12 @@ public class DashboardServlet extends HttpServlet {
         } else {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
         }
+        
+        // IMPORTANT: Removed the code at the bottom because forwarding is already handled above!
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         doGet(request, response);
     }
