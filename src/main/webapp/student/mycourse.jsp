@@ -1,7 +1,9 @@
 <%-- 
     Document   : mycourse
-    Created on : 22 Dec 2025, 1:48:25 am
+    Created on : 22 Dec 2025
     Author     : maisarahabjalil
+
+    talks to enrollment servlet&DAO
 --%>
 <%@page import="java.util.List"%>
 <%@page import="com.sems.model.Course"%>
@@ -39,7 +41,7 @@
                     <a href="${pageContext.request.contextPath}/student/MyCourseServlet" class="nav-link active">
                         <i class="fas fa-book"></i> My Classes
                     </a>
-                    <a href="${pageContext.request.contextPath}/student/addcourse.jsp" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/student/AddCourseServlet" class="nav-link">
                         <i class="fas fa-plus-square"></i> Add Subjects
                     </a>
                     <a href="${pageContext.request.contextPath}/ProfileServlet" class="nav-link">
@@ -64,12 +66,21 @@
                 <div class="schedule-container">
                     <div class="table-header-flex">
                         <h3>Course Enrollment List</h3>
-                        <span class="badge-count"><%= (enrolledCourses != null) ? enrolledCourses.size() : 0%> Subjects</span>
+                        <div class="header-actions">
+                            <a href="${pageContext.request.contextPath}/student/addcourse.jsp" class="btn-add-mode">
+                                <i class="fas fa-plus-circle"></i> Add Course
+                            </a>
+                            <button type="button" id="toggleDropBtn" class="btn-drop-mode" onclick="toggleDropMode()">
+                                <i class="fas fa-minus-circle"></i> Drop Course
+                            </button>
+                            <span class="badge-count"><%= (enrolledCourses != null) ? enrolledCourses.size() : 0%> Subjects</span>
+                        </div>
                     </div>
 
                     <table class="admin-table">
                         <thead>
                             <tr>
+                                <th class="drop-column"></th>
                                 <th>Code</th>
                                 <th>Course Name</th>
                                 <th>Credits</th>
@@ -78,19 +89,34 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <% if (enrolledCourses != null && !enrolledCourses.isEmpty()) {
-                                for (Course c : enrolledCourses) {%>
-                            <tr>
-                                <td class="course-code-tag"><%= c.getCourseCode()%></td>
-                                <td><%= c.getCourseName()%></td>
+                            <%
+                                if (enrolledCourses != null && !enrolledCourses.isEmpty()) {
+                                    for (Course c : enrolledCourses) {
+                            %>
+                            <tr id="row-<%= c.getCourseId()%>">
+                                <td class="drop-column">
+                                    <button type="button" class="btn-action-delete" 
+                                            onclick="confirmDrop('<%= c.getCourseId()%>', '<%= c.getCourseCode()%>'); event.stopPropagation();">
+                                        <i class="fas fa-times-circle"></i>
+                                    </button>
+                                </td>
+
+                                <td class="course-code-tag" onclick="showCourseModal('<%= c.getCourseCode()%>', '<%= c.getCourseName().replace("'", "\\'")%>', '<%= c.getCredits()%>', '<%= c.getCourseDay()%>', '<%= c.getCourseTime().substring(0, 5)%>', '<%= (c.getDepartment() != null) ? c.getDepartment() : "General"%>', '<%= c.getEnrolledCount()%>', '<%= c.getCapacity()%>')" style="cursor: pointer;">
+                                    <strong><%= c.getCourseCode()%></strong>
+                                </td>
+                                <td onclick="showCourseModal('<%= c.getCourseCode()%>', '<%= c.getCourseName().replace("'", "\\'")%>', '<%= c.getCredits()%>', '<%= c.getCourseDay()%>', '<%= c.getCourseTime().substring(0, 5)%>', '<%= (c.getDepartment() != null) ? c.getDepartment() : "General"%>', '<%= c.getEnrolledCount()%>', '<%= c.getCapacity()%>')" style="cursor: pointer;">
+                                    <%= c.getCourseName()%>
+                                </td>
                                 <td><%= c.getCredits()%></td>
                                 <td><i class="fas fa-calendar-day schedule-icon"></i><%= c.getCourseDay()%></td>
                                 <td><i class="fas fa-clock schedule-icon"></i><%= c.getCourseTime().substring(0, 5)%></td>
                             </tr>
-                            <% }
-                        } else { %>
+                            <%
+                                }
+                            } else {
+                            %>
                             <tr>
-                                <td colspan="5" class="empty-state">
+                                <td colspan="6" class="empty-state">
                                     <i class="fas fa-info-circle"></i>
                                     No courses found. Go to 'Add Subjects' to enroll.
                                 </td>
@@ -115,5 +141,42 @@
                 </a>
             </aside>
         </div>
+
+        <div id="courseDetailOverlay" class="modal-overlay">
+            <div class="modal-box">
+                <div class="modal-icon"><i class="fas fa-book-open"></i></div>
+                <h3 id="modalCourseName">Course Details</h3>
+                <p id="modalCourseCode">CODE</p>
+
+                <div class="modal-form-grid">
+                    <div class="input-group">
+                        <label>Department</label>
+                        <p id="modalDepartment" class="view-data">-</p>
+                    </div>
+                    <div class="input-group">
+                        <label>Credits</label>
+                        <p id="modalCredits" class="view-data">-</p>
+                    </div>
+                    <div class="input-group">
+                        <label>Day</label>
+                        <p id="modalDay" class="view-data">-</p>
+                    </div>
+                    <div class="input-group">
+                        <label>Time</label>
+                        <p id="modalTime" class="view-data">-</p>
+                    </div>
+                    <div class="input-group full-width">
+                        <label>Enrollment Status</label>
+                        <p id="modalCapacity" class="view-data">-</p>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" onclick="closeCourseModal()" class="btn-cancel">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <script src="${pageContext.request.contextPath}/js/mycourse.js"></script>
     </body>
 </html>

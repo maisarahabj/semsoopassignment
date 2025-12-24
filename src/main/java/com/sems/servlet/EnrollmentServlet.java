@@ -1,13 +1,3 @@
-/**
- *
- * @author maisarahabjalil
- * 
- * REGISTERING FOR A COURSE
- * 
- * student view: can enroll/drop themselves in a course
- * admin view: can enroll/drop a student in a course
- * 
- */
 package com.sems.servlet;
 
 import com.sems.dao.*;
@@ -18,59 +8,85 @@ import java.io.IOException;
 
 @WebServlet("/EnrollmentServlet")
 public class EnrollmentServlet extends HttpServlet {
+
     private EnrollmentDAO enrollmentDAO = new EnrollmentDAO();
     private StudentDAO studentDAO = new StudentDAO();
     private CourseDAO courseDAO = new CourseDAO();
 
+    // Handle the "Drop" clicks from My Classes (GET requests)
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+        processRequest(request, response);
+    }
+
+    // Handle Enrollment submissions (POST requests)
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    private void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         HttpSession session = request.getSession();
         String role = (String) session.getAttribute("role");
         Integer sessionUserId = (Integer) session.getAttribute("userId");
 
         if (sessionUserId == null) {
-            response.sendRedirect("login.jsp");
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
 
-        String action = request.getParameter("action"); 
-        String courseCode = request.getParameter("courseCode"); // User inputs "CS01"
-        
-        // 1. TRANSLATION: Find the ID for the provided Code
-        int courseId = courseDAO.getCourseIdByCode(courseCode);
-        
+        String action = request.getParameter("action");
+        String courseIdStr = request.getParameter("courseId");
+        String courseCode = request.getParameter("courseCode");
+
+        int courseId = -1;
+
+        // Determine courseId either from ID or Code
+        if (courseIdStr != null) {
+            courseId = Integer.parseInt(courseIdStr);
+        } else if (courseCode != null) {
+            courseId = courseDAO.getCourseIdByCode(courseCode);
+        }
+
         if (courseId == -1) {
-            // Error handling if the course code doesn't exist
-            response.sendRedirect("dashboard.jsp?error=invalidCourse");
+            response.sendRedirect(request.getContextPath() + "/student/MyCourseServlet?error=invalidCourse");
             return;
         }
 
-        // 2. IDENTIFY STUDENT
+        // Identify Student
         int targetStudentId;
-        if ("admin".equals(role)) {
+        if ("admin".equals(role) && request.getParameter("studentId") != null) {
             targetStudentId = Integer.parseInt(request.getParameter("studentId"));
         } else {
+            // For students, get their specific Student ID from their User ID
             targetStudentId = studentDAO.getStudentIdByUserId(sessionUserId);
         }
 
         boolean success = false;
-        
-        // 3. EXECUTE ENROLLMENT
+
         if ("enroll".equals(action)) {
-            success = enrollmentDAO.enrollStudent(targetStudentId, courseId);
-            if (success) {
-                courseDAO.incrementEnrolledCount(courseId);
-            }
+            // Using your existing adminEnroll method because it handles the transaction (Enroll + Increment)
+            success = enrollmentDAO.adminEnrollStudentInCourse(targetStudentId, courseId);
         } else if ("drop".equals(action)) {
-            success = enrollmentDAO.dropCourse(targetStudentId, courseId);
-            if (success) {
-                courseDAO.decrementEnrolledCount(courseId);
-            }
+            // Using your existing adminDrop method because it handles the transaction (Drop + Decrement)
+            success = enrollmentDAO.adminDropStudentFromCourse(targetStudentId, courseId);
         }
 
-        String redirect = "admin".equals(role) ? "adminstudent.jsp" : "addcourse.jsp";
-        response.sendRedirect(redirect + "?success=" + success);
+        // Smart Redirect based on role and action
+        if ("admin".equals(role)) {
+            response.sendRedirect("adminstudent.jsp?success=" + success);
+        } else {
+            if ("drop".equals(action)) {
+                // Go back to classes list if they dropped a course
+                response.sendRedirect(request.getContextPath() + "/student/MyCourseServlet?success=" + success);
+            } else {
+                // Go back to add subjects if they were trying to enroll
+                response.sendRedirect(request.getContextPath() + "/student/AddCourseServlet?success=" + success);
+            }
+        }
     }
 }

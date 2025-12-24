@@ -1,0 +1,87 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 24 Dec 2025, 9:31:25 pm
+    Author     : maisarahabjalil
+*/
+
+@import url("mycourse.css"); /* Inherit everything from mycourse */
+
+/* Search bar styling */
+.search-box-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box-container i {
+    position: absolute;
+    left: 15px;
+    color: #94a3b8;
+}
+
+.search-box-container input {
+    padding: 10px 15px 10px 40px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    width: 250px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-box-container input:focus {
+    border-color: #6366f1;
+    width: 300px;
+}
+
+/* Enroll Mode Button (Green version of Drop button) */
+.btn-enroll-mode {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+    height: 36px;
+    padding: 0 18px;
+    border-radius: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-enroll-mode.active {
+    background: #16a34a;
+    color: white;
+}
+
+/* Green Row for already enrolled courses */
+.row-enrolled {
+    background-color: #f0fdf4 !important; /* Light green */
+}
+
+.enrolled-icon {
+    color: #16a34a;
+    font-size: 1.1rem;
+}
+
+/* Green Plus Button */
+.add-column {
+    display: none; /* Hidden until Register Mode is clicked */
+    width: 50px;
+    text-align: center;
+}
+
+.btn-action-add {
+    background: none;
+    border: none;
+    color: #16a34a;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-action-add:hover {
+    transform: scale(1.2);
+}

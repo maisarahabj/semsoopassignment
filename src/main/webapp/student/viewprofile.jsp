@@ -40,7 +40,7 @@
                     <a href="${pageContext.request.contextPath}/student/MyCourseServlet" class="nav-link">
                         <i class="fas fa-book"></i> My Classes
                     </a>
-                    <a href="${pageContext.request.contextPath}/student/addcourse.jsp" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/student/AddCourseServlet" class="nav-link">
                         <i class="fas fa-plus-square"></i> Add Subjects
                     </a>
                     <a href="${pageContext.request.contextPath}/ProfileServlet" class="nav-link active">
