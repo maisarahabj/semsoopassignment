@@ -5,8 +5,9 @@
 package com.sems.servlet;
 
 import com.sems.dao.StudentDAO;
-import com.sems.dao.StudentDAO;
+import com.sems.dao.CourseDAO;
 import com.sems.model.Student;
+import com.sems.model.Course;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -17,15 +18,23 @@ import java.util.List;
 public class AdminManageStudentServlet extends HttpServlet {
 
     private StudentDAO studentDAO = new StudentDAO();
+    private CourseDAO courseDAO = new CourseDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Fetch all students using your existing DAO logic
+        // 1. Fetch data for the student table
         List<Student> studentList = studentDAO.getAllStudents();
-        request.setAttribute("studentList", studentList);
 
+        // 2. NEW: Fetch data for the "Enroll in Course" dropdown in the modal
+        List<Course> allCoursesList = courseDAO.getAllCourses();
+
+        // 3. Attach both lists to the request
+        request.setAttribute("studentList", studentList);
+        request.setAttribute("allCoursesList", allCoursesList);
+
+        // 4. Forward to the JSP page
         request.getRequestDispatcher("/admin/adminstudent.jsp").forward(request, response);
     }
 

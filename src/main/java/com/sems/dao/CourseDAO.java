@@ -200,7 +200,6 @@ public class CourseDAO {
     }
 
     //ADMIMN dash todays course
-
     public List<Course> getTodayCourses(String dayName) {
         List<Course> list = new ArrayList<>();
         // Use the parameter in your SQL query
@@ -225,6 +224,35 @@ public class CourseDAO {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    //ADMIN VIEW: view student card
+    public List<Course> getEnrolledCoursesByStudentId(int studentId) {
+        List<Course> list = new ArrayList<>();
+        // This query joins the enrollment table (to find the student's picks)
+        // with the courses table (to get the details like Name and Time)
+        String sql = "SELECT c.* FROM courses c "
+                + "JOIN enrollments e ON c.course_id = e.course_id "
+                + "WHERE e.student_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, studentId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Course c = new Course();
+                c.setCourseId(rs.getInt("course_id"));
+                c.setCourseCode(rs.getString("course_code"));
+                c.setCourseName(rs.getString("course_name"));
+                c.setCourseDay(rs.getString("course_day"));
+                c.setCourseTime(rs.getString("course_time"));
+                list.add(c);
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return list;

@@ -141,3 +141,229 @@
     opacity: 1; /* Override the 0.8 opacity if you have a global hover rule */
 }
 /* -- END -- /* Profile View Styling */
+
+/* 2. Layout Fixes for Admin View */
+.dashboard-wrapper {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.sidebar, .main-content {
+    height: 100vh;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+/* 3. Modal Form Grid & Input Styling */
+.modal-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    text-align: left;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input-group.full-width {
+    grid-column: span 2;
+}
+
+.modal-input {
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.modal-input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.view-data {
+    background: #f8fafc;
+    padding: 10px;
+    border-radius: 6px;
+    color: #334155;
+    font-weight: 500;
+    margin: 0;
+    border: 1px solid #f1f5f9;
+}
+
+/* 4. Button & Badge Styling */
+.btn-save-student, .btn-confirm {
+    background-color: #38a169;
+    color: white;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-save-student:hover {
+    background-color: #2f855a;
+    transform: translateY(-1px);
+}
+
+.btn-add-manual {
+    background: #e6fffa;
+    color: #38a169;
+    border: 1px solid #b2f5ea;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-add-manual:hover {
+    background: #38a169;
+    color: white;
+}
+
+/* 5. Course Management Section (Inside Modal) */
+
+.inline-enroll-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8fafc;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.modal-input-mini {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: #334155;
+}
+
+.btn-enroll-mini {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.course-list-container {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    background: white;
+    margin-top: 10px;
+}
+
+.modal-course-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.modal-course-table th {
+    background: #f8fafc;
+    color: #64748b;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 12px;
+    text-align: left;
+    position: sticky;
+    top: 0;
+}
+
+.modal-course-table td {
+    padding: 12px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+    font-size: 14px;
+}
+
+.modal-code-badge {
+    background: #eff6ff;
+    color: #2563eb;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+/* 6. Action Buttons (Drop/Delete) */
+.btn-drop-mini {
+    background: #fff1f2;
+    color: #e11d48;
+    border: 1px solid #ffe4e6;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-drop-mini:hover {
+    background: #e11d48;
+    color: white;
+}
+
+/* 7. Directory Table (Main Page) */
+.schedule-container {
+    background: white;
+    margin-top: 30px;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 15px;
+    color: #2563eb;
+    font-weight: 600;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.admin-table td {
+    padding: 15px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* 8. Unenroll Confirmation Specifics */
+#unenrollConfirmOverlay .modal-box {
+    border-top: 5px solid #e11d48;
+}
+
+#unenrollConfirmOverlay .modal-icon {
+    color: #e11d48;
+    background: #fff1f2;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 24px;
+}

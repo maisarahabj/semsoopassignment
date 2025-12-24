@@ -1,10 +1,4 @@
 <%-- 
-    Document   : adminstudent VIEW/EDIT STUDENT LIST
-    Created on : 22 Dec 2025, 1:45:50 am
-    Author     : maisarahabjalil
---%>
-
-<%-- 
     Document   : adminstudent
     Created on : 22 Dec 2025, 1:45:25 am
     Author     : maisarahabjalil
@@ -19,7 +13,7 @@
         <meta charset="UTF-8">
         <title>Barfact Admin | Manage Students</title>
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/admindash.css">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/adminstudent.css">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/adminstudent.css?v=1.2">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body>
@@ -204,6 +198,44 @@
                         <label>Home Address</label>
                         <p id="viewAddress" class="view-data">-</p>
                     </div>
+                    <div class="input-group full-width" style="margin-top: 20px;">
+                        <label style="color: #007bff; border-bottom: 2px solid #f0f4f8; padding-bottom: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <span><i class="fas fa-book-reader"></i> Enrolled Courses</span>
+
+                            <div class="inline-enroll-form">
+                                <select id="enrollCourseSelect" class="modal-input-mini">
+                                    <option value="">-- Enroll in Course --</option>
+                                    <%
+                                        List<com.sems.model.Course> allCourses = (List<com.sems.model.Course>) request.getAttribute("allCoursesList");
+                                        if (allCourses != null) {
+                                            for (com.sems.model.Course c : allCourses) {
+                                    %>
+                                    <option value="<%= c.getCourseId()%>"><%= c.getCourseCode()%> - <%= c.getCourseName()%></option>
+                                    <%
+                                            }
+                                        }
+                                    %>
+                                </select>
+                                <button type="button" class="btn-enroll-mini" onclick="enrollStudentAction()">Add</button>
+                            </div>
+                        </label>
+
+                        <div class="course-list-container">
+                            <table class="modal-course-table">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Course Name</th>
+                                        <th>Schedule</th>
+                                        <th style="text-align: right;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="viewCourseList">
+                                    <tr><td colspan="4" style="text-align:center;">Loading courses...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal-actions" style="margin-top: 30px; justify-content: flex-end;">
@@ -212,6 +244,9 @@
             </div>
         </div>
 
-        <script src="${pageContext.request.contextPath}/js/adminstudent.js"></script>                
-    </body>
+        <script>
+            // Define the context path for the JS file to use
+            window.contextPath = '${pageContext.request.contextPath}';
+        </script>
+        <script src="${pageContext.request.contextPath}/js/adminstudent.js"></script>
 </html>
