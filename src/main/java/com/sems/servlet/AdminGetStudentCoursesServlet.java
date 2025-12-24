@@ -13,6 +13,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
+import java.io.PrintWriter;
 
 @WebServlet("/AdminGetStudentCoursesServlet")
 public class AdminGetStudentCoursesServlet extends HttpServlet {
@@ -24,39 +25,35 @@ public class AdminGetStudentCoursesServlet extends HttpServlet {
         int studentId = Integer.parseInt(request.getParameter("studentId"));
         List<Course> courses = enrollmentDAO.getEnrolledCourseDetails(studentId);
 
-        response.setContentType("application/json");
-        StringBuilder json = new StringBuilder("[");
-        for (int i = 0; i < courses.size(); i++) {
-            Course c = courses.get(i);
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
 
-            // 1. Get safe strings for Day and Time
-            String day = (c.getCourseDay() != null) ? c.getCourseDay() : "TBA";
-            String rawTime = (c.getCourseTime() != null) ? c.getCourseTime().toString() : "";
-
-            // 2. Format time (HH:mm) if it exists, otherwise use TBA
-            String formattedTime = "";
-            if (!rawTime.isEmpty() && rawTime.length() >= 5) {
-                formattedTime = rawTime.substring(0, 5);
-            } else {
-                formattedTime = "TBA";
-            }
-
-            // 3. Build the JSON object
-            json.append(String.format(
-                    "{\"id\":%d, \"code\":\"%s\", \"name\":\"%s\", \"day\":\"%s\", \"time\":\"%s\"}",
-                    c.getCourseId(),
-                    c.getCourseCode(),
-                    c.getCourseName(),
-                    day,
-                    formattedTime
-            ));
-
-            if (i < courses.size() - 1) {
-                json.append(",");
-            }
+        if (courses == null || courses.isEmpty()) {
+            out.print("<tr><td colspan='4' style='text-align:center;'>No courses found.</td></tr>");
+            return;
         }
-        json.append("]");
-        response.getWriter().print(json.toString());
+
+        for (Course c : courses) {
+            // EXACT LOGIC FROM YOUR ADMINCOURSE.JSP
+            String day = c.getCourseDay();
+            String time = "TBA";
+
+            // Safety check to prevent StringIndexOutOfBoundsException
+            if (c.getCourseTime() != null && c.getCourseTime().length() >= 5) {
+                time = c.getCourseTime().substring(0, 5);
+            }
+
+            out.println("<tr>");
+            out.println("  <td><strong>" + c.getCourseCode() + "</strong></td>");
+            out.println("  <td>" + c.getCourseName() + "</td>");
+            out.println("  <td style='color: #64748b;'>" + (day != null ? day : "TBA") + " " + time + "</td>");
+            out.println("  <td style='text-align: right;'>");
+            out.println("    <button type='button' class='btn-drop-mini' onclick='dropCourseAction(" + c.getCourseId() + ")'>");
+            out.println("      <i class='fas fa-trash-alt'></i>");
+            out.println("    </button>");
+            out.println("  </td>");
+            out.println("</tr>");
+        }
     }
 
     // 2. Handling the "Drop" or "Enroll" action

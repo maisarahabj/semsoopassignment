@@ -237,7 +237,7 @@
                         </div>
                     </div>
                 </div>
-                                <!<!-- Confirm deletion -->
+                <!<!-- Confirm deletion -->
                 <div id="unenrollConfirmOverlay" class="modal-overlay" style="display:none; z-index: 2000;">
                     <div class="modal-box" style="width: 400px; text-align: center;">
                         <div class="modal-icon" style="color: #e11d48; background: #fff1f2;"><i class="fas fa-book-minus"></i></div>
@@ -249,7 +249,14 @@
                             <button type="button" id="confirmUnenrollBtn" class="btn-confirm" style="background: #e11d48;">Remove Course</button>
                         </div>
                     </div>
-                </div>               
+                </div>  
+                <!--confirm add-->
+                <div class="toast-container">
+                    <div id="successToast" class="toast">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="toastMessage">Action Successful!</span>
+                    </div>
+                </div>
 
                 <div class="modal-actions" style="margin-top: 30px; justify-content: flex-end;">
                     <button type="button" onclick="closeProfileModal()" class="btn-cancel">Close</button>
