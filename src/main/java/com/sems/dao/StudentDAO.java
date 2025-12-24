@@ -36,6 +36,12 @@ public class StudentDAO {
             + "WHERE u.status = 'ACTIVE' "
             + "ORDER BY s.last_name, s.first_name";
 
+    // to get created_at time stamp - showing when registered
+    private static final String SELECT_STUDENT_WITH_USER_DATA
+            = "SELECT s.*, u.created_at FROM students s "
+            + "JOIN users u ON s.user_id = u.user_id "
+            + "WHERE s.user_id = ?";
+
 // check if username or email is already taken in the system
     public boolean isUserExists(String username, String email) {
         String sql = "SELECT (SELECT count(*) FROM users WHERE username = ?) + "
@@ -129,12 +135,18 @@ public class StudentDAO {
 
         try {
             conn = DatabaseConnection.getConnection();
-            pstmt = conn.prepareStatement(SELECT_STUDENT_BY_USER_ID);
+            pstmt = conn.prepareStatement(SELECT_STUDENT_WITH_USER_DATA);
             pstmt.setInt(1, userId);
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                return extractStudentFromResultSet(rs);
+                Student student = extractStudentFromResultSet(rs);
+                Timestamp ts = rs.getTimestamp("created_at");
+                if (ts != null) {
+                    student.setEnrollmentDate(new java.sql.Date(ts.getTime()));
+                }
+
+                return student;
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error fetching student by user ID", e);
@@ -144,6 +156,7 @@ public class StudentDAO {
         return null;
     }
 
+    //showing student from user
     public int getStudentIdByUserId(int userId) {
         int studentId = -1; // Default to -1 (not found)
         String sql = "SELECT student_id FROM students WHERE user_id = ?";
@@ -282,6 +295,21 @@ public class StudentDAO {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    // STUDENT VIEW: updating students own info
+    public boolean updateStudentContactInfo(int userId, String email, String phone, String address) {
+        String sql = "UPDATE students SET email = ?, phone = ?, address = ? WHERE user_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            pstmt.setString(2, phone);
+            pstmt.setString(3, address);
+            pstmt.setInt(4, userId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating student contact info", e);
+            return false;
         }
     }
 

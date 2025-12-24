@@ -1,62 +1,136 @@
-/* 
-    Created on : 24 Dec 2025, 6:17:35 am
-    Author     : maisarahabjalil
+/* viewprofile.css - Synchronized Version
+    Matches JSP structure: form-grid, form-group, editable-input-group
 */
 
-.profile-container {
-    max-width: 600px;
-    margin: 50px auto;
+/* 1. Main Content Layout */
+.profile-card-container {
     background: white;
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin-top: 20px;
 }
 
-.profile-card {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 25px;
 }
 
-.info-group label {
+.form-group.full-width {
+    grid-column: span 2; /* Spans across both columns */
+}
+
+/* 2. Form Labels & Static Text */
+.form-group label {
     display: block;
     font-size: 0.85rem;
     color: #64748b;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.info-group p {
-    font-size: 1.1rem;
+.view-text {
+    font-size: 1.05rem;
     color: #1e293b;
+    padding: 8px 0;
     margin: 0;
 }
 
-.info-group input, .info-group textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
+/* 3. Inline Editable Components */
+.editable-input-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 5px 0;
+    transition: border-color 0.2s ease;
+}
+
+/* Highlight the line when user clicks the input */
+.editable-input-group:focus-within {
+    border-color: #3b82f6;
+}
+
+.display-value {
+    margin: 0;
+    color: #1e293b;
+    font-size: 1.05rem;
+    flex: 1;
+}
+
+.edit-field {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #3b82f6;
+    border-radius: 4px;
     font-size: 1rem;
+    outline: none;
+    background: #f0f7ff; /* Light blue background when editing */
 }
 
-.highlight {
-    background: #f1f5f9;
-    padding: 15px;
-    border-radius: 8px;
+/* 4. Action Buttons & Icons */
+.inline-edit-btn {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    cursor: pointer;
+    padding: 8px;
+    margin-left: 10px;
+    transition: transform 0.2s, color 0.2s;
 }
 
-.btn-save {
+.inline-edit-btn:hover {
+    color: #1d4ed8;
+    transform: scale(1.1);
+}
+
+.form-actions {
+    margin-top: 30px;
+    padding-top: 20px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.btn-save-profile {
     background: #2563eb;
     color: white;
     border: none;
-    padding: 12px 25px;
-    border-radius: 6px;
+    padding: 12px 30px;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
     transition: background 0.2s;
 }
 
-.btn-save:hover {
+.btn-save-profile:hover {
     background: #1d4ed8;
+}
+
+.btn-cancel {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    padding: 12px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #e2e8f0;
+}
+
+/* 5. Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+    margin-bottom: 20px;
 }
