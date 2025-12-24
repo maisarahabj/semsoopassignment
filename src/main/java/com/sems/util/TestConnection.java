@@ -9,23 +9,22 @@ import java.util.Scanner;
 public class TestConnection {
 
     public static void main(String[] args) {
-        EnrollmentDAO dao = new EnrollmentDAO();
-        
-        // --- TEST SCENARIO: ENROLLING IN A FULL COURSE ---
-        // Assume Student ID 1 and Course ID 1 (Make sure Course 1 exists in DB)
-        int testStudentId = 1; 
-        int testCourseId = 1;
+        // Manually setting the IDs from your screenshot
+        int studentIdToDelete = 101;
+        int userIdToDelete = 25; // Associated user_id for 'flut shy'
 
-        System.out.println("=== STARTING ENROLLMENT TEST ===");
-        
-        boolean result = dao.adminEnrollStudentInCourse(testStudentId, testCourseId);
-        
+        com.sems.dao.StudentDAO dao = new com.sems.dao.StudentDAO();
+
+        System.out.println("--- STARTING CONSOLE DELETE TEST ---");
+        System.out.println("Target: Student ID " + studentIdToDelete + ", User ID " + userIdToDelete);
+
+        boolean result = dao.deleteStudent(studentIdToDelete, userIdToDelete);
+
         if (result) {
-            System.out.println("RESULT: Success! (Student was enrolled)");
+            System.out.println("SUCCESS: Student and User deleted from database.");
         } else {
-            System.out.println("RESULT: Failed! (Logic correctly blocked enrollment or DB error occurred)");
+            System.out.println("FAILURE: Check the IDE console for SQL Error logs.");
         }
-        
-        System.out.println("=== TEST FINISHED ===");
+        System.out.println("--- TEST FINISHED ---");
     }
 }

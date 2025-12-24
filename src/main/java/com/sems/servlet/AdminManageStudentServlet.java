@@ -77,16 +77,20 @@ public class AdminManageStudentServlet extends HttpServlet {
 
         if ("DELETE".equals(action)) {
             String studentIdStr = request.getParameter("studentId");
-            String userIdStr = request.getParameter("userId"); // Captured from the hidden input in JSP
+            String userIdStr = request.getParameter("userId");
 
             if (studentIdStr != null && !studentIdStr.isEmpty() && userIdStr != null && !userIdStr.isEmpty()) {
                 try {
                     int sId = Integer.parseInt(studentIdStr);
                     int uId = Integer.parseInt(userIdStr);
 
-                    // Call the double-delete method in your DAO
-                    studentDAO.deleteStudent(sId, uId);
+                    boolean deleted = studentDAO.deleteStudent(sId, uId);
 
+                    if (deleted) {
+                        // Redirect immediately on success to prevent further execution
+                        response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet?status=deleteSuccess");
+                        return;
+                    }
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }

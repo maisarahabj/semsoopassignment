@@ -200,41 +200,67 @@ public class StudentDAO {
 
     // ADMIN DELETE STUDENT
     public boolean deleteStudent(int studentId, int userId) {
-        String deleteStudentSql = "DELETE FROM students WHERE student_id = ?";
-        String deleteUserSql = "DELETE FROM users WHERE user_id = ?";
-
         Connection conn = null;
         try {
             conn = DatabaseConnection.getConnection();
-            conn.setAutoCommit(false); // Start transaction
+            conn.setAutoCommit(false); // Start Transaction
 
-            // 1. Delete Student Profile
-            try (PreparedStatement ps1 = conn.prepareStatement(deleteStudentSql)) {
-                ps1.setInt(1, studentId);
-                ps1.executeUpdate();
+            System.out.println("DEBUG: Starting delete transaction for Student ID: " + studentId);
+
+            // STEP 1: Fixed column name to 'enrolled_count' to match your SQL table
+            String updateCap = "UPDATE courses SET enrolled_count = GREATEST(0, enrolled_count - 1) "
+                    + "WHERE course_id IN (SELECT course_id FROM enrollments WHERE student_id = ?)";
+
+            try (PreparedStatement ps = conn.prepareStatement(updateCap)) {
+                ps.setInt(1, studentId);
+                int rowsAffected = ps.executeUpdate();
+                System.out.println("DEBUG: Capacity updated for " + rowsAffected + " courses.");
             }
 
-            // 2. Delete User Credentials
-            try (PreparedStatement ps2 = conn.prepareStatement(deleteUserSql)) {
-                ps2.setInt(1, userId);
-                ps2.executeUpdate();
+            // STEP 2: Delete Enrollments
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM enrollments WHERE student_id = ?")) {
+                ps.setInt(1, studentId);
+                ps.executeUpdate();
+                System.out.println("DEBUG: Enrollments cleared.");
             }
 
-            conn.commit(); // Save both deletions
+            // STEP 3: Delete Student Profile
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM students WHERE student_id = ?")) {
+                ps.setInt(1, studentId);
+                ps.executeUpdate();
+                System.out.println("DEBUG: Student profile deleted.");
+            }
+
+            // STEP 4: Delete User account
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM users WHERE user_id = ?")) {
+                ps.setInt(1, userId);
+                ps.executeUpdate();
+                System.out.println("DEBUG: User account deleted.");
+            }
+
+            conn.commit(); // Finalize all changes
+            System.out.println("DEBUG: Transaction committed successfully.");
             return true;
+
         } catch (SQLException e) {
-            if (conn != null) try {
-                conn.rollback();
-            } catch (SQLException ex) {
+            System.out.println("DEBUG: SQL ERROR: " + e.getMessage());
+            if (conn != null) {
+                try {
+                    conn.rollback(); // Undo everything if Step 1 (or any step) fails
+                    System.out.println("DEBUG: Transaction rolled back.");
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
             }
             e.printStackTrace();
             return false;
         } finally {
-            try {
-                if (conn != null) {
+            if (conn != null) {
+                try {
                     conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
-            } catch (SQLException e) {
             }
         }
     }
