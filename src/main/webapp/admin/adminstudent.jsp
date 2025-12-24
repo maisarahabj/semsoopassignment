@@ -99,14 +99,28 @@
 
         <div id="addStudentOverlay" class="modal-overlay">
             <div class="modal-box" style="width: 550px;">
-                <div class="modal-icon" style="color: #38a169;"><i class="fas fa-user-circle"></i></div>
+                <div class="modal-icon" style="color: #38a169;"><i class="fas fa-user-plus"></i></div>
                 <h3>Add New Student Record</h3>
-                <p style="color: #666; margin-bottom: 20px;">Enter the student's details manually.</p>
+                <p style="color: #666; margin-bottom: 20px;">Enter the student's account and profile details manually.</p>
 
                 <form action="${pageContext.request.contextPath}/AdminManageStudentServlet" method="POST">
                     <input type="hidden" name="action" value="ADD_MANUAL">
 
                     <div class="modal-form-grid">
+                        <div class="input-group full-width">
+                            <label>Student ID (Manual Assignment)</label>
+                            <input type="text" name="studentId" required class="modal-input" placeholder="e.g., 2023001">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Account Username</label>
+                            <input type="text" name="username" required class="modal-input" placeholder="Username for login">
+                        </div>
+                        <div class="input-group">
+                            <label>Account Password</label>
+                            <input type="password" name="password" required class="modal-input" placeholder="Initial password">
+                        </div>
+
                         <div class="input-group">
                             <label>First Name</label>
                             <input type="text" name="firstName" required class="modal-input">
@@ -115,10 +129,12 @@
                             <label>Last Name</label>
                             <input type="text" name="lastName" required class="modal-input">
                         </div>
+
                         <div class="input-group full-width">
                             <label>Email Address</label>
                             <input type="email" name="email" required class="modal-input">
                         </div>
+
                         <div class="input-group">
                             <label>Date of Birth</label>
                             <input type="date" name="dob" required class="modal-input">
@@ -127,6 +143,7 @@
                             <label>Phone Number</label>
                             <input type="text" name="phone" class="modal-input" placeholder="Optional">
                         </div>
+
                         <div class="input-group full-width">
                             <label>Home Address</label>
                             <textarea name="address" rows="2" class="modal-input" style="height: auto;"></textarea>

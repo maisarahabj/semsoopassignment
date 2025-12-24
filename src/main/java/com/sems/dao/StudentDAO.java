@@ -227,6 +227,64 @@ public class StudentDAO {
         }
     }
 
+    //ADMINview: manual registration
+    public boolean createStudentManually(Student student, String username, String password) {
+        String userSql = "INSERT INTO users (username, password_hash, role, status) VALUES (?, ?, 'student', 'ACTIVE')";
+        String studentSql = "INSERT INTO students (student_id, user_id, first_name, last_name, email, phone, address, dob) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false); // Start Transaction
+
+            // 1. Insert into Users Table
+            int generatedUserId = -1;
+            try (PreparedStatement psUser = conn.prepareStatement(userSql, Statement.RETURN_GENERATED_KEYS)) {
+                psUser.setString(1, username);
+                psUser.setString(2, password); // Note: In a real app, hash this!
+                psUser.executeUpdate();
+
+                try (ResultSet rs = psUser.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        generatedUserId = rs.getInt(1);
+                    }
+                }
+            }
+
+            // 2. Insert into Students Table using the new User ID
+            try (PreparedStatement psStudent = conn.prepareStatement(studentSql)) {
+                psStudent.setInt(1, student.getStudentId()); // The manual ID from Admin
+                psStudent.setInt(2, generatedUserId);
+                psStudent.setString(3, student.getFirstName());
+                psStudent.setString(4, student.getLastName());
+                psStudent.setString(5, student.getEmail());
+                psStudent.setString(6, student.getPhone());
+                psStudent.setString(7, student.getAddress());
+                psStudent.setDate(8, student.getDob());
+                psStudent.executeUpdate();
+            }
+
+            conn.commit(); // Save everything
+            return true;
+        } catch (SQLException e) {
+            if (conn != null) try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     // map SQL Result to Student Model
     private Student extractStudentFromResultSet(ResultSet rs) throws SQLException {
         Student student = new Student();

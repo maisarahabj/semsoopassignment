@@ -35,6 +35,37 @@ public class AdminManageStudentServlet extends HttpServlet {
 
         String action = request.getParameter("action");
 
+        if ("ADD_MANUAL".equals(action)) {
+            // Extract Account Data
+            String username = request.getParameter("username");
+            String pass = request.getParameter("password");
+            int manualId = Integer.parseInt(request.getParameter("studentId"));
+
+            // Extract Profile Data
+            Student s = new Student();
+            s.setStudentId(manualId);
+            s.setFirstName(request.getParameter("firstName"));
+            s.setLastName(request.getParameter("lastName"));
+            s.setEmail(request.getParameter("email"));
+            s.setPhone(request.getParameter("phone"));
+            s.setAddress(request.getParameter("address"));
+
+            // Convert String date to SQL Date
+            try {
+                java.sql.Date dob = java.sql.Date.valueOf(request.getParameter("dob"));
+                s.setDob(dob);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // Call the new transactional method
+            boolean success = studentDAO.createStudentManually(s, username, pass);
+
+            if (success) {
+                // Success! We can add a message attribute if we want
+            }
+        }
+
         if ("DELETE".equals(action)) {
             String studentIdStr = request.getParameter("studentId");
             String userIdStr = request.getParameter("userId"); // Captured from the hidden input in JSP
