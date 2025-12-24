@@ -227,7 +227,7 @@
                                         <th>Code</th>
                                         <th>Course Name</th>
                                         <th>Schedule</th>
-                                        <th style="text-align: right;">Action</th>
+                                        <th style="text-align: left;">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="viewCourseList">
@@ -237,6 +237,19 @@
                         </div>
                     </div>
                 </div>
+                                <!<!-- Confirm deletion -->
+                <div id="unenrollConfirmOverlay" class="modal-overlay" style="display:none; z-index: 2000;">
+                    <div class="modal-box" style="width: 400px; text-align: center;">
+                        <div class="modal-icon" style="color: #e11d48; background: #fff1f2;"><i class="fas fa-book-minus"></i></div>
+                        <h3>Unenroll Student?</h3>
+                        <p style="color: #64748b; margin-top: 10px;">Are you sure you want to remove this student from the course?</p>
+
+                        <div class="modal-actions" style="margin-top: 25px; justify-content: center; gap: 15px;">
+                            <button type="button" onclick="closeUnenrollModal()" class="btn-cancel">Cancel</button>
+                            <button type="button" id="confirmUnenrollBtn" class="btn-confirm" style="background: #e11d48;">Remove Course</button>
+                        </div>
+                    </div>
+                </div>               
 
                 <div class="modal-actions" style="margin-top: 30px; justify-content: flex-end;">
                     <button type="button" onclick="closeProfileModal()" class="btn-cancel">Close</button>
