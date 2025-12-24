@@ -1,6 +1,7 @@
 package com.sems.util;
 
 import com.sems.dao.UserDAO;
+import com.sems.dao.EnrollmentDAO;
 import com.sems.model.User;
 import java.util.List;
 import java.util.Scanner;
@@ -8,45 +9,23 @@ import java.util.Scanner;
 public class TestConnection {
 
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        UserDAO userDAO = new UserDAO();
+        EnrollmentDAO dao = new EnrollmentDAO();
+        
+        // --- TEST SCENARIO: ENROLLING IN A FULL COURSE ---
+        // Assume Student ID 1 and Course ID 1 (Make sure Course 1 exists in DB)
+        int testStudentId = 1; 
+        int testCourseId = 1;
 
-        System.out.println("=== SEMS ADMIN CONSOLE LOGIN ===");
-        System.out.print("Enter Admin Username: ");
-        String username = sc.nextLine();
-        System.out.print("Enter Admin Password: ");
-        String password = sc.nextLine();
-
-        // 1. Simulate LoginServlet Authentication
-        User adminUser = userDAO.validateUser(username, password);
-
-        if (adminUser != null && "admin".equalsIgnoreCase(adminUser.getRole())) {
-            System.out.println("\n[SUCCESS] Welcome, Admin: " + adminUser.getUsername());
-            System.out.println("Status: " + adminUser.getStatus());
-            
-            // 2. Simulate AdminPendingServlet Data Loading
-            System.out.println("\n--- Fetching Registration Queue (Pending Users) ---");
-            List<User> pendingList = userDAO.getPendingUsers();
-
-            if (pendingList.isEmpty()) {
-                System.out.println("Queue is empty. No pending registrations found.");
-            } else {
-                System.out.println("Found " + pendingList.size() + " users waiting for approval:");
-                System.out.println("--------------------------------------------------");
-                System.out.printf("%-10s | %-15s | %-10s%n", "User ID", "Username", "Role");
-                System.out.println("--------------------------------------------------");
-                
-                for (User u : pendingList) {
-                    System.out.printf("%-10d | %-15s | %-10s%n", 
-                        u.getUserId(), u.getUsername(), u.getRole());
-                }
-            }
-        } else if (adminUser != null) {
-            System.out.println("[DENIED] User authenticated but is NOT an admin. Current role: " + adminUser.getRole());
+        System.out.println("=== STARTING ENROLLMENT TEST ===");
+        
+        boolean result = dao.adminEnrollStudentInCourse(testStudentId, testCourseId);
+        
+        if (result) {
+            System.out.println("RESULT: Success! (Student was enrolled)");
         } else {
-            System.out.println("[FAILED] Invalid admin credentials.");
+            System.out.println("RESULT: Failed! (Logic correctly blocked enrollment or DB error occurred)");
         }
         
-        sc.close();
+        System.out.println("=== TEST FINISHED ===");
     }
 }
