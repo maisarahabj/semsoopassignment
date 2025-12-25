@@ -18,10 +18,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 
 /* Black Overlay */
 .modal-overlay {
-    display: none; 
+    display: none;
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(5px);
     z-index: 1000;
@@ -175,14 +177,32 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 }
 
 /* Specific Column Widths for Course Management (8 Columns Total) */
-.admin-table th:nth-child(1), .admin-table td:nth-child(1) { width: 8%; }  /* Code */
-.admin-table th:nth-child(2), .admin-table td:nth-child(2) { width: 22%; } /* Course Name */
-.admin-table th:nth-child(3), .admin-table td:nth-child(3) { width: 7%; }  /* Credits */
-.admin-table th:nth-child(4), .admin-table td:nth-child(4) { width: 10%; } /* Capacity */
-.admin-table th:nth-child(5), .admin-table td:nth-child(5) { width: 10%; } /* Day */
-.admin-table th:nth-child(6), .admin-table td:nth-child(6) { width: 10%; } /* Time */
-.admin-table th:nth-child(7), .admin-table td:nth-child(7) { width: 18%; text-align: center; } /* Enrolled List */
-.admin-table th:nth-child(8), .admin-table td:nth-child(8) { width: 15%; text-align: center; } /* Action (Delete) */
+.admin-table th:nth-child(1), .admin-table td:nth-child(1) {
+    width: 8%;
+}  /* Code */
+.admin-table th:nth-child(2), .admin-table td:nth-child(2) {
+    width: 22%;
+} /* Course Name */
+.admin-table th:nth-child(3), .admin-table td:nth-child(3) {
+    width: 7%;
+}  /* Credits */
+.admin-table th:nth-child(4), .admin-table td:nth-child(4) {
+    width: 10%;
+} /* Capacity */
+.admin-table th:nth-child(5), .admin-table td:nth-child(5) {
+    width: 10%;
+} /* Day */
+.admin-table th:nth-child(6), .admin-table td:nth-child(6) {
+    width: 10%;
+} /* Time */
+.admin-table th:nth-child(7), .admin-table td:nth-child(7) {
+    width: 18%;
+    text-align: center;
+} /* Enrolled List */
+.admin-table th:nth-child(8), .admin-table td:nth-child(8) {
+    width: 15%;
+    text-align: center;
+} /* Action (Delete) */
 
 /* Global Table Fix to prevent overflow */
 .admin-table {
@@ -284,4 +304,64 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 .btn-approve:hover {
     background: #4f46e5;
     color: white;
+}
+
+/* Prerequisite Badge - Admin Style */
+.badge-container {
+    position: relative;
+    display: inline-block;
+}
+
+.badge-prereq {
+    background-color: #facc15;
+    color: #854d0e;
+    font-size: 0.6rem; /* Slightly smaller for admin table */
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    border: 1px solid #eab308;
+    display: inline-flex;
+    align-items: center;
+    cursor: help;
+}
+
+.badge-prereq i {
+    font-size: 0.55rem;
+    margin-right: 3px;
+}
+
+/* Tooltip Pop-up */
+.prereq-tooltip {
+    visibility: hidden;
+    width: 180px;
+    background-color: #1e293b;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 6px 10px;
+    position: absolute;
+    z-index: 100;
+    bottom: 130%;
+    left: 0; /* Align to the left in admin view */
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    z-index: 10001;
+}
+
+.prereq-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 20px; /* Arrow on the left */
+    border-width: 5px;
+    border-style: solid;
+    border-color: #1e293b transparent transparent transparent;
+}
+
+.badge-container:hover .prereq-tooltip {
+    visibility: visible;
+    opacity: 1;
 }

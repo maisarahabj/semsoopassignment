@@ -80,12 +80,32 @@
                                     for (Course c : courses) {
                             %>
                             <tr>
-                                <td><strong><%= c.getCourseCode()%></strong></td>
-                                <td><%= c.getCourseName()%></td>
+                                <td><%= c.getCourseCode()%></td>
+
+                                <td>
+                                    <div class="course-name-wrapper" style="display: flex; flex-direction: column; align-items: flex-start;">
+                                        <span class="course-title" style="font-weight: 400;"><%= c.getCourseName()%></span>
+
+                                        <% if (c.isHasPrereq()) {%>
+                                        <div class="badge-container" style="margin-top: 4px;">
+                                            <span class="badge-prereq">
+                                                <i class="fas fa-lock"></i> Prerequisite
+                                            </span>
+                                            <div class="prereq-tooltip">
+                                                Requires: <strong><%= c.getPrerequisiteName()%></strong>
+                                            </div>
+                                        </div>
+                                        <% }%>
+                                    </div>
+                                </td>
+
                                 <td><%= c.getCredits()%></td> 
+
                                 <td><%= c.getEnrolledCount()%>/<%= c.getCapacity()%></td> 
+
                                 <td><%= c.getCourseDay()%></td>
-                                <td><%= c.getCourseTime().substring(0, 5)%></td>
+
+                                <td><%= (c.getCourseTime() != null && c.getCourseTime().length() >= 5) ? c.getCourseTime().substring(0, 5) : "TBA"%></td>
 
                                 <td style="text-align: center;">
                                     <button type="button" class="btn-approve" 
@@ -101,8 +121,10 @@
                                     </button>
                                 </td>
                             </tr>
-                            <% }
-                                }%>
+                            <%
+                                    }
+                                }
+                            %>
                         </tbody>
                     </table>
                 </div>
