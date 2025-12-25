@@ -233,6 +233,24 @@
             </div>
         </div>
 
+        <div id="prereqErrorModal" class="modal-overlay" style="display: none;">
+            <div class="modal-box">
+                <div class="modal-icon" style="color: #ef4444;">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3 style="color: #1e293b;">Enrollment Blocked</h3>
+                <p id="prereqMessage" style="color: #64748b; margin-top: 10px;">
+                    This student has not met the required prerequisite for this course. 
+                    A grade of <strong>A, B, C, or Exempted</strong> is required.
+                </p>
+                <div class="modal-actions" style="margin-top: 25px;">
+                    <button onclick="closePrereqModal()" class="btn-confirm" style="background-color: #ef4444; color: white; border: none; width: 100%;">
+                        Understand
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <script>window.contextPath = '${pageContext.request.contextPath}';</script>
         <script src="${pageContext.request.contextPath}/js/adminstudent.js"></script>
     </body>

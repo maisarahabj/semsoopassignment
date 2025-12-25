@@ -116,7 +116,7 @@
                                     <i class="fas fa-check-double enrolled-icon"></i>
                                     <% }%>
                                 </td>
-                                <td class="course-code-tag"><strong><%= c.getCourseCode()%></strong></td>
+                                <td class="course-code-tag"><strong><%= c.getCourseCode()%></td>
 
                                 <td>
                                     <div class="course-name-wrapper">

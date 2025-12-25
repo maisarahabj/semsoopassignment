@@ -4,8 +4,8 @@
  */
 
 // --- Global State ---
-let currentViewedStudentId = null; 
-let pendingDropCourseId = null;    
+let currentViewedStudentId = null;
+let pendingDropCourseId = null;
 
 // --- Modal Toggle Functions ---
 
@@ -115,13 +115,15 @@ function toggleAdminEdit() {
     const inputs = document.querySelectorAll('#profileOverlay .modal-input');
 
     viewData.forEach(el => {
-        if (el.id !== 'viewFullName') el.classList.toggle('hidden');
+        if (el.id !== 'viewFullName')
+            el.classList.toggle('hidden');
     });
-    
+
     inputs.forEach(el => el.classList.toggle('hidden'));
-    
-    if (actions) actions.classList.toggle('hidden');
-    
+
+    if (actions)
+        actions.classList.toggle('hidden');
+
     console.log("Toggle complete.");
 }
 
@@ -133,9 +135,12 @@ function resetAdminModalState() {
     const nameHeading = document.getElementById('viewFullName');
     const nameInputs = document.getElementById('editNameContainer');
 
-    if (actions) actions.classList.add('hidden');
-    if (nameHeading) nameHeading.classList.remove('hidden');
-    if (nameInputs) nameInputs.classList.add('hidden');
+    if (actions)
+        actions.classList.add('hidden');
+    if (nameHeading)
+        nameHeading.classList.remove('hidden');
+    if (nameInputs)
+        nameInputs.classList.add('hidden');
 
     document.querySelectorAll('#profileOverlay .view-data').forEach(el => el.classList.remove('hidden'));
     document.querySelectorAll('#profileOverlay .modal-input').forEach(el => el.classList.add('hidden'));
@@ -175,22 +180,23 @@ function enrollStudentAction() {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: params
     })
-    .then(res => res.text())
-    .then(res => {
-        if (res.trim() === "success") {
-            showToast("Student enrolled successfully!");
-            loadEnrolledCourses(currentViewedStudentId);
-            document.getElementById('enrollCourseSelect').value = "";
-        } else {
-            alert("Failed to enroll.");
-        }
-    });
+            .then(res => res.text())
+            .then(res => {
+                if (res.trim() === "success") {
+                    showToast("Student enrolled successfully!");
+                    loadEnrolledCourses(currentViewedStudentId);
+                    document.getElementById('enrollCourseSelect').value = "";
+                } else {
+                    alert("Failed to enroll.");
+                }
+            });
 }
 
 function dropCourseAction(courseId) {
     pendingDropCourseId = courseId;
     const overlay = document.getElementById('unenrollConfirmOverlay');
-    if (overlay) overlay.style.display = 'flex';
+    if (overlay)
+        overlay.style.display = 'flex';
 
     const confirmBtn = document.getElementById('confirmUnenrollBtn');
     if (confirmBtn) {
@@ -211,14 +217,14 @@ function executeUnenroll() {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: params
     })
-    .then(res => res.text())
-    .then(res => {
-        if (res.trim() === "success") {
-            showToast("Course removed successfully!");
-            loadEnrolledCourses(currentViewedStudentId);
-            closeUnenrollModal();
-        }
-    });
+            .then(res => res.text())
+            .then(res => {
+                if (res.trim() === "success") {
+                    showToast("Course removed successfully!");
+                    loadEnrolledCourses(currentViewedStudentId);
+                    closeUnenrollModal();
+                }
+            });
 }
 
 // --- Utility Functions ---
@@ -235,8 +241,10 @@ window.onclick = function (event) {
         if (event.target == overlay) {
             overlay.style.display = 'none';
             document.body.style.overflow = 'auto'; // Unlock scroll
-            if (overlay.id === 'profileOverlay') resetAdminModalState();
-            if (overlay.id === 'unenrollConfirmOverlay') pendingDropCourseId = null;
+            if (overlay.id === 'profileOverlay')
+                resetAdminModalState();
+            if (overlay.id === 'unenrollConfirmOverlay')
+                pendingDropCourseId = null;
         }
     });
 };
@@ -261,11 +269,25 @@ function filterStudents() {
     tableRows.forEach(row => {
         // We get the text content of the whole row (ID, Name, Email, etc.)
         const rowText = row.textContent.toLowerCase();
-        
+
         if (rowText.includes(input)) {
             row.style.display = ""; // Show row
         } else {
             row.style.display = "none"; // Hide row
         }
     });
+}
+
+window.onload = function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('error') === 'missing_prereq') {
+        document.getElementById('prereqErrorModal').style.display = 'flex';
+    }
+};
+
+function closePrereqModal() {
+    document.getElementById('prereqErrorModal').style.display = 'none';
+    // Optional: Clean the URL so the popup doesn't keep appearing on refresh
+    const newUrl = window.location.pathname + window.location.search.replace(/[\?&]error=missing_prereq/, '').replace(/&studentId=\d+/, '');
+    window.history.replaceState({}, document.title, newUrl);
 }

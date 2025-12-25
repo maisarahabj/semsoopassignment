@@ -72,17 +72,23 @@ public class EnrollmentServlet extends HttpServlet {
 
         boolean success = false;
 
-        // 5. Action Logic Execution
+        // 5. Action Logic Execution (UPDATED)
         if ("enroll".equals(action)) {
 
             // --- SECURITY GATE: Prerequisite Check ---
-            // Verifies if the student has passed required foundational courses with A, B, or C.
+            // Verifies if the student has passed required foundational courses.
             boolean canEnroll = enrollmentDAO.isPrerequisiteSatisfied(targetStudentId, courseId);
 
             if (!canEnroll) {
-                // If prerequisite check fails, redirect back with error code
-                response.sendRedirect(request.getContextPath() + "/student/AddCourseServlet?error=missing_prereq");
-                return;
+                // REDIRECT LOGIC: Send the user back to their respective dashboard
+                if ("admin".equals(role)) {
+                    // Admin stays in admin student management
+                    response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet?error=missing_prereq&studentId=" + targetStudentId);
+                } else {
+                    // Student stays in student add course page
+                    response.sendRedirect(request.getContextPath() + "/student/AddCourseServlet?error=missing_prereq");
+                }
+                return; // EXIT EARLY - do not proceed to enrollment
             }
 
             // If check passes, execute enrollment transaction (Insert + Increment Count)
@@ -93,10 +99,10 @@ public class EnrollmentServlet extends HttpServlet {
             success = enrollmentDAO.adminDropStudentFromCourse(targetStudentId, courseId);
         }
 
-        // 6. Navigation Management (Role-based redirection)
+        // 6. Navigation Management (Role-based redirection for SUCCESSFUL actions)
         if ("admin".equals(role)) {
             // Admins stay on the student management page
-            response.sendRedirect("adminstudent.jsp?success=" + success);
+            response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet?success=" + success);
         } else {
             // Students go back to the relevant view depending on the action performed
             if ("drop".equals(action)) {
