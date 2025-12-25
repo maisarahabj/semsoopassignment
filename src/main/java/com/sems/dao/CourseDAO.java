@@ -1,6 +1,9 @@
 /**
  *
  * @author maisarahabjalil
+ *
+ * for course table in workbench
+ * extracts dbase rows n turn into Java objs for student n admin dash
  */
 package com.sems.dao;
 
@@ -12,12 +15,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Data Access Object for Course operations. Handles course creation, retrieval,
- * and seat count management.
- *
- * @author maisarahabjalil
- */
 public class CourseDAO {
 
     private static final Logger LOGGER = Logger.getLogger(CourseDAO.class.getName());
@@ -52,9 +49,7 @@ public class CourseDAO {
     private static final String UPDATE_DECREMENT_ENROLLED
             = "UPDATE courses SET enrolled_count = enrolled_count - 1 WHERE course_id = ? AND enrolled_count > 0";
 
-    /**
-     * Helper method to find the course_id based on a course_code.
-     */
+    //finds PK of course table using course code name
     public int getCourseIdByCode(String courseCode) {
         int id = -1;
         Connection conn = null;
@@ -78,6 +73,7 @@ public class CourseDAO {
         return id;
     }
 
+    //ADMIN VIEW: creating course 
     public boolean createCourse(Course course) {
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -91,8 +87,7 @@ public class CourseDAO {
             // Mapping the new integer fields
             pstmt.setInt(3, course.getCredits());
             pstmt.setInt(4, course.getCapacity());
-
-            pstmt.setInt(5, 0); // New courses start with 0 enrolled
+            pstmt.setInt(5, 0);
             pstmt.setString(6, course.getCourseDay());
             pstmt.setString(7, course.getCourseTime());
 
@@ -105,6 +100,7 @@ public class CourseDAO {
         return false;
     }
 
+    //gets all courses including pre-req
     public List<Course> getAllCourses() {
         List<Course> courses = new ArrayList<>();
         Connection conn = null;
@@ -125,11 +121,20 @@ public class CourseDAO {
         return courses;
     }
 
+    // STU VIEW: dashboard schedule - getting courses enrolled by specific student
     public List<Course> getCoursesByStudentId(int studentId) {
         List<Course> enrolledCourses = new ArrayList<>();
-        String sql = "SELECT c.* FROM courses c "
+
+        String sql = "SELECT c.*, p_table.prereq_name as prerequisite_name, "
+                + "CASE WHEN p_table.course_id IS NOT NULL THEN 1 ELSE 0 END as has_prereq "
+                + "FROM courses c "
+                + "LEFT JOIN (SELECT p.course_id, c2.course_name as prereq_name "
+                + "           FROM prerequisites p "
+                + "           JOIN courses c2 ON p.prerequisite_course_id = c2.course_id) p_table "
+                + "ON c.course_id = p_table.course_id "
                 + "JOIN enrollments e ON c.course_id = e.course_id "
                 + "WHERE e.student_id = ? AND e.status = 'enrolled'";
+
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, studentId);
             ResultSet rs = pstmt.executeQuery();
@@ -142,6 +147,7 @@ public class CourseDAO {
         return enrolledCourses;
     }
 
+    // BOTH VIEW: increase/decrease enrollment count if a student is enrolled
     public boolean incrementEnrolledCount(int courseId) {
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -174,12 +180,20 @@ public class CourseDAO {
         return false;
     }
 
-    // students
+    // STU VIEW: filters course by day for student timetable page
     public List<Course> getCoursesByDay(int studentId, String day) {
         List<Course> list = new ArrayList<>();
-        String sql = "SELECT c.* FROM courses c "
+
+        String sql = "SELECT c.*, p_table.prereq_name as prerequisite_name, "
+                + "CASE WHEN p_table.course_id IS NOT NULL THEN 1 ELSE 0 END as has_prereq "
+                + "FROM courses c "
+                + "LEFT JOIN (SELECT p.course_id, c2.course_name as prereq_name "
+                + "           FROM prerequisites p "
+                + "           JOIN courses c2 ON p.prerequisite_course_id = c2.course_id) p_table "
+                + "ON c.course_id = p_table.course_id "
                 + "JOIN enrollments e ON c.course_id = e.course_id "
                 + "WHERE e.student_id = ? AND c.course_day = ? AND e.status = 'enrolled'";
+
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, studentId);
             ps.setString(2, day);
@@ -193,19 +207,41 @@ public class CourseDAO {
         return list;
     }
 
+    //ADMIN: delete entire course completely
     public boolean deleteCourse(int courseId) {
-        String sql = "DELETE FROM courses WHERE course_id = ?";
+
+        String deleteEnrollmentsSql = "DELETE FROM enrollments WHERE course_id = ?";
+        String deleteCourseSql = "DELETE FROM courses WHERE course_id = ?";
+
         Connection conn = null;
-        PreparedStatement pstmt = null;
+        PreparedStatement pstmtEnroll = null;
+        PreparedStatement pstmtCourse = null;
+
         try {
             conn = DatabaseConnection.getConnection();
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, courseId);
-            return pstmt.executeUpdate() > 0;
+            conn.setAutoCommit(false);
+
+            // remove up enrollments row
+            pstmtEnroll = conn.prepareStatement(deleteEnrollmentsSql);
+            pstmtEnroll.setInt(1, courseId);
+            pstmtEnroll.executeUpdate();
+
+            // delete the course row
+            pstmtCourse = conn.prepareStatement(deleteCourseSql);
+            pstmtCourse.setInt(1, courseId);
+            boolean success = pstmtCourse.executeUpdate() > 0;
+
+            conn.commit();
+            return success;
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error deleting course", e);
+            if (conn != null) try {
+                conn.rollback();
+            } catch (SQLException ex) {
+            }
+            LOGGER.log(Level.SEVERE, "Error deleting course and its enrollments", e);
         } finally {
-            DatabaseConnection.closeResources(null, pstmt, conn);
+            DatabaseConnection.closeResources(null, pstmtEnroll, null);
+            DatabaseConnection.closeResources(null, pstmtCourse, conn);
         }
         return false;
     }
@@ -213,12 +249,11 @@ public class CourseDAO {
     //ADMIMN dash todays course
     public List<Course> getTodayCourses(String dayName) {
         List<Course> list = new ArrayList<>();
-        // Use the parameter in your SQL query
+
         String sql = "SELECT * FROM courses WHERE course_day = ? ORDER BY course_time ASC";
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            // This binds "Wednesday" (or whatever currentDay is) to the '?'
             ps.setString(1, dayName);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -243,8 +278,7 @@ public class CourseDAO {
     //ADMIN VIEW: view student card
     public List<Course> getEnrolledCoursesByStudentId(int studentId) {
         List<Course> list = new ArrayList<>();
-        // This query joins the enrollment table (to find the student's picks)
-        // with the courses table (to get the details like Name and Time)
+
         String sql = "SELECT c.* FROM courses c "
                 + "JOIN enrollments e ON c.course_id = e.course_id "
                 + "WHERE e.student_id = ?";
@@ -269,6 +303,70 @@ public class CourseDAO {
         return list;
     }
 
+    /**
+     * ADMIN: creating course with pre-req
+     * creates a course and optionally links a prerequisite in the prerequisites
+     * table. Uses a Transaction (commit/rollback) to ensure both succeed or
+     * both fail.
+     */
+    public boolean createCourseWithPrereq(Course course, int prerequisiteId) {
+        Connection conn = null;
+        PreparedStatement pstmtCourse = null;
+        PreparedStatement pstmtPrereq = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false); // Start Transaction
+
+            // 1. Insert the Course - RETURN_GENERATED_KEYS is needed to get the new Course ID
+            String sqlCourse = "INSERT INTO courses (course_code, course_name, credits, capacity, enrolled_count, course_day, course_time) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            pstmtCourse = conn.prepareStatement(sqlCourse, Statement.RETURN_GENERATED_KEYS);
+            pstmtCourse.setString(1, course.getCourseCode());
+            pstmtCourse.setString(2, course.getCourseName());
+            pstmtCourse.setInt(3, course.getCredits());
+            pstmtCourse.setInt(4, course.getCapacity());
+            pstmtCourse.setInt(5, 0);
+            pstmtCourse.setString(6, course.getCourseDay());
+            pstmtCourse.setString(7, course.getCourseTime());
+
+            int affectedRows = pstmtCourse.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating course failed.");
+            }
+
+            // 2. Get the newly created Course ID
+            int newCourseId = 0;
+            rs = pstmtCourse.getGeneratedKeys();
+            if (rs.next()) {
+                newCourseId = rs.getInt(1);
+            }
+
+            // 3. If a prerequisite was selected, insert it into the prerequisites table
+            if (prerequisiteId > 0 && newCourseId > 0) {
+                String sqlPrereq = "INSERT INTO prerequisites (course_id, prerequisite_course_id) VALUES (?, ?)";
+                pstmtPrereq = conn.prepareStatement(sqlPrereq);
+                pstmtPrereq.setInt(1, newCourseId);
+                pstmtPrereq.setInt(2, prerequisiteId);
+                pstmtPrereq.executeUpdate();
+            }
+
+            conn.commit(); // Save everything
+            return true;
+
+        } catch (SQLException e) {
+            if (conn != null) try {
+                conn.rollback();
+            } catch (SQLException ex) {
+            }
+            LOGGER.log(Level.SEVERE, "Error creating course with prereq", e);
+            return false;
+        } finally {
+            DatabaseConnection.closeResources(rs, pstmtCourse, null);
+            DatabaseConnection.closeResources(null, pstmtPrereq, conn);
+        }
+    }
+
     //mapping template - javas telling SQL which cell to look at
     private Course extractCourseFromResultSet(ResultSet rs) throws SQLException {
         Course course = new Course();
@@ -280,8 +378,15 @@ public class CourseDAO {
         course.setEnrolledCount(rs.getInt("enrolled_count"));
         course.setCourseDay(rs.getString("course_day"));
         course.setCourseTime(rs.getString("course_time"));
-        course.setHasPrereq(rs.getInt("has_prereq") == 1);
-        course.setPrerequisiteName(rs.getString("prerequisite_name"));
+
+        try {
+            course.setHasPrereq(rs.getInt("has_prereq") == 1);
+            course.setPrerequisiteName(rs.getString("prerequisite_name"));
+        } catch (SQLException e) {
+
+            course.setHasPrereq(false);
+            course.setPrerequisiteName(null);
+        }
 
         return course;
     }

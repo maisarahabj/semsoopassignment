@@ -61,6 +61,7 @@ public class CourseServlet extends HttpServlet {
         }
 
         // --- ADMIN FEATURE: Adding a brand new course ---
+        // --- ADMIN FEATURE: Adding a brand new course ---
         if ("ADD".equals(action)) {
             String courseCode = request.getParameter("courseCode");
             String courseName = request.getParameter("courseName");
@@ -69,6 +70,10 @@ public class CourseServlet extends HttpServlet {
             String day = request.getParameter("courseDay");
             String time = request.getParameter("courseTime");
 
+            // 1. Grab the NEW prerequisite ID from your form
+            String prereqParam = request.getParameter("prerequisiteId");
+            int prerequisiteId = (prereqParam != null && !prereqParam.isEmpty()) ? Integer.parseInt(prereqParam) : 0;
+
             Course newCourse = new Course();
             newCourse.setCourseCode(courseCode);
             newCourse.setCourseName(courseName);
@@ -76,14 +81,14 @@ public class CourseServlet extends HttpServlet {
             newCourse.setCapacity(capacity);
             newCourse.setCourseDay(day);
 
-            // Logic to add :00 for SQL Time format
             if (time != null && time.length() == 5) {
                 newCourse.setCourseTime(time + ":00");
             } else {
                 newCourse.setCourseTime(time);
             }
 
-            boolean success = courseDAO.createCourse(newCourse);
+            // 2. Pass the prerequisiteId to a modified DAO method
+            boolean success = courseDAO.createCourseWithPrereq(newCourse, prerequisiteId);
 
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/CourseServlet?action=manage&msg=added");

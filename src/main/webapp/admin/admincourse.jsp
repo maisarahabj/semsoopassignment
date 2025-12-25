@@ -16,7 +16,82 @@
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/admincourse.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
+
+    <style>
+        .add-course-form {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .add-course-form input, .add-course-form select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .add-course-form input:focus, .add-course-form select:focus {
+            border-color: #3b82f6;
+        }
+
+        /* Fixed Widths for specific small data */
+        .input-small {
+            width: 80px;
+        }
+        .input-tiny {
+            width: 60px;
+        }
+        .input-day {
+            width: 110px;
+        }
+        .input-time {
+            width: 120px;
+        }
+
+        /* Flexible Widths for Name and Prerequisite */
+        .input-flex-large {
+            flex: 2;
+            min-width: 150px;
+        }
+        .input-flex-medium {
+            flex: 1.5;
+            min-width: 140px;
+            background-color: #ffffff;
+            color: #475569;
+            font-style: italic; /* Visual cue that it's different/optional */
+        }
+
+        .btn-add-submit {
+            background: #3b82f6;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-add-submit:hover {
+            background: #2563eb;
+        }
+    </style>
+
     <body>
+
+        <%
+            // This connects the data from the Servlet to your JSP variables
+            List<Course> courses = (List<Course>) request.getAttribute("allCourses");
+        %>
+
         <div class="dashboard-wrapper">
             <aside class="sidebar">
                 <div class="logo-section"><img src="${pageContext.request.contextPath}/assets/cat.png" class="logo-img"style="width: 50px; height: 50px; "><span class="logo-text">Barfact Admin</span></div>
@@ -38,21 +113,42 @@
 
                 <div class="schedule-container" style="margin-bottom: 20px;">
                     <h3>Add New Course</h3>
-                    <form action="${pageContext.request.contextPath}/CourseServlet" method="POST" style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; align-items: center;">
+                    <form action="${pageContext.request.contextPath}/CourseServlet" method="POST" class="add-course-form">
                         <input type="hidden" name="action" value="ADD">
-                        <input type="text" name="courseCode" placeholder="Code" required style="padding: 8px; border-radius: 5px; border: 1px solid #ddd; width: 100px;">
-                        <input type="text" name="courseName" placeholder="Course Name" required style="padding: 8px; border-radius: 5px; border: 1px solid #ddd; flex: 1;">
-                        <input type="number" name="credits" placeholder="Credits" min="1" max="5" required style="padding: 8px; border-radius: 5px; border: 1px solid #ddd; width: 80px;">
-                        <input type="number" name="capacity" placeholder="Cap" min="1" required style="padding: 8px; border-radius: 5px; border: 1px solid #ddd; width: 80px;">
-                        <select name="courseDay" required style="padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+
+                        <input type="text" name="courseCode" placeholder="Code" required class="input-small">
+
+                        <input type="text" name="courseName" placeholder="Course Name" required class="input-flex-large">
+
+                        <select name="prerequisiteId" class="input-flex-medium">
+                            <option value="">No Prerequisite (Optional)</option>
+                            <%
+                                if (courses != null) {
+                                    for (Course p : courses) {
+                            %>
+                            <option value="<%= p.getCourseId()%>">
+                                Req: <%= p.getCourseCode()%> - <%= p.getCourseName()%></option>
+                                <%
+                                        }
+                                    }
+                                %>
+                        </select>
+
+                        <input type="number" name="credits" placeholder="Crd" min="1" max="5" required class="input-tiny">
+
+                        <input type="number" name="capacity" placeholder="Cap" min="1" required class="input-tiny">
+
+                        <select name="courseDay" required class="input-day">
                             <option value="Monday">Monday</option>
                             <option value="Tuesday">Tuesday</option>
                             <option value="Wednesday">Wednesday</option>
                             <option value="Thursday">Thursday</option>
                             <option value="Friday">Friday</option>
                         </select>
-                        <input type="time" name="courseTime" required style="padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
-                        <button type="submit" class="btn-approve" style="background: #007bff; color: white; padding: 8px 15px; border-radius: 10px; ">Add Course</button>
+
+                        <input type="time" name="courseTime" required class="input-time">
+
+                        <button type="submit" class="btn-add-submit">Add Course</button>
                     </form>
                 </div>
 
@@ -67,7 +163,9 @@
                             <tr>
                                 <th>Code</th> 
                                 <th>Name</th> 
-                                <th>Credits</th> <th>Cap</th>     <th>Day</th> 
+                                <th>Credits</th>
+                                <th>Cap</th>
+                                <th>Day</th> 
                                 <th>Time</th>
                                 <th style="text-align: center;">Enrolled List</th>
                                 <th style="text-align: center;">Action</th>
@@ -75,7 +173,6 @@
                         </thead>
                         <tbody>
                             <%
-                                List<Course> courses = (List<Course>) request.getAttribute("allCourses");
                                 if (courses != null) {
                                     for (Course c : courses) {
                             %>
