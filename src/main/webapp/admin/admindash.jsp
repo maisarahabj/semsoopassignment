@@ -26,7 +26,7 @@
         <div class="dashboard-wrapper">
             <aside class="sidebar">
                 <div class="logo-section">
-                    <div class="logo-box"></div>
+                    <img src="${pageContext.request.contextPath}/assets/cat.png" class="logo-img"style="width: 50px; height: 50px; ">
                     <span class="logo-text">Barfact Admin</span>
                 </div>
 

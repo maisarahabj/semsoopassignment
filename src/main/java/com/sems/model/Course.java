@@ -13,9 +13,10 @@ public class Course {
     private int capacity;         
     private int enrolledCount;    
     private boolean isActive;     
-    // Added fields for schedule
     private String courseDay;
     private String courseTime;
+    private boolean hasPrereq;
+    private String prerequisiteName;
 
     // Constructors
     public Course() {
@@ -57,12 +58,17 @@ public class Course {
     public boolean isIsActive() { return isActive; }
     public void setIsActive(boolean isActive) { this.isActive = isActive; }
 
-    // Added Getters and Setters for schedule
     public String getCourseDay() { return courseDay; }
     public void setCourseDay(String courseDay) { this.courseDay = courseDay; }
 
     public String getCourseTime() { return courseTime; }
     public void setCourseTime(String courseTime) { this.courseTime = courseTime; }
+    
+    public boolean isHasPrereq() { return hasPrereq; }
+    public void setHasPrereq(boolean hasPrereq) { this.hasPrereq = hasPrereq; }
+    
+    public String getPrerequisiteName() { return prerequisiteName; }
+    public void setPrerequisiteName(String prerequisiteName) { this.prerequisiteName = prerequisiteName; }
 
     @Override
     public String toString() {

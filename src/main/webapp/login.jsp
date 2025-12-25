@@ -9,12 +9,12 @@
     </head>
     <body>
         <div class="login-container">
-            <div class="logo-area">
-                <div class="temp-logo" style="padding-bottom: 20px">
-                    <img src="${pageContext.request.contextPath}/assets/cat.png" class="logo-img"style="width: 200%; height: 200%; ">
-                </div>
-            </div>
 
+            <div class="logo-area">
+
+                <img src="${pageContext.request.contextPath}/assets/cat.png" class="logo-img"style="width: 200px; height: 200px; ">
+
+            </div>
             <form action="${pageContext.request.contextPath}/auth/LoginServlet" method="POST">
                 <div class="input-group">
                     <label for="username">Username</label>

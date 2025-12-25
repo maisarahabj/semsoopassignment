@@ -1,7 +1,9 @@
-/* viewprofile.css - Synchronized Version
-    Matches JSP structure: form-grid, form-group, editable-input-group
-*/
-
+html, body {
+    margin: 0 8px;
+    padding: 0;
+    height: 100%;    
+    overflow: hidden;
+}
 /* 1. Main Content Layout */
 .profile-card-container {
     background: white;

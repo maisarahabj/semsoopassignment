@@ -19,7 +19,7 @@
     <body>
         <div class="dashboard-wrapper">
             <aside class="sidebar">
-                <div class="logo-section"><div class="logo-box"></div><span class="logo-text">Barfact Admin</span></div>
+                <div class="logo-section"><img src="${pageContext.request.contextPath}/assets/cat.png" class="logo-img"style="width: 50px; height: 50px; "><span class="logo-text">Barfact Admin</span></div>
                 <nav class="nav-menu">
                     <a href="${pageContext.request.contextPath}/DashboardServlet" class="nav-link"><i class="fas fa-chart-line"></i> Overview</a>
                     <a href="${pageContext.request.contextPath}/CourseServlet?action=manage" class="nav-link"><i class="fas fa-book-open"></i> Manage Courses</a>

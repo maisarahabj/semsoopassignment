@@ -9,6 +9,17 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 
 @import url("mycourse.css"); /* Inherit everything from mycourse */
 
+
+.schedule-container {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+    height: auto !important; /* Allow it to grow with the table */
+    min-height: fit-content;
+}
+
 /* Search bar styling */
 .search-box-container {
     position: relative;
@@ -84,4 +95,272 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 
 .btn-action-add:hover {
     transform: scale(1.2);
+}
+
+/* -- START : Css for pre requisite badge & confirmation pop up -- */
+
+/* Prerequisite Badge */
+.course-name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.badge-prereq {
+    background-color: #facc15; /* Mustard Yellow */
+    color: #854d0e; /* Dark Brown for text contrast */
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid #eab308;
+    display: inline-flex;
+    align-items: center;
+    cursor: help;
+    white-space: nowrap;
+}
+
+.badge-prereq i {
+    font-size: 0.6rem;
+    margin-right: 4px;
+}
+
+/* Error Alert Banner (For Servlet Feedback) */
+.alert-banner {
+    margin: 20px 0;
+    padding: 15px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    animation: slideDown 0.4s ease-out;
+}
+
+.alert-banner.error {
+    background-color: #fef2f2;
+    border-left: 5px solid #ef4444;
+    color: #b91c1c;
+}
+
+.alert-banner i {
+    font-size: 1.2rem;
+}
+
+.close-alert {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: inherit;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.badge-container {
+    position: relative; /* Needed for the tooltip position */
+    display: inline-block;
+}
+
+/* The Pop-up Tooltip */
+.prereq-tooltip {
+    visibility: hidden;
+    width: 200px;
+    background-color: #334155; /* Dark Slate */
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 10;
+    bottom: 125%; /* Position above the badge */
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 11px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Tooltip Arrow */
+.prereq-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #334155 transparent transparent transparent;
+}
+
+/* Show tooltip on hover */
+.badge-container:hover .prereq-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.badge-prereq {
+    /* Your existing mustard yellow styles here */
+    cursor: help;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal Overlay Background */
+.custom-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+}
+
+/* Modal Box */
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: inherit;
+}
+
+.modal-icon {
+    font-size: 3rem;
+    color: #3b82f6;
+    margin-bottom: 15px;
+}
+
+.modal-content h2 {
+    margin-bottom: 10px;
+    color: #1e293b;
+    font-family: inherit;
+}
+
+.modal-content p {
+    color: #64748b;
+    margin-bottom: 25px;
+    font-family: inherit;
+}
+
+/* Action Buttons */
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn-cancel {
+    padding: 10px 20px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: inherit;
+}
+
+.btn-confirm {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: inherit;
+}
+
+.btn-confirm:hover {
+    background: #2563eb;
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+/* -- END : Css for pre requisite badge & confirmation pop up -- */
+
+/* pre-req alert
+/* Error Alert Banner Styling */
+.alert-banner {
+    margin: 20px 0;
+    padding: 15px 25px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-family: inherit;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);
+    animation: slideDown 0.5s ease-out; /* Makes it drop down smoothly */
+}
+
+.alert-banner.error {
+    background-color: #fef2f2; /* Very light red */
+    border-left: 6px solid #ef4444; /* Bright red accent */
+    color: #991b1b; /* Dark red text for readability */
+}
+
+.alert-banner i {
+    font-size: 1.4rem;
+    color: #ef4444;
+}
+
+.alert-banner span {
+    font-size: 0.95rem;
+    flex-grow: 1;
+}
+
+.close-alert {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    color: #991b1b;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.close-alert:hover {
+    opacity: 1;
+}
+
+/* Animation for the banner appearing */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

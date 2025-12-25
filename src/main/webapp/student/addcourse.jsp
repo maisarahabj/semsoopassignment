@@ -64,6 +64,16 @@
                     <div class="banner-icon"><i class="fas fa-plus-circle"></i></div>
                 </div>
 
+                <!--missing pre=-req message-->
+                <% if ("missing_prereq".equals(request.getParameter("error"))) { %>
+                <div class="alert-banner error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span><strong>Enrolment Blocked:</strong> You have not met the prerequisite requirements for this course (Minimum Grade C required).</span>
+                    <button type="button" class="close-alert" onclick="this.parentElement.style.display = 'none';">&times;</button>
+                </div>
+                <% }%>
+
+
                 <div class="schedule-container">
                     <div class="table-header-flex">
                         <div class="search-box-container">
@@ -107,15 +117,37 @@
                                     <% }%>
                                 </td>
                                 <td class="course-code-tag"><strong><%= c.getCourseCode()%></strong></td>
-                                <td><%= c.getCourseName()%></td>
+
+                                <td>
+                                    <div class="course-name-wrapper">
+                                        <span class="course-title"><%= c.getCourseName()%></span>
+                                        <% if (c.isHasPrereq()) {%>
+                                        <div class="badge-container">
+                                            <span class="badge-prereq">
+                                                <i class="fas fa-lock"></i> Prerequisite
+                                            </span>
+                                            <div class="prereq-tooltip">
+                                                Requires: <strong><%= c.getPrerequisiteName()%></strong>
+                                            </div>
+                                        </div>
+                                        <% }%>
+                                    </div>
+                                </td>
+
                                 <td><%= c.getCredits()%></td>
                                 <td><%= c.getEnrolledCount()%> / <%= c.getCapacity()%></td>
-                                <td><i class="fas fa-clock schedule-icon"></i><%= c.getCourseDay()%> (<%= c.getCourseTime().substring(0, 5)%>)</td>
+                                <td>
+                                    <i class="fas fa-clock schedule-icon"></i>
+                                    <%= c.getCourseDay()%> 
+                                    (<%= (c.getCourseTime() != null && c.getCourseTime().length() >= 5) ? c.getCourseTime().substring(0, 5) : "TBA"%>)
+                                </td>
                             </tr>
                             <%
-                                    }
                                 }
+                            } else {
                             %>
+                            <tr><td colspan="6" style="text-align:center;">No courses found.</td></tr>
+                            <% }%>
                         </tbody>
                     </table>
                 </div>
@@ -135,6 +167,20 @@
             </aside>
         </div>
 
+        <!--overlay pop up for confirming enrollment-->
+        <div id="enrollModal" class="custom-modal">
+            <div class="modal-content">
+                <div class="modal-icon"><i class="fas fa-question-circle"></i></div>
+                <h2>Course Registration</h2>
+                <p id="enrollModalText">Are you sure you want to enroll in this course?</p>
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeEnrollModal()">Cancel</button>
+                    <button id="confirmEnrollBtn" class="btn-confirm">Confirm Enrollment</button>
+                </div>
+            </div>
+        </div>
+
         <script src="${pageContext.request.contextPath}/js/addcourse.js"></script>
+
     </body>
 </html>

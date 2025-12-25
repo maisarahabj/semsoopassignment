@@ -27,9 +27,11 @@ public class EnrollmentServlet extends HttpServlet {
         processRequest(request, response);
     }
 
+    //processing all enrollment-related actions - Enroll/Drop
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // 1. Session & Authentication Check
         HttpSession session = request.getSession();
         String role = (String) session.getAttribute("role");
         Integer sessionUserId = (Integer) session.getAttribute("userId");
@@ -39,52 +41,67 @@ public class EnrollmentServlet extends HttpServlet {
             return;
         }
 
+        // 2. Extract Request Parameters
         String action = request.getParameter("action");
         String courseIdStr = request.getParameter("courseId");
         String courseCode = request.getParameter("courseCode");
 
+        // 3. Resolve Course Identity
         int courseId = -1;
-
-        // Determine courseId either from ID or Code
         if (courseIdStr != null) {
             courseId = Integer.parseInt(courseIdStr);
         } else if (courseCode != null) {
             courseId = courseDAO.getCourseIdByCode(courseCode);
         }
 
+        // Validation: If no valid course is found, exit early
         if (courseId == -1) {
             response.sendRedirect(request.getContextPath() + "/student/MyCourseServlet?error=invalidCourse");
             return;
         }
 
-        // Identify Student
+        // 4. Resolve Target Student Identity
         int targetStudentId;
         if ("admin".equals(role) && request.getParameter("studentId") != null) {
+            // Admin can perform actions on behalf of any student
             targetStudentId = Integer.parseInt(request.getParameter("studentId"));
         } else {
-            // For students, get their specific Student ID from their User ID
+            // Students can only perform actions on their own record
             targetStudentId = studentDAO.getStudentIdByUserId(sessionUserId);
         }
 
         boolean success = false;
 
+        // 5. Action Logic Execution
         if ("enroll".equals(action)) {
-            // Using your existing adminEnroll method because it handles the transaction (Enroll + Increment)
+
+            // --- SECURITY GATE: Prerequisite Check ---
+            // Verifies if the student has passed required foundational courses with A, B, or C.
+            boolean canEnroll = enrollmentDAO.isPrerequisiteSatisfied(targetStudentId, courseId);
+
+            if (!canEnroll) {
+                // If prerequisite check fails, redirect back with error code
+                response.sendRedirect(request.getContextPath() + "/student/AddCourseServlet?error=missing_prereq");
+                return;
+            }
+
+            // If check passes, execute enrollment transaction (Insert + Increment Count)
             success = enrollmentDAO.adminEnrollStudentInCourse(targetStudentId, courseId);
+
         } else if ("drop".equals(action)) {
-            // Using your existing adminDrop method because it handles the transaction (Drop + Decrement)
+            // Execute drop transaction (Delete + Decrement Count)
             success = enrollmentDAO.adminDropStudentFromCourse(targetStudentId, courseId);
         }
 
-        // Smart Redirect based on role and action
+        // 6. Navigation Management (Role-based redirection)
         if ("admin".equals(role)) {
+            // Admins stay on the student management page
             response.sendRedirect("adminstudent.jsp?success=" + success);
         } else {
+            // Students go back to the relevant view depending on the action performed
             if ("drop".equals(action)) {
-                // Go back to classes list if they dropped a course
                 response.sendRedirect(request.getContextPath() + "/student/MyCourseServlet?success=" + success);
             } else {
-                // Go back to add subjects if they were trying to enroll
                 response.sendRedirect(request.getContextPath() + "/student/AddCourseServlet?success=" + success);
             }
         }

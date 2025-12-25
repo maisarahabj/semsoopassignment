@@ -27,6 +27,13 @@ public class EnrollmentDAO {
     private static final String DELETE_BY_STUDENT_COURSE
             = "DELETE FROM enrollments WHERE student_id = ? AND course_id = ?";
 
+    private static final String CHECK_PREREQUISITE
+            = "SELECT p.prerequisite_course_id, "
+            + "       (SELECT e.grade FROM enrollments e "
+            + "        WHERE e.student_id = ? AND e.course_id = p.prerequisite_course_id LIMIT 1) as student_grade "
+            + "FROM prerequisites p "
+            + "WHERE p.course_id = ?";
+
     /**
      * Enrolls a student in a specific course
      */
@@ -117,14 +124,15 @@ public class EnrollmentDAO {
         enrollment.setStudentId(rs.getInt("student_id"));
         enrollment.setCourseId(rs.getInt("course_id"));
         enrollment.setEnrollmentDate(rs.getTimestamp("enrollment_date"));
-
         enrollment.setStatus(rs.getString("status"));
+        enrollment.setGrade(rs.getString("grade"));
+
         return enrollment;
     }
 
     /**
-     * fetches the actual Course objects for a specific student
-     * used for both admin/student view
+     * fetches the actual Course objects for a specific student used for both
+     * admin/student view
      */
     public List<com.sems.model.Course> getEnrolledCourseDetails(int studentId) {
         List<com.sems.model.Course> courses = new ArrayList<>();
@@ -250,6 +258,48 @@ public class EnrollmentDAO {
             return false;
         } finally {
             DatabaseConnection.closeResources(null, null, conn);
+        }
+    }
+
+    /**
+     * Verifies if a student has met the prerequisites for a course. Logic:
+     * Checks if any prerequisite exists, then ensures student has grade A, B,
+     * or C.
+     */
+    public boolean isPrerequisiteSatisfied(int studentId, int courseId) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseConnection.getConnection();
+            pstmt = conn.prepareStatement(CHECK_PREREQUISITE);
+            pstmt.setInt(1, studentId);
+            pstmt.setInt(2, courseId);
+            rs = pstmt.executeQuery();
+
+            // Iterate through all prerequisites for this course
+            while (rs.next()) {
+                int prereqId = rs.getInt("prerequisite_course_id");
+                String grade = rs.getString("student_grade");
+
+                // If grade is null, student never took the prereq.
+                // If grade is FAIL or N/A, they haven't met the standard.
+                if (grade == null || "FAIL".equals(grade) || "N/A".equals(grade)) {
+                    LOGGER.warning("Prerequisite Check Failed: Student " + studentId
+                            + " lacks valid grade for Prereq Course " + prereqId);
+                    return false;
+                }
+            }
+
+            // If we reach here, either there were no prereqs or all were passed.
+            return true;
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error checking prerequisites", e);
+            return false;
+        } finally {
+            DatabaseConnection.closeResources(rs, pstmt, conn);
         }
     }
 }

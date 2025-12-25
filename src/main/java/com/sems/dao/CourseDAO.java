@@ -26,11 +26,22 @@ public class CourseDAO {
     private static final String INSERT_COURSE
             = "INSERT INTO courses (course_code, course_name, credits, capacity, enrolled_count, course_day, course_time) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
+    private static final String BASE_COURSE_QUERY
+            = "SELECT c.*, "
+            + "       p_table.prereq_name as prerequisite_name, "
+            + "       CASE WHEN p_table.course_id IS NOT NULL THEN 1 ELSE 0 END as has_prereq "
+            + "FROM courses c "
+            + "LEFT JOIN ("
+            + "    SELECT p.course_id, c2.course_name as prereq_name "
+            + "    FROM prerequisites p "
+            + "    JOIN courses c2 ON p.prerequisite_course_id = c2.course_id"
+            + ") p_table ON c.course_id = p_table.course_id ";
+
     private static final String SELECT_ALL_COURSES
-            = "SELECT * FROM courses ORDER BY course_code";
+            = BASE_COURSE_QUERY + " ORDER BY c.course_code";
 
     private static final String SELECT_COURSE_BY_ID
-            = "SELECT * FROM courses WHERE course_id = ?";
+            = BASE_COURSE_QUERY + " WHERE c.course_id = ?";
 
     private static final String SELECT_ID_BY_CODE
             = "SELECT course_id FROM courses WHERE course_code = ?";
@@ -257,9 +268,8 @@ public class CourseDAO {
         }
         return list;
     }
-    
-    //ADMIN VIEW: see 
 
+    //mapping template - javas telling SQL which cell to look at
     private Course extractCourseFromResultSet(ResultSet rs) throws SQLException {
         Course course = new Course();
         course.setCourseId(rs.getInt("course_id"));
@@ -270,6 +280,9 @@ public class CourseDAO {
         course.setEnrolledCount(rs.getInt("enrolled_count"));
         course.setCourseDay(rs.getString("course_day"));
         course.setCourseTime(rs.getString("course_time"));
+        course.setHasPrereq(rs.getInt("has_prereq") == 1);
+        course.setPrerequisiteName(rs.getString("prerequisite_name"));
+
         return course;
     }
 }

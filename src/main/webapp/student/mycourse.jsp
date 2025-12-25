@@ -67,7 +67,7 @@
                     <div class="table-header-flex">
                         <h3>Course Enrollment List</h3>
                         <div class="header-actions">
-                            <a href="${pageContext.request.contextPath}/student/addcourse.jsp" class="btn-add-mode">
+                            <a href="${pageContext.request.contextPath}/student/AddCourseServlet" class="btn-add-mode">
                                 <i class="fas fa-plus-circle"></i> Add Course
                             </a>
                             <button type="button" id="toggleDropBtn" class="btn-drop-mode" onclick="toggleDropMode()">

@@ -1,20 +1,32 @@
 package com.sems.model;
+
 import java.sql.Timestamp;
+
 /**
  *
  * @author maisarahabjalil
  */
-
 public class Enrollment {
-    private int enrollmentId;      
-    private int studentId;         
-    private int courseId;          
-    private String status;         
-    private Timestamp enrollmentDate; 
+
+    private int enrollmentId;
+    private int studentId;
+    private int courseId;
+    private String status;
+    private Timestamp enrollmentDate;
+    private String grade; // NEW FIELD matches ENUM('A','B','C','FAIL','N/A')
+
+    // Constructors
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
 
     // Constructors
     public Enrollment() {
-        this.status = "enrolled";  
+        this.status = "enrolled";
     }
 
     public Enrollment(int studentId, int courseId) {
@@ -24,21 +36,45 @@ public class Enrollment {
     }
 
     // Getters and Setters
-    public int getEnrollmentId() { return enrollmentId; }
-    public void setEnrollmentId(int enrollmentId) { this.enrollmentId = enrollmentId; }
+    public int getEnrollmentId() {
+        return enrollmentId;
+    }
 
-    public int getStudentId() { return studentId; }
-    public void setStudentId(int studentId) { this.studentId = studentId; }
+    public void setEnrollmentId(int enrollmentId) {
+        this.enrollmentId = enrollmentId;
+    }
 
-    public int getCourseId() { return courseId; }
-    public void setCourseId(int courseId) { this.courseId = courseId; }
+    public int getStudentId() {
+        return studentId;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public void setStudentId(int studentId) {
+        this.studentId = studentId;
+    }
 
-    public Timestamp getEnrollmentDate() { return enrollmentDate; }
-    public void setEnrollmentDate(Timestamp enrollmentDate) { this.enrollmentDate = enrollmentDate; }
+    public int getCourseId() {
+        return courseId;
+    }
 
+    public void setCourseId(int courseId) {
+        this.courseId = courseId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Timestamp getEnrollmentDate() {
+        return enrollmentDate;
+    }
+
+    public void setEnrollmentDate(Timestamp enrollmentDate) {
+        this.enrollmentDate = enrollmentDate;
+    }
 
     @Override
     public String toString() {
