@@ -302,4 +302,107 @@ public class EnrollmentDAO {
             DatabaseConnection.closeResources(rs, pstmt, conn);
         }
     }
+
+    /**
+     * grabs every row in enrollment w the specific student filters without
+     * grade N/A matches grade w course credits adds points and divide total
+     * credits
+     */
+    public double calculateStudentCGPA(int studentId) {
+        String sql = "SELECT e.grade, c.credits FROM enrollments e "
+                + "JOIN courses c ON e.course_id = c.course_id "
+                + "WHERE e.student_id = ? AND e.grade NOT IN ('N/A', 'exempted')";
+
+        double totalPoints = 0;
+        int totalCredits = 0;
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, studentId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String grade = rs.getString("grade");
+                int credits = rs.getInt("credits");
+                double points = 0;
+
+                switch (grade) {
+                    case "A":
+                        points = 4.0;
+                        break;
+                    case "B":
+                        points = 3.5;
+                        break; // Based on your request
+                    case "C":
+                        points = 2.5;
+                        break;
+                    case "FAIL":
+                        points = 0.0;
+                        break;
+                    default:
+                        continue; // Skip others
+                }
+
+                totalPoints += (points * credits);
+                totalCredits += credits;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return (totalCredits == 0) ? 0.0 : (totalPoints / totalCredits);
+    }
+
+    /**
+     * calls calc method to get CGPA and writes in the student table for student
+     * and admin view
+     *
+     */
+    public double updateAndGetStudentCGPA(int studentId) {
+        double cgpa = calculateStudentCGPA(studentId); // Run the math method we just made
+
+        // Now, SAVE it to the student table so it shows up in the Directory
+        String updateSql = "UPDATE students SET gpa = ? WHERE student_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(updateSql)) {
+            ps.setDouble(1, cgpa);
+            ps.setInt(2, studentId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return cgpa;
+    }
+
+     /**
+     * report card generator
+     * translates numbers in SQL into obj
+     *
+     */
+    public List<Enrollment> getFullTranscript(int studentId) {
+        List<Enrollment> transcript = new java.util.ArrayList<>();
+        String sql = "SELECT e.*, c.course_code, c.course_name "
+                + "FROM enrollments e "
+                + "JOIN courses c ON e.course_id = c.course_id "
+                + "WHERE e.student_id = ? AND e.grade IS NOT NULL";
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, studentId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Enrollment e = new Enrollment();
+                e.setEnrollmentId(rs.getInt("enrollment_id"));
+                e.setGrade(rs.getString("grade"));
+                e.setStatus(rs.getString("status"));
+                // --- POPULATING THE NEW FIELDS ---
+                e.setCourseCode(rs.getString("course_code"));
+                e.setCourseName(rs.getString("course_name"));
+
+                transcript.add(e);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching transcript", e);
+        }
+        return transcript;
+    }
 }

@@ -371,6 +371,27 @@ public class StudentDAO {
         }
     }
 
+    // allows servlet to get student profile - name GPA etc
+    public Student getStudentById(int studentId) {
+        Student student = null;
+        String sql = "SELECT * FROM students WHERE student_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, studentId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    student = extractStudentFromResultSet(rs);
+                    // Note: If you need the created_at timestamp here like in your other methods,
+                    // you would need to JOIN with the users table.
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching student by ID: " + studentId, e);
+        }
+        return student;
+    }
+
     // map SQL Result to Student Model
     private Student extractStudentFromResultSet(ResultSet rs) throws SQLException {
         Student student = new Student();

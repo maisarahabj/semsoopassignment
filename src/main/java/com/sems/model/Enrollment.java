@@ -13,7 +13,9 @@ public class Enrollment {
     private int courseId;
     private String status;
     private Timestamp enrollmentDate;
-    private String grade; // NEW FIELD matches ENUM('A','B','C','FAIL','N/A')
+    private String grade; // ENUM('A','B','C','FAIL','N/A')
+    private String courseCode;
+    private String courseName;
 
     // Constructors
     public String getGrade() {
@@ -79,5 +81,21 @@ public class Enrollment {
     @Override
     public String toString() {
         return "Enrollment [StudentID=" + studentId + ", CourseID=" + courseId + ", Status=" + status + "]";
+    }
+
+    public String getCourseCode() {
+        return courseCode;
+    }
+
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
     }
 }

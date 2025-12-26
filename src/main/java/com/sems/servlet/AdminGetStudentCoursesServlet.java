@@ -83,14 +83,22 @@ public class AdminGetStudentCoursesServlet extends HttpServlet {
         int studentId = Integer.parseInt(request.getParameter("studentId"));
         int courseId = Integer.parseInt(request.getParameter("courseId"));
 
-        boolean success = false;
-        if ("DROP".equals(action)) {
-            success = enrollmentDAO.adminDropStudentFromCourse(studentId, courseId);
-        } else if ("ENROLL".equals(action)) {
-            success = enrollmentDAO.adminEnrollStudentInCourse(studentId, courseId);
+        if ("ENROLL".equals(action)) {
+            // Run the prerequisite check before allowing enrollment
+            boolean canEnroll = enrollmentDAO.isPrerequisiteSatisfied(studentId, courseId);
+
+            if (!canEnroll) {
+                // Send back a specific message so the JS knows it's a prereq issue
+                response.getWriter().print("prereq_missing");
+                return;
+            }
+
+            boolean success = enrollmentDAO.adminEnrollStudentInCourse(studentId, courseId);
+            response.getWriter().print(success ? "success" : "error");
+
+        } else if ("DROP".equals(action)) {
+            boolean success = enrollmentDAO.adminDropStudentFromCourse(studentId, courseId);
+            response.getWriter().print(success ? "success" : "error");
         }
-
-        response.getWriter().print(success ? "success" : "error");
-
     }
 }

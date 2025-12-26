@@ -164,30 +164,30 @@ function loadEnrolledCourses(studentId) {
 }
 
 function enrollStudentAction() {
+    const studentId = document.getElementById('editStudentId').value;
     const courseId = document.getElementById('enrollCourseSelect').value;
-    if (!courseId) {
-        alert("Please select a course first.");
-        return;
-    }
 
-    const params = new URLSearchParams();
-    params.append('action', 'ENROLL');
-    params.append('studentId', currentViewedStudentId);
-    params.append('courseId', courseId);
+    if (!courseId)
+        return;
 
     fetch(`${window.contextPath}/AdminGetStudentCoursesServlet`, {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: params
+        body: `action=ENROLL&studentId=${studentId}&courseId=${courseId}`
     })
-            .then(res => res.text())
-            .then(res => {
-                if (res.trim() === "success") {
-                    showToast("Student enrolled successfully!");
-                    loadEnrolledCourses(currentViewedStudentId);
-                    document.getElementById('enrollCourseSelect').value = "";
+            .then(response => response.text())
+            .then(data => {
+                const trimmedData = data.trim(); // Clean any whitespace
+
+                if (trimmedData === "prereq_missing") {
+                    // This links to the <div> ID in your JSP
+                    document.getElementById('prereqErrorModal').style.display = 'flex';
+                } else if (trimmedData === "success") {
+                    showToast("Student Enrolled Successfully!");
+                    // Refresh the list inside the modal
+                    loadEnrolledCourses(studentId);
                 } else {
-                    alert("Failed to enroll.");
+                    showToast("Error: Enrollment failed.", true);
                 }
             });
 }
