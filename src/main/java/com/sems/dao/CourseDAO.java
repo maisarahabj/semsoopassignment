@@ -100,7 +100,7 @@ public class CourseDAO {
         return false;
     }
 
-    //gets all courses including pre-req
+    //ADMIN: gets all courses including pre-req
     public List<Course> getAllCourses() {
         List<Course> courses = new ArrayList<>();
         Connection conn = null;
@@ -117,6 +117,29 @@ public class CourseDAO {
             LOGGER.log(Level.SEVERE, "Error fetching all courses", e);
         } finally {
             DatabaseConnection.closeResources(rs, stmt, conn);
+        }
+        return courses;
+    }
+
+    //STU VIEWWW: to register - only show incomplete courses 
+    public List<Course> getAvailableCoursesForStudent(int studentId) {
+        List<Course> courses = new ArrayList<>();
+
+        String sql = BASE_COURSE_QUERY
+                + " LEFT JOIN enrollments e ON c.course_id = e.course_id AND e.student_id = ? "
+                + " WHERE e.grade IS NULL OR e.grade = 'N/A' "
+                + " ORDER BY c.course_code";
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, studentId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                courses.add(extractCourseFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching available courses", e);
         }
         return courses;
     }
@@ -304,10 +327,9 @@ public class CourseDAO {
     }
 
     /**
-     * ADMIN: creating course with pre-req
-     * creates a course and optionally links a prerequisite in the prerequisites
-     * table. Uses a Transaction (commit/rollback) to ensure both succeed or
-     * both fail.
+     * ADMIN: creating course with pre-req creates a course and optionally links
+     * a prerequisite in the prerequisites table. Uses a Transaction
+     * (commit/rollback) to ensure both succeed or both fail.
      */
     public boolean createCourseWithPrereq(Course course, int prerequisiteId) {
         Connection conn = null;

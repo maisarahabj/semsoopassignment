@@ -2,7 +2,6 @@
  *
  * @author maisarahabjalil
  */
-
 package com.sems.servlet;
 
 import com.sems.dao.CourseDAO;
@@ -23,15 +22,15 @@ import java.util.Set; // Added missing import
 
 @WebServlet("/student/AddCourseServlet")
 public class AddCourseServlet extends HttpServlet {
-    
+
     private CourseDAO courseDAO = new CourseDAO();
     private EnrollmentDAO enrollmentDAO = new EnrollmentDAO();
     private StudentDAO studentDAO = new StudentDAO();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
 
@@ -43,10 +42,10 @@ public class AddCourseServlet extends HttpServlet {
         try {
             // 1. Get Student Profile
             Student student = studentDAO.getStudentByUserId(userId);
-            
+
             if (student != null) {
-                // 2. Get ALL courses from the database
-                List<Course> allCourses = courseDAO.getAllCourses();
+                // 2. Get ALL courses from the database (filters completed)
+                List<Course> allCourses = courseDAO.getAvailableCoursesForStudent(student.getStudentId());
 
                 // 3. Get IDs of courses the student is ALREADY in
                 List<Course> enrolled = enrollmentDAO.getEnrolledCourseDetails(student.getStudentId());

@@ -16,6 +16,7 @@ public class Enrollment {
     private String grade; // ENUM('A','B','C','FAIL','N/A')
     private String courseCode;
     private String courseName;
+    private int credits;
 
     // Constructors
     public String getGrade() {
@@ -97,5 +98,13 @@ public class Enrollment {
 
     public void setCourseName(String courseName) {
         this.courseName = courseName;
+    }
+
+    public int getCredits() {
+        return credits;
+    }
+
+    public void setCredits(int credits) {
+        this.credits = credits;
     }
 }

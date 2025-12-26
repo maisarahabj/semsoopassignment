@@ -341,14 +341,15 @@ public class EnrollmentDAO {
                     default:
                         continue; // Skip others
                 }
-
+                
                 totalPoints += (points * credits);
                 totalCredits += credits;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        
+        //cgpa
         return (totalCredits == 0) ? 0.0 : (totalPoints / totalCredits);
     }
 
@@ -374,34 +375,35 @@ public class EnrollmentDAO {
         return cgpa;
     }
 
-     /**
-     * report card generator
-     * translates numbers in SQL into obj
+    /**
+     * report card generator translates numbers in SQL into obj
      *
      */
     public List<Enrollment> getFullTranscript(int studentId) {
-        List<Enrollment> transcript = new java.util.ArrayList<>();
-        String sql = "SELECT e.*, c.course_code, c.course_name "
+        List<Enrollment> transcript = new ArrayList<>();
+        String sql = "SELECT e.*, c.course_code, c.course_name, c.credits "
                 + "FROM enrollments e "
                 + "JOIN courses c ON e.course_id = c.course_id "
-                + "WHERE e.student_id = ? AND e.grade IS NOT NULL";
+                + "WHERE e.student_id = ? AND e.grade NOT IN ('N/A')";
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, studentId);
             ResultSet rs = ps.executeQuery();
+
             while (rs.next()) {
                 Enrollment e = new Enrollment();
                 e.setEnrollmentId(rs.getInt("enrollment_id"));
                 e.setGrade(rs.getString("grade"));
                 e.setStatus(rs.getString("status"));
-                // --- POPULATING THE NEW FIELDS ---
                 e.setCourseCode(rs.getString("course_code"));
                 e.setCourseName(rs.getString("course_name"));
+                e.setCredits(rs.getInt("credits"));
 
                 transcript.add(e);
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching transcript", e);
+            LOGGER.log(Level.SEVERE, "Error fetching transcript for student ID: " + studentId, e);
         }
         return transcript;
     }
