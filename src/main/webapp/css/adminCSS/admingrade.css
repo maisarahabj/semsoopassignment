@@ -1,0 +1,104 @@
+/* 
+    Created on : 27 Dec 2025, 12:55:44 am
+    Author     : maisarahabjalil
+*/
+
+.edit-mode .grade-text {
+    display: none;
+}
+.grade-select {
+    display: none;
+    padding: 5px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    width: 100px;
+    font-family: inherit;
+}
+.edit-mode .grade-select {
+    display: inline-block;
+}
+.search-flex {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+.btn-save-changes {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: none;
+    font-weight: 600;
+}
+.edit-mode .btn-save-changes {
+    display: block;
+}
+.btn-edit-toggle {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.edit-mode .btn-edit-toggle {
+    background: #64748b;
+}
+
+/* -- START search bar styling -- */
+.search-box-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-right: 15px; /* Space between search and buttons */
+}
+
+.search-box-container i {
+    position: absolute;
+    left: 15px;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+.search-box-container input {
+    padding: 10px 15px 10px 40px;
+    border-radius: 25px; /* Rounded pill shape */
+    border: 1px solid #e2e8f0;
+    width: 300px; /* Starting width */
+    font-size: 0.85rem;
+    outline: none;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+}
+
+.search-box-container input:focus {
+    border-color: #6366f1;
+    width: 400px; /* Expands on focus */
+    background: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Layout adjustments for the header */
+.grade-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+/* -- END search bar styling -- */
+
+.sidebar {
+            height: auto;
+        }

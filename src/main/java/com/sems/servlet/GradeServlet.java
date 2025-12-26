@@ -29,36 +29,76 @@ public class GradeServlet extends HttpServlet {
         String role = (String) session.getAttribute("role");
         Integer userId = (Integer) session.getAttribute("userId");
 
-        int targetStudentId;
+        if (userId == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
 
-        // ADMIN VISION: They can search for a student
+        int targetStudentId = -1;
+
+        // 1. Resolve Target Student ID
         if ("admin".equals(role)) {
-            String searchId = request.getParameter("studentId");
-            if (searchId == null || searchId.isEmpty()) {
-                // If no student selected yet, show a search page or list
-                request.getRequestDispatcher("/admin/adminGradesSearch.jsp").forward(request, response);
+            String searchInput = request.getParameter("studentId");
+
+            // If admin just clicked the link but hasn't searched yet
+            if (searchInput == null || searchInput.isEmpty()) {
+                request.getRequestDispatcher("/admin/admingrade.jsp").forward(request, response);
                 return;
             }
-            targetStudentId = Integer.parseInt(searchId);
-        } // STUDENT VISION: They only see their own
-        else {
+
+            try {
+                // Try to parse as ID first
+                targetStudentId = Integer.parseInt(searchInput);
+            } catch (NumberFormatException e) {
+                // If it's not a number, it might be a name. 
+                // You can add studentDAO.getIdByName(searchInput) here later!
+                response.sendRedirect(request.getContextPath() + "/GradeServlet?error=invalidId");
+                return;
+            }
+        } else {
+            // Student vision: get their own ID
             targetStudentId = studentDAO.getStudentIdByUserId(userId);
         }
 
+        // 2. Fetch Data
         Student s = studentDAO.getStudentById(targetStudentId);
-        request.setAttribute("student", s);
+        if (s == null) {
+            response.sendRedirect(request.getContextPath() + "/GradeServlet?error=notFound");
+            return;
+        }
 
-        // 1. Calculate/Update CGPA so it's fresh
+        // Fresh math for CGPA and Transcript
+        //checks if its admin or student
+        // 1. Always update math first
         double currentCGPA = enrollmentDAO.updateAndGetStudentCGPA(targetStudentId);
 
-        // 2. Fetch all grades for the transcript table
-        List<Enrollment> transcript = enrollmentDAO.getFullTranscript(targetStudentId);
+// 2. Logic to decide which DAO method to use
+        List<Enrollment> transcript;
+        if ("admin".equals(role)) {
+            // Admin needs to see EVERYTHING (including N/A) to grade them
+            transcript = enrollmentDAO.getAdminTranscript(targetStudentId);
+        } else {
+            // Students only see completed subjects (Report Card view)
+            transcript = enrollmentDAO.getFullTranscript(targetStudentId);
+        }
 
-        // 3. Send to JSP
+// 3. Set Attributes as usual
+        request.setAttribute("student", s);
         request.setAttribute("transcript", transcript);
         request.setAttribute("cgpa", currentCGPA);
-        request.setAttribute("studentId", targetStudentId);
 
-        request.getRequestDispatcher("/student/viewgrades.jsp").forward(request, response);
+        // 3. Set Attributes
+        request.setAttribute("student", s);
+        request.setAttribute("transcript", transcript);
+        request.setAttribute("cgpa", currentCGPA);
+
+        // 4. SMART REDIRECTION
+        if ("admin".equals(role)) {
+            // Admins go to the management console (admingrade.jsp)
+            request.getRequestDispatcher("/admin/admingrade.jsp").forward(request, response);
+        } else {
+            // Students go to the read-only view
+            request.getRequestDispatcher("/student/viewgrades.jsp").forward(request, response);
+        }
     }
 }

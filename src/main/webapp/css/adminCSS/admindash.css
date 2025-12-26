@@ -4,7 +4,7 @@
 */
 
 /* Import all shared styles from student dashboard.css first */
-@import url("../studentCSS/dashboard.css");
+@import url("/SEMS/css/studentCSS/dashboard.css");
 
 /* Override specifically for Admin to fix the right-panel scroll issue */
 .dashboard-wrapper {
