@@ -1,30 +1,40 @@
 package com.sems.util;
 
-import com.sems.dao.UserDAO;
-import com.sems.dao.EnrollmentDAO;
-import com.sems.model.User;
+import com.sems.dao.EvaluationDAO;
+import com.sems.model.Evaluation;
 import java.util.List;
-import java.util.Scanner;
 
 public class TestConnection {
 
     public static void main(String[] args) {
-        // Manually setting the IDs from your screenshot
-        int studentIdToDelete = 101;
-        int userIdToDelete = 25; // Associated user_id for 'flut shy'
+        EvaluationDAO dao = new EvaluationDAO();
 
-        com.sems.dao.StudentDAO dao = new com.sems.dao.StudentDAO();
+        // --- STEP 1: TEST DATABASE INSERT ---
+        System.out.println("DEBUG: Testing SQL Insertion...");
+        Evaluation testEval = new Evaluation();
+        testEval.setStudentId(99); // Ensure student 99 exists in students table
+        testEval.setCourseId(1);   // Ensure course 1 exists in courses table
+        testEval.setRating(5);
+        testEval.setComments("Test from TestConnection.java");
 
-        System.out.println("--- STARTING CONSOLE DELETE TEST ---");
-        System.out.println("Target: Student ID " + studentIdToDelete + ", User ID " + userIdToDelete);
+        boolean insertResult = dao.submitEvaluation(testEval);
+        System.out.println("RESULT: Was insertion successful? -> " + insertResult);
 
-        boolean result = dao.deleteStudent(studentIdToDelete, userIdToDelete);
+        // --- STEP 2: TEST RETRIEVING SUBMITTED IDS ---
+        System.out.println("\nDEBUG: Testing ID retrieval for Student 99...");
+        List<Integer> ids = dao.getEvaluatedCourseIds(99);
 
-        if (result) {
-            System.out.println("SUCCESS: Student and User deleted from database.");
+        if (ids != null && !ids.isEmpty()) {
+            System.out.println("RESULT: Found " + ids.size() + " submitted evaluations.");
+            System.out.println("IDs found: " + ids);
         } else {
-            System.out.println("FAILURE: Check the IDE console for SQL Error logs.");
+            System.out.println("RESULT: No IDs found. (This is why your badge isn't showing!)");
         }
-        System.out.println("--- TEST FINISHED ---");
+
+        // --- STEP 3: TEST REVEAL IDENTITY ---
+        System.out.println("\nDEBUG: Testing Reveal Identity Logic...");
+        // Use an ID that actually exists in your evaluations table
+        String name = dao.revealStudentIdentity(1);
+        System.out.println("RESULT: Identity revealed -> " + name);
     }
 }

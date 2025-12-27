@@ -46,6 +46,9 @@
                     <a href="${pageContext.request.contextPath}/GradeServlet" class="nav-link">
                         <i class="fas fa-poll-h"></i> My Results
                     </a>
+                    <a href="${pageContext.request.contextPath}/EvaluationServlet" class="nav-link">
+                        <i class="fas fa-star"></i> Course Evaluation
+                    </a>
                     <a href="${pageContext.request.contextPath}/ProfileServlet" class="nav-link active">
                         <i class="fas fa-user"></i> Profile
                     </a>

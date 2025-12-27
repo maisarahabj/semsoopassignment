@@ -399,6 +399,7 @@ public class EnrollmentDAO {
                 e.setCourseCode(rs.getString("course_code"));
                 e.setCourseName(rs.getString("course_name"));
                 e.setCredits(rs.getInt("credits"));
+                e.setCourseId(rs.getInt("course_id"));
 
                 transcript.add(e);
             }
@@ -444,6 +445,7 @@ public class EnrollmentDAO {
                 e.setStatus(rs.getString("status"));
                 e.setCourseCode(rs.getString("course_code"));
                 e.setCourseName(rs.getString("course_name"));
+                e.setCourseId(rs.getInt("course_id"));
                 e.setCredits(rs.getInt("credits"));
                 transcript.add(e);
             }

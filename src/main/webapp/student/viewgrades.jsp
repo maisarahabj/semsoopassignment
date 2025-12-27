@@ -47,6 +47,9 @@
                     <a href="${pageContext.request.contextPath}/student/MyCourseServlet" class="nav-link"><i class="fas fa-book"></i> My Classes</a>
                     <a href="${pageContext.request.contextPath}/student/AddCourseServlet" class="nav-link"><i class="fas fa-plus-square"></i> Add Subjects</a>
                     <a href="${pageContext.request.contextPath}/GradeServlet" class="nav-link active"><i class="fas fa-poll-h"></i> My Results</a>
+                    <a href="${pageContext.request.contextPath}/EvaluationServlet" class="nav-link">
+                        <i class="fas fa-star"></i> Course Evaluation
+                    </a>
                     <a href="${pageContext.request.contextPath}/ProfileServlet" class="nav-link"><i class="fas fa-user"></i> Profile</a>
                 </nav>
                 <div class="cgpa-container">
