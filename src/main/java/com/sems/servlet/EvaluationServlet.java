@@ -2,6 +2,8 @@ package com.sems.servlet;
 
 import com.sems.dao.EvaluationDAO;
 import com.sems.dao.EnrollmentDAO;
+import com.sems.dao.StudentDAO;
+import com.sems.model.Student;
 import com.sems.model.Evaluation;
 import com.sems.model.Enrollment;
 import java.io.IOException;
@@ -18,6 +20,7 @@ public class EvaluationServlet extends HttpServlet {
 
     private final EvaluationDAO evalDAO = new EvaluationDAO();
     private final EnrollmentDAO enrollDAO = new EnrollmentDAO();
+    private final StudentDAO studentDAO = new StudentDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -25,33 +28,44 @@ public class EvaluationServlet extends HttpServlet {
         HttpSession session = request.getSession();
         String role = (String) session.getAttribute("role");
         Integer userId = (Integer) session.getAttribute("userId");
-        String action = request.getParameter("action"); // Catch the action parameter
+        String action = request.getParameter("action");
 
-        // 1. AJAX Check: If the admin clicked the "Eval" button in the pop-up
+        // 1. AJAX Check: For the Admin "Eval" pop-up
         if ("getReviews".equals(action)) {
             handleGetReviews(request, response);
             return;
         }
 
+        // 2. Security Check
         if (userId == null) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
 
+        // 3. Student View Logic
         if ("student".equals(role)) {
             Integer studentId = (Integer) session.getAttribute("studentId");
+
             if (studentId != null) {
+                // Fetch full Student object to provide CGPA/Name to the JSP
+                Student student = studentDAO.getStudentByUserId(userId);
+
+                // Fetch lists for the evaluation table
                 List<Enrollment> transcript = enrollDAO.getFullTranscript(studentId);
                 List<Integer> evaluatedCourseIds = evalDAO.getEvaluatedCourseIds(studentId);
 
+                // Pass everything to the JSP
+                request.setAttribute("student", student); // FIX: This enables CGPA display
                 request.setAttribute("transcript", transcript);
                 request.setAttribute("submittedCourseIds", evaluatedCourseIds);
+
                 request.getRequestDispatcher("/student/evaluation.jsp").forward(request, response);
             } else {
                 response.sendRedirect(request.getContextPath() + "/DashboardServlet");
             }
+
+            // 4. Admin View Logic
         } else if ("admin".equals(role)) {
-            // This is for the standard Admin Dashboard view
             List<Evaluation> courseStats = evalDAO.getCourseAverages();
             request.setAttribute("courseStats", courseStats);
             request.getRequestDispatcher("/admin/adminviewevals.jsp").forward(request, response);
