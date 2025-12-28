@@ -1,5 +1,19 @@
+/**
+ *
+ * @author maisarahabjalil
+ *
+ *  STUDENT VIEW:
+ *  doGet   -   shows list of completed course
+ *          -   checks submitted reviews
+ *  ADMIN VIEW:
+ *  doPost  -   displays summary w ratings
+ *          -   fetches comments
+ *
+ *
+ */
 package com.sems.servlet;
 
+import com.sems.dao.ActivityLogDAO;
 import com.sems.dao.EvaluationDAO;
 import com.sems.dao.EnrollmentDAO;
 import com.sems.dao.StudentDAO;
@@ -21,6 +35,7 @@ public class EvaluationServlet extends HttpServlet {
     private final EvaluationDAO evalDAO = new EvaluationDAO();
     private final EnrollmentDAO enrollDAO = new EnrollmentDAO();
     private final StudentDAO studentDAO = new StudentDAO();
+    private final ActivityLogDAO logDAO = new ActivityLogDAO(); // 1. Log DAO initialized
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -47,15 +62,11 @@ public class EvaluationServlet extends HttpServlet {
             Integer studentId = (Integer) session.getAttribute("studentId");
 
             if (studentId != null) {
-                // Fetch full Student object to provide CGPA/Name to the JSP
                 Student student = studentDAO.getStudentByUserId(userId);
-
-                // Fetch lists for the evaluation table
                 List<Enrollment> transcript = enrollDAO.getFullTranscript(studentId);
                 List<Integer> evaluatedCourseIds = evalDAO.getEvaluatedCourseIds(studentId);
 
-                // Pass everything to the JSP
-                request.setAttribute("student", student); // FIX: This enables CGPA display
+                request.setAttribute("student", student);
                 request.setAttribute("transcript", transcript);
                 request.setAttribute("submittedCourseIds", evaluatedCourseIds);
 
@@ -86,14 +97,13 @@ public class EvaluationServlet extends HttpServlet {
 
     private void handleStudentSubmission(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("userId"); // Needed for log
+        Integer studentId = (Integer) session.getAttribute("studentId");
+
         try {
-            Integer studentId = (Integer) session.getAttribute("studentId");
             int courseId = Integer.parseInt(request.getParameter("courseId"));
             int rating = Integer.parseInt(request.getParameter("rating"));
             String comments = request.getParameter("comments");
-
-            // DEBUG PRINT
-            System.out.println("SUBMITTING EVAL: Student=" + studentId + ", Course=" + courseId + ", Rating=" + rating);
 
             Evaluation eval = new Evaluation();
             eval.setStudentId(studentId);
@@ -102,21 +112,26 @@ public class EvaluationServlet extends HttpServlet {
             eval.setComments(comments);
 
             boolean success = evalDAO.submitEvaluation(eval);
-            System.out.println("DATABASE INSERT SUCCESS: " + success);
 
             if (success) {
+                // 2. TRIGGER LOG: Record student evaluation
+                logDAO.recordLog(userId, courseId, "EVALUATE",
+                        "Student submitted a " + rating + "-star evaluation for course ID: " + courseId);
+
                 response.sendRedirect(request.getContextPath() + "/EvaluationServlet?status=success");
             } else {
                 response.sendRedirect(request.getContextPath() + "/EvaluationServlet?error=fail");
             }
         } catch (Exception e) {
-            e.printStackTrace(); // This will show you EXACTLY why it crashed in the output log
+            e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/EvaluationServlet?error=exception");
         }
     }
 
     private void handleAdminReveal(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+        HttpSession session = request.getSession();
+        Integer adminUserId = (Integer) session.getAttribute("userId"); // The Admin performing the reveal
         String securityPassword = request.getParameter("securityPassword");
         String evalIdStr = request.getParameter("evalId");
 
@@ -127,17 +142,22 @@ public class EvaluationServlet extends HttpServlet {
 
         int evalId = Integer.parseInt(evalIdStr);
 
+        // Security check for identity reveal
         if ("admin123".equals(securityPassword)) {
-            String name = evalDAO.revealStudentIdentity(evalId);
+            String studentName = evalDAO.revealStudentIdentity(evalId);
+
+            // 3. TRIGGER LOG: Record that an Admin peeked at an identity
+            logDAO.recordLog(adminUserId, evalId, "ADMIN_REVEAL_IDENTITY",
+                    "Admin revealed student identity for Evaluation ID: " + evalId);
+
             response.setContentType("text/plain");
-            response.getWriter().write(name);
+            response.getWriter().write(studentName);
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Incorrect Password");
         }
     }
 
-    // ADMIN: Converts Review list to JSON for the Admin Pop-up
     private void handleGetReviews(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             int courseId = Integer.parseInt(request.getParameter("courseId"));
@@ -151,12 +171,12 @@ public class EvaluationServlet extends HttpServlet {
                 Evaluation r = reviews.get(i);
                 json.append("{");
                 json.append("\"rating\":").append(r.getRating()).append(",");
-                // Clean comments to prevent JSON breaking
+
                 String cleanComment = r.getComments() != null
                         ? r.getComments().replace("\"", "\\\"").replace("\n", " ").replace("\r", "") : "";
+
                 json.append("\"comments\":\"").append(cleanComment).append("\",");
                 json.append("\"submittedDate\":\"").append(r.getSubmittedDate()).append("\",");
-                // FIX: Removed the trailing comma from evalId
                 json.append("\"evalId\":").append(r.getEvaluationId());
                 json.append("}");
 
@@ -173,5 +193,4 @@ public class EvaluationServlet extends HttpServlet {
             response.getWriter().write("[]");
         }
     }
-
 }

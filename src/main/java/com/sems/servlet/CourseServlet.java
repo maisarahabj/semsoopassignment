@@ -9,6 +9,9 @@
 package com.sems.servlet;
 
 import com.sems.dao.CourseDAO;
+import com.sems.dao.ActivityLogDAO;
+import com.sems.dao.StudentDAO;
+import com.sems.model.Student;
 import com.sems.model.Course;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -20,7 +23,10 @@ import java.util.List;
 public class CourseServlet extends HttpServlet {
 
     private CourseDAO courseDAO = new CourseDAO();
+    private final ActivityLogDAO logDAO = new ActivityLogDAO();
+    private final StudentDAO studentDAO = new StudentDAO();
 
+    // grabs course list for every1 to just view
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -29,14 +35,10 @@ public class CourseServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         String role = (session != null) ? (String) session.getAttribute("role") : "";
 
-        // --- FETCH DATA FOR BOTH VIEWS ---
         List<Course> allCourses = courseDAO.getAllCourses();
-        // Providing both names to ensure both Student and Admin JSPs work
         request.setAttribute("courses", allCourses);
         request.setAttribute("allCourses", allCourses);
 
-        // --- SMART ROUTING ---
-        // If action is 'manage' or user is admin, show admin page
         if ("manage".equals(action) || "admin".equalsIgnoreCase(role)) {
             request.getRequestDispatcher("/admin/admincourse.jsp").forward(request, response);
         } else {
@@ -44,24 +46,35 @@ public class CourseServlet extends HttpServlet {
         }
     }
 
+    // remove and create course - links pre-req as well
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session = request.getSession();
+        Integer adminUserId = (Integer) session.getAttribute("userId");
         String action = request.getParameter("action");
 
-        // --- ADMIN REMOVE COURSE ROW --- 
+        // Fetch Admin Name for a better log description
+        Student adminProfile = studentDAO.getStudentByUserId(adminUserId);
+        String adminName = (adminProfile != null) ? adminProfile.getFirstName() : "Admin";
+
+        // --- ADMIN REMOVE COURSE --- 
         if ("DELETE".equals(action)) {
             int courseId = Integer.parseInt(request.getParameter("courseId"));
             boolean isDeleted = courseDAO.deleteCourse(courseId);
 
-            // Redirect with context path to refresh the list safely
+            if (isDeleted) {
+                // LOG: Course Deletion
+                logDAO.recordLog(adminUserId, courseId, "ADMIN_DELETE_COURSE",
+                        "Admin " + adminName + " permanently deleted Course ID #" + courseId);
+            }
+
             response.sendRedirect(request.getContextPath() + "/CourseServlet?action=manage&status=" + (isDeleted ? "deleted" : "error"));
             return;
         }
 
-        // --- ADMIN FEATURE: Adding a brand new course ---
-        // --- ADMIN FEATURE: Adding a brand new course ---
+        // --- ADMIN ADD COURSE ---
         if ("ADD".equals(action)) {
             String courseCode = request.getParameter("courseCode");
             String courseName = request.getParameter("courseName");
@@ -70,7 +83,6 @@ public class CourseServlet extends HttpServlet {
             String day = request.getParameter("courseDay");
             String time = request.getParameter("courseTime");
 
-            // 1. Grab the NEW prerequisite ID from your form
             String prereqParam = request.getParameter("prerequisiteId");
             int prerequisiteId = (prereqParam != null && !prereqParam.isEmpty()) ? Integer.parseInt(prereqParam) : 0;
 
@@ -87,10 +99,13 @@ public class CourseServlet extends HttpServlet {
                 newCourse.setCourseTime(time);
             }
 
-            // 2. Pass the prerequisiteId to a modified DAO method
             boolean success = courseDAO.createCourseWithPrereq(newCourse, prerequisiteId);
 
             if (success) {
+                // LOG: Course Creation
+                logDAO.recordLog(adminUserId, null, "ADMIN_ADD_COURSE",
+                        "Admin " + adminName + " created new course: " + courseCode + " - " + courseName);
+
                 response.sendRedirect(request.getContextPath() + "/CourseServlet?action=manage&msg=added");
             } else {
                 response.sendRedirect(request.getContextPath() + "/CourseServlet?action=manage&msg=error");

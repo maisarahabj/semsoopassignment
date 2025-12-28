@@ -54,6 +54,9 @@
                     <a href="${pageContext.request.contextPath}/AdminManageStudentServlet" class="nav-link"><i class="fas fa-user-graduate"></i> Manage Students</a>
                     <a href="${pageContext.request.contextPath}/GradeServlet" class="nav-link active"><i class="fas fa-graduation-cap"></i> Grade Management</a>
                     <a href="${pageContext.request.contextPath}/auth/AdminPendingServlet" class="nav-link"><i class="fas fa-clock"></i> Pending Approvals</a>
+                    <a href="${pageContext.request.contextPath}/ActivityServlet" class="nav-link">
+                        <i class="fas fa-history"></i> System Logs
+                    </a>
                 </nav>
             </aside>
 
