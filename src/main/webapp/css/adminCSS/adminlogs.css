@@ -1,9 +1,127 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
-*/
 /* 
     Created on : 29 Dec 2025, 1:00:58 am
     Author     : maisarahabjalil
 */
 
+/* 1. Wrap Details and Row Expansion */
+            .admin-table td:last-child {
+                white-space: normal !important;
+                word-wrap: break-word;
+                line-height: 1.4;
+                padding: 12px 15px;
+            }
+
+            .admin-table td {
+                height: auto;
+                vertical-align: middle;
+            }
+
+            /* 2. Column Widths */
+            .admin-table th:nth-child(1), .admin-table td:nth-child(1) {
+                width: 14%;
+                text-align: center;
+            }
+            .admin-table th:nth-child(2), .admin-table td:nth-child(2) {
+                width: 14%;
+            }
+            .admin-table th:nth-child(3), .admin-table td:nth-child(3) {
+                width: 7%;
+            }
+            .admin-table th:nth-child(4), .admin-table td:nth-child(4) {
+                width: 11%;
+            }
+            .admin-table th:nth-child(5), .admin-table td:nth-child(5) {
+                width: 18%;
+            }
+            .admin-table th:nth-child(6), .admin-table td:nth-child(6) {
+                width: 36%;
+            }
+
+            /* 3. Action Pills & Badges */
+            .role-badge {
+                background: #f0f7ff;
+                color: #007bff;
+                padding: 4px 10px;
+                border-radius: 6px;
+                font-size: 11px;
+                text-transform: uppercase;
+                font-weight: bold;
+            }
+            .action-pill {
+                padding: 4px 10px;
+                border-radius: 6px;
+                font-weight: bold;
+                font-size: 11px;
+                font-family: monospace;
+                display: inline-block;
+            }
+            .pill-delete {
+                background: #fff5f5;
+                color: #e53e3e;
+                border: 1px solid #fed7d7;
+            }
+            .pill-enroll {
+                background: #e6fffa;
+                color: #38a169;
+                border: 1px solid #b2f5ea;
+            }
+            .pill-grade  {
+                background: #eff6ff;
+                color: #2563eb;
+                border: 1px solid #dbeafe;
+            }
+            .pill-info   {
+                background: #f8fafc;
+                color: #64748b;
+                border: 1px solid #e2e8f0;
+            }
+
+            .timestamp-text {
+                color: #64748b;
+                font-size: 0.82rem;
+                line-height: 1.4;
+            }
+
+            .policy-banner {
+                background: rgba(255, 255, 255, 0.15);
+                padding: 10px 20px;
+                border-radius: 10px;
+                border-left: 4px solid #facc15;
+                font-size: 0.9rem;
+                margin-left: 20px;
+            }
+
+            /* 4. SIDEBAR & LOGOUT BUTTON (Matching Student Dashboard CSS) */
+            .nav-menu {
+                display: flex;
+                flex-direction: column;
+                height: calc(100% - 100px); /* Adjust based on logo section height */
+            }
+
+            .logout-container {
+                display: flex;
+                justify-items: self-end;
+                margin-top: auto;
+                padding: 10px 0;
+            }
+
+            .btn-logout {
+                display: block;
+                width: 90%;
+                padding: 12px;
+                border-radius: 10px;
+                background: linear-gradient(to right, #1890ff, #eb2f96);
+                color: white !important;
+                font-size: 14px;
+                font-weight: bold;
+                cursor: pointer;
+                text-align: center;
+                text-decoration: none;
+                transition: opacity 0.3s;
+                border: none;
+            }
+
+            .btn-logout:hover {
+                opacity: 0.9;
+                color: white !important;
+            }

@@ -7,6 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map; 
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
@@ -17,6 +18,7 @@ public class DashboardServlet extends HttpServlet {
     private StudentDAO studentDAO = new StudentDAO();
     private CourseDAO courseDAO = new CourseDAO();
     private UserDAO userDAO = new UserDAO();
+    private SummaryDAO summaryDAO = new SummaryDAO(); 
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -37,15 +39,28 @@ public class DashboardServlet extends HttpServlet {
             // --- ADMIN LOGIC: Get Today's Classes ---
             String currentDay = LocalDate.now()
                     .getDayOfWeek()
-                    .getDisplayName(TextStyle.FULL, Locale.ENGLISH); // Result: "Wednesday"
+                    .getDisplayName(TextStyle.FULL, Locale.ENGLISH); 
 
             // Fetch the list using the day name string
             List<Course> todayClasses = courseDAO.getTodayCourses(currentDay);
 
             int activeStudents = userDAO.getActiveStudentCount();
-            // Set the attribute so admindash.jsp can see it
+
+            // --- NEW ADMIN STATS LOGIC ---
+            double campusGPA = summaryDAO.getCampusAvgGPA();
+            int activeSeats = summaryDAO.getTotalActiveEnrollments();
+            Map<String, Object> topCourse = summaryDAO.getTopRatedCourse();
+
+            // Set the attributes so admindash.jsp can see it
             request.setAttribute("todayClasses", todayClasses);
             request.setAttribute("activeStudentCount", activeStudents);
+
+            // Attributes for the new 2x2 grid cards
+            request.setAttribute("campusGPA", campusGPA);
+            request.setAttribute("totalActiveEnrollments", activeSeats);
+            request.setAttribute("topCourseName", topCourse.getOrDefault("name", "N/A"));
+            request.setAttribute("topCourseRating", topCourse.getOrDefault("rating", "0.0"));
+
             // Forward to Admin Dashboard
             request.getRequestDispatcher("/admin/admindash.jsp").forward(request, response);
 
@@ -66,7 +81,6 @@ public class DashboardServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
         }
 
-        // IMPORTANT: Removed the code at the bottom because forwarding is already handled above!
     }
 
     @Override

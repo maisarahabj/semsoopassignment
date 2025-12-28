@@ -16,132 +16,9 @@
         <title>Barfact Uni | System Logs</title>
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/admindash.css">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/admincourse.css">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/adminlogs.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-        <style>
-            /* 1. Wrap Details and Row Expansion */
-            .admin-table td:last-child {
-                white-space: normal !important;
-                word-wrap: break-word;
-                line-height: 1.4;
-                padding: 12px 15px;
-            }
-
-            .admin-table td {
-                height: auto;
-                vertical-align: middle;
-            }
-
-            /* 2. Column Widths */
-            .admin-table th:nth-child(1), .admin-table td:nth-child(1) {
-                width: 14%;
-                text-align: center;
-            }
-            .admin-table th:nth-child(2), .admin-table td:nth-child(2) {
-                width: 14%;
-            }
-            .admin-table th:nth-child(3), .admin-table td:nth-child(3) {
-                width: 7%;
-            }
-            .admin-table th:nth-child(4), .admin-table td:nth-child(4) {
-                width: 11%;
-            }
-            .admin-table th:nth-child(5), .admin-table td:nth-child(5) {
-                width: 18%;
-            }
-            .admin-table th:nth-child(6), .admin-table td:nth-child(6) {
-                width: 36%;
-            }
-
-            /* 3. Action Pills & Badges */
-            .role-badge {
-                background: #f0f7ff;
-                color: #007bff;
-                padding: 4px 10px;
-                border-radius: 6px;
-                font-size: 11px;
-                text-transform: uppercase;
-                font-weight: bold;
-            }
-            .action-pill {
-                padding: 4px 10px;
-                border-radius: 6px;
-                font-weight: bold;
-                font-size: 11px;
-                font-family: monospace;
-                display: inline-block;
-            }
-            .pill-delete {
-                background: #fff5f5;
-                color: #e53e3e;
-                border: 1px solid #fed7d7;
-            }
-            .pill-enroll {
-                background: #e6fffa;
-                color: #38a169;
-                border: 1px solid #b2f5ea;
-            }
-            .pill-grade  {
-                background: #eff6ff;
-                color: #2563eb;
-                border: 1px solid #dbeafe;
-            }
-            .pill-info   {
-                background: #f8fafc;
-                color: #64748b;
-                border: 1px solid #e2e8f0;
-            }
-
-            .timestamp-text {
-                color: #64748b;
-                font-size: 0.82rem;
-                line-height: 1.4;
-            }
-
-            .policy-banner {
-                background: rgba(255, 255, 255, 0.15);
-                padding: 10px 20px;
-                border-radius: 10px;
-                border-left: 4px solid #facc15;
-                font-size: 0.9rem;
-                margin-left: 20px;
-            }
-
-            /* 4. SIDEBAR & LOGOUT BUTTON (Matching Student Dashboard CSS) */
-            .nav-menu {
-                display: flex;
-                flex-direction: column;
-                height: calc(100% - 100px); /* Adjust based on logo section height */
-            }
-
-            .logout-container {
-                display: flex;
-                justify-items: center;
-                margin-top: auto;
-                padding: 10px 0;
-            }
-
-            .btn-logout {
-                display: block;
-                width: 90%;
-                padding: 12px;
-                border-radius: 10px;
-                background: linear-gradient(to right, #1890ff, #eb2f96);
-                color: white !important;
-                font-size: 14px;
-                font-weight: bold;
-                cursor: pointer;
-                text-align: center;
-                text-decoration: none;
-                transition: opacity 0.3s;
-                border: none;
-            }
-
-            .btn-logout:hover {
-                opacity: 0.9;
-                color: white !important;
-            }
-        </style>
     </head>
     <body>
 
@@ -159,18 +36,27 @@
                     <span class="logo-text">Barfact Admin</span>
                 </div>
                 <nav class="nav-menu">
-                    <a href="${pageContext.request.contextPath}/DashboardServlet" class="nav-link"><i class="fas fa-chart-line"></i> Overview</a>
-                    <a href="${pageContext.request.contextPath}/CourseServlet?action=manage" class="nav-link"><i class="fas fa-book-open"></i> Manage Courses</a>
-                    <a href="${pageContext.request.contextPath}/AdminManageStudentServlet" class="nav-link"><i class="fas fa-user-graduate"></i> Manage Students</a>
-                    <a href="${pageContext.request.contextPath}/GradeServlet" class="nav-link"><i class="fas fa-graduation-cap"></i> Grade Management</a>
-                    <a href="${pageContext.request.contextPath}/auth/AdminPendingServlet" class="nav-link"><i class="fas fa-clock"></i> Pending Approvals</a>
-                    <a href="${pageContext.request.contextPath}/ActivityServlet" class="nav-link active"><i class="fas fa-history"></i> System Logs</a>
-
-                    <div class="logout-container">
-                        <a href="${pageContext.request.contextPath}/auth/LogoutServlet" class="btn-logout">
-                            <i class="fas fa-sign-out-alt"></i> Log Out
-                        </a>
-                    </div>
+                    <a href="${pageContext.request.contextPath}/DashboardServlet" class="nav-link">
+                        <i class="fas fa-chart-line"></i> Overview
+                    </a>
+                    <a href="${pageContext.request.contextPath}/CourseServlet" class="nav-link">
+                        <i class="fas fa-book-open"></i> Manage Courses
+                    </a>
+                    <a href="${pageContext.request.contextPath}/AdminManageStudentServlet" class="nav-link">
+                        <i class="fas fa-user-graduate"></i> Manage Students
+                    </a>
+                    <a href="${pageContext.request.contextPath}/GradeServlet" class="nav-link">
+                        <i class="fas fa-graduation-cap"></i> Grade Management
+                    </a>
+                    <a href="${pageContext.request.contextPath}/auth/AdminPendingServlet" class="nav-link">
+                        <i class="fas fa-clock"></i> Pending Approvals
+                    </a>
+                    <a href="${pageContext.request.contextPath}/ActivityServlet" class="nav-link active">
+                        <i class="fas fa-history"></i> System Logs
+                    </a>
+                    <a href="${pageContext.request.contextPath}/AdminReportServlet" class="nav-link">
+                        <i class="fas fa-file-alt"></i> Academic Report
+                    </a>
                 </nav>
             </aside>
 
