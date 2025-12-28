@@ -112,7 +112,7 @@ public class EvaluationDAO {
                 return rs.getString("first_name") + " " + rs.getString("last_name");
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error revealing identity", e);
+            e.printStackTrace();
         }
         return "Identity Hidden";
     }

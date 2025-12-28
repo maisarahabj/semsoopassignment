@@ -31,16 +31,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     align-items: center;
 }
 
-/*.modal-box {
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    width: 400px;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    animation: slideUp 0.3s ease;
-}*/
-
 /* ----- START: MODAL BOX (confirmation delete) ----- */
 
 
@@ -170,7 +160,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 }
 
 .admin-table td {
-    padding: 15px;
+    padding: 10px;
     background: white;
     border-top: 1px solid #eef2f6;
     border-bottom: 1px solid #eef2f6;
@@ -194,15 +184,16 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     width: 10%;
 } /* Day */
 .admin-table th:nth-child(6), .admin-table td:nth-child(6) {
-    width: 10%;
+    width: 8%;
 } /* Time */
 .admin-table th:nth-child(7), .admin-table td:nth-child(7) {
-    width: 18%;
-    text-align: center;
-} /* Enrolled List */
+    width: 12%;
+} /* Eval Column */
 .admin-table th:nth-child(8), .admin-table td:nth-child(8) {
     width: 15%;
-    text-align: center;
+} /* Enrolled List */
+.admin-table th:nth-child(9), .admin-table td:nth-child(9) {
+    width: 12%;
 } /* Action */
 
 /* Global Table Fix to prevent overflow */
@@ -366,3 +357,54 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     visibility: visible;
     opacity: 1;
 }
+
+
+/* --- START: EVAL COLUMN ---- */
+
+/* New Evaluation Button Style */
+.btn-eval {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fef3c7;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-eval:hover {
+    background: #facc15;
+    color: #854d0e;
+}
+
+/* Evaluation Card Styling for the Modal */
+.eval-card {
+    text-align: left;
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border-left: 4px solid #facc15;
+}
+
+.eval-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+.eval-stars {
+    color: #facc15;
+    margin-bottom: 5px;
+}
+
+.eval-comment {
+    font-size: 0.9rem;
+    color: #1e293b;
+    line-height: 1.4;
+}
+
+/* --- END: EVAL COLUMN ---- */

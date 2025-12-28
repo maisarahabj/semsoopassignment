@@ -170,7 +170,7 @@
                                 <th>Cap</th>
                                 <th>Day</th> 
                                 <th>Time</th>
-                                <th style="text-align: center;">Enrolled List</th>
+                                <th style="text-align: center;">Evaluations</th> <th style="text-align: center;">Enrolled List</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
@@ -208,6 +208,13 @@
                                 <td><%= (c.getCourseTime() != null && c.getCourseTime().length() >= 5) ? c.getCourseTime().substring(0, 5) : "TBA"%></td>
 
                                 <td style="text-align: center;">
+                                    <button type="button" class="btn-eval" 
+                                            onclick="loadCourseEvaluations('<%= c.getCourseId()%>', '<%= c.getCourseCode().replace("'", "\\'")%>')">
+                                        <i class="fas fa-star"></i> Eval
+                                    </button>
+                                </td>
+
+                                <td style="text-align: center;">
                                     <button type="button" class="btn-approve" 
                                             onclick="loadEnrolledStudents('<%= c.getCourseId()%>', '<%= c.getCourseCode().replace("'", "\\'")%>')">
                                         <i class="fas fa-users"></i> View List
@@ -243,6 +250,36 @@
                         <input type="hidden" name="courseId" id="modalCourseId">
                         <button type="submit" class="btn-confirm">Yes, Delete Permanently</button>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <!--EVAL OVERLAY-->
+        <div id="evaluationsOverlay" class="modal-overlay">
+            <div class="modal-box" style="width: 600px;">
+                <div class="modal-icon" style="color: #facc15;"><i class="fas fa-chart-bar"></i></div>
+                <h3>Course Feedback & Stats</h3>
+                <p id="evalCourseTitle" style="font-weight: bold; color: #475569; margin-bottom: 10px;">Course Code</p>
+
+                <div id="evalStatsSummary" style="display: flex; justify-content: space-around; background: #fffbeb; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #fef3c7;">
+                    <div>
+                        <span style="display:block; font-size: 0.75rem; color: #b45309; text-transform: uppercase; font-weight: bold;">Average Rating</span>
+                        <span id="avgRatingText" style="font-size: 1.5rem; font-weight: bold; color: #d97706;">0.0</span>
+                    </div>
+                    <div style="border-left: 1px solid #fde68a;"></div>
+                    <div>
+                        <span style="display:block; font-size: 0.75rem; color: #b45309; text-transform: uppercase; font-weight: bold;">Total Reviews</span>
+                        <span id="totalReviewsText" style="font-size: 1.5rem; font-weight: bold; color: #d97706;">0</span>
+                    </div>
+                </div>
+
+                <div style="max-height: 300px; overflow-y: auto; border: 1px solid #f1f5f9; border-radius: 8px; padding: 10px;">
+                    <div id="evalListContainer">
+                    </div>
+                </div>
+
+                <div class="modal-actions" style="margin-top: 20px; justify-content: flex-end;">
+                    <button type="button" onclick="closeEvalModal()" class="btn-cancel">Close</button>
                 </div>
             </div>
         </div>

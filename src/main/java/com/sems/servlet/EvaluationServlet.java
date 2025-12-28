@@ -25,6 +25,13 @@ public class EvaluationServlet extends HttpServlet {
         HttpSession session = request.getSession();
         String role = (String) session.getAttribute("role");
         Integer userId = (Integer) session.getAttribute("userId");
+        String action = request.getParameter("action"); // Catch the action parameter
+
+        // 1. AJAX Check: If the admin clicked the "Eval" button in the pop-up
+        if ("getReviews".equals(action)) {
+            handleGetReviews(request, response);
+            return;
+        }
 
         if (userId == null) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
@@ -32,13 +39,9 @@ public class EvaluationServlet extends HttpServlet {
         }
 
         if ("student".equals(role)) {
-            // Get studentId safely from session
             Integer studentId = (Integer) session.getAttribute("studentId");
             if (studentId != null) {
-                // 1. Get courses eligible for evaluation (A, B, C, FAIL)
                 List<Enrollment> transcript = enrollDAO.getFullTranscript(studentId);
-
-                // 2. Get IDs of courses this student has ALREADY evaluated
                 List<Integer> evaluatedCourseIds = evalDAO.getEvaluatedCourseIds(studentId);
 
                 request.setAttribute("transcript", transcript);
@@ -48,7 +51,7 @@ public class EvaluationServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/DashboardServlet");
             }
         } else if ("admin".equals(role)) {
-            // Logic for admin to see course averages
+            // This is for the standard Admin Dashboard view
             List<Evaluation> courseStats = evalDAO.getCourseAverages();
             request.setAttribute("courseStats", courseStats);
             request.getRequestDispatcher("/admin/adminviewevals.jsp").forward(request, response);
@@ -110,7 +113,6 @@ public class EvaluationServlet extends HttpServlet {
 
         int evalId = Integer.parseInt(evalIdStr);
 
-        // Security check for the reveal action
         if ("admin123".equals(securityPassword)) {
             String name = evalDAO.revealStudentIdentity(evalId);
             response.setContentType("text/plain");
@@ -120,4 +122,42 @@ public class EvaluationServlet extends HttpServlet {
             response.getWriter().write("Incorrect Password");
         }
     }
+
+    // ADMIN: Converts Review list to JSON for the Admin Pop-up
+    private void handleGetReviews(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            int courseId = Integer.parseInt(request.getParameter("courseId"));
+            List<Evaluation> reviews = evalDAO.getReviewsByCourseId(courseId);
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            StringBuilder json = new StringBuilder("[");
+            for (int i = 0; i < reviews.size(); i++) {
+                Evaluation r = reviews.get(i);
+                json.append("{");
+                json.append("\"rating\":").append(r.getRating()).append(",");
+                // Clean comments to prevent JSON breaking
+                String cleanComment = r.getComments() != null
+                        ? r.getComments().replace("\"", "\\\"").replace("\n", " ").replace("\r", "") : "";
+                json.append("\"comments\":\"").append(cleanComment).append("\",");
+                json.append("\"submittedDate\":\"").append(r.getSubmittedDate()).append("\",");
+                // FIX: Removed the trailing comma from evalId
+                json.append("\"evalId\":").append(r.getEvaluationId());
+                json.append("}");
+
+                if (i < reviews.size() - 1) {
+                    json.append(",");
+                }
+            }
+            json.append("]");
+
+            response.getWriter().write(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("[]");
+        }
+    }
+
 }
