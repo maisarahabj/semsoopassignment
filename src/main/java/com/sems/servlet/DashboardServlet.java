@@ -17,6 +17,7 @@ public class DashboardServlet extends HttpServlet {
     private StudentDAO studentDAO = new StudentDAO();
     private CourseDAO courseDAO = new CourseDAO();
     private UserDAO userDAO = new UserDAO();
+    private SemesterDAO semesterDAO = new SemesterDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -43,9 +44,12 @@ public class DashboardServlet extends HttpServlet {
             List<Course> todayClasses = courseDAO.getTodayCourses(currentDay);
 
             int activeStudents = userDAO.getActiveStudentCount();
+            Semester activeSemester = semesterDAO.getActiveSemester();
+            
             // Set the attribute so admindash.jsp can see it
             request.setAttribute("todayClasses", todayClasses);
             request.setAttribute("activeStudentCount", activeStudents);
+            request.setAttribute("activeSemester", activeSemester);
             // Forward to Admin Dashboard
             request.getRequestDispatcher("/admin/admindash.jsp").forward(request, response);
 
@@ -55,8 +59,11 @@ public class DashboardServlet extends HttpServlet {
 
             if (student != null) {
                 List<Course> enrolledCourses = courseDAO.getCoursesByStudentId(student.getStudentId());
+                Semester activeSemester = semesterDAO.getActiveSemester();
+                
                 request.setAttribute("student", student);
                 request.setAttribute("enrolledCourses", enrolledCourses);
+                request.setAttribute("activeSemester", activeSemester);
 
                 request.getRequestDispatcher("/student/dashboard.jsp").forward(request, response);
             } else {

@@ -4,6 +4,7 @@
     Author     : maisarahabjalil
 --%>
 <%@page import="com.sems.model.User"%>
+<%@page import="com.sems.model.Semester"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -21,6 +22,7 @@
                 return;
             }
             String adminName = (String) session.getAttribute("username");
+            Semester activeSemester = (Semester) request.getAttribute("activeSemester");
         %>
 
         <div class="dashboard-wrapper">
@@ -33,6 +35,18 @@
                 <nav class="nav-menu">
                     <a href="${pageContext.request.contextPath}/DashboardServlet" class="nav-link active">
                         <i class="fas fa-chart-line"></i> Overview
+                    </a>
+
+                    <a href="${pageContext.request.contextPath}/SemesterServlet" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i> Manage Semesters
+                    </a>
+
+                    <a href="${pageContext.request.contextPath}/AcademicCalendarServlet" class="nav-link">
+                        <i class="fas fa-calendar-check"></i> Academic Calendar
+                    </a>
+
+                    <a href="${pageContext.request.contextPath}/BulkCourseMigrationServlet" class="nav-link">
+                        <i class="fas fa-exchange-alt"></i> Course Migration
                     </a>
 
                     <a href="${pageContext.request.contextPath}/CourseServlet" class="nav-link">
@@ -57,6 +71,19 @@
                     <div class="banner-text">
                         <h1>System Portal, <span class="highlight-blue">Admin <%= adminName%></span></h1>
                         <p>Manage university courses, student enrollments, and system settings.</p>
+                        <% if (activeSemester != null) { %>
+                        <p style="margin-top: 10px; font-size: 14px; opacity: 0.9;">
+                            <i class="fas fa-calendar-check"></i> Current Semester: 
+                            <strong><%= activeSemester.getSemesterName() %></strong>
+                            (<%= activeSemester.getStartDate() %> - <%= activeSemester.getEndDate() %>)
+                        </p>
+                        <% } else { %>
+                        <p style="margin-top: 10px; font-size: 14px; color: #ff6b6b;">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            No active semester. Please <a href="${pageContext.request.contextPath}/SemesterServlet" 
+                            style="color: #fff; text-decoration: underline;">create a new semester</a>.
+                        </p>
+                        <% } %>
                     </div>
                     <div class="banner-icon">
                         <i class="fas fa-user-shield"></i>

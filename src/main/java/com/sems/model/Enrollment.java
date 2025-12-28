@@ -17,6 +17,7 @@ public class Enrollment {
     private String courseCode;
     private String courseName;
     private int credits;
+    private int semesterId;
 
     // Constructors
     public String getGrade() {
@@ -106,5 +107,13 @@ public class Enrollment {
 
     public void setCredits(int credits) {
         this.credits = credits;
+    }
+
+    public int getSemesterId() {
+        return semesterId;
+    }
+
+    public void setSemesterId(int semesterId) {
+        this.semesterId = semesterId;
     }
 }

@@ -37,6 +37,9 @@
                     <a href="${pageContext.request.contextPath}/DashboardServlet" class="nav-link">
                         <i class="fas fa-chart-line"></i> Overview
                     </a>
+                    <a href="${pageContext.request.contextPath}/SemesterServlet" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i> Manage Semesters
+                    </a>
                     <a href="${pageContext.request.contextPath}/CourseServlet" class="nav-link">
                         <i class="fas fa-book-open"></i> Manage Courses
                     </a>

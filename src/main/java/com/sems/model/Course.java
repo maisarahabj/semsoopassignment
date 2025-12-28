@@ -17,6 +17,7 @@ public class Course {
     private String courseTime;
     private boolean hasPrereq;
     private String prerequisiteName;
+    private int semesterId;
 
     // Constructors
     public Course() {
@@ -69,6 +70,9 @@ public class Course {
     
     public String getPrerequisiteName() { return prerequisiteName; }
     public void setPrerequisiteName(String prerequisiteName) { this.prerequisiteName = prerequisiteName; }
+
+    public int getSemesterId() { return semesterId; }
+    public void setSemesterId(int semesterId) { this.semesterId = semesterId; }
 
     @Override
     public String toString() {

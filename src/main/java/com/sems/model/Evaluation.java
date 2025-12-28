@@ -14,6 +14,7 @@ public class Evaluation {
     private int rating;
     private String comments;
     private Timestamp submittedDate;
+    private int semesterId;
 
     // Additional fields for display purposes
     private String courseName;
@@ -85,5 +86,13 @@ public class Evaluation {
 
     public void setStudentFullName(String studentFullName) {
         this.studentFullName = studentFullName;
+    }
+
+    public int getSemesterId() {
+        return semesterId;
+    }
+
+    public void setSemesterId(int semesterId) {
+        this.semesterId = semesterId;
     }
 }

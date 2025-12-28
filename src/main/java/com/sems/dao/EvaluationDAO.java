@@ -37,13 +37,22 @@ public class EvaluationDAO {
      * STUDENT ACTION: Submit a new evaluation for a course.
      */
     public boolean submitEvaluation(Evaluation eval) {
-        String sql = "INSERT INTO evaluations (course_id, student_id, rating, comments) VALUES (?, ?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        // Get the semester from the enrollment
+        String sql = "INSERT INTO evaluations (course_id, student_id, rating, comments, semester_id) "
+                + "SELECT ?, ?, ?, ?, e.semester_id "
+                + "FROM enrollments e "
+                + "WHERE e.student_id = ? AND e.course_id = ? "
+                + "LIMIT 1";
+        
+        try (Connection conn = DatabaseConnection.getConnection(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, eval.getCourseId());
             pstmt.setInt(2, eval.getStudentId());
             pstmt.setInt(3, eval.getRating());
             pstmt.setString(4, eval.getComments());
+            pstmt.setInt(5, eval.getStudentId());
+            pstmt.setInt(6, eval.getCourseId());
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {

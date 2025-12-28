@@ -332,6 +332,15 @@ public class CourseDAO {
      * (commit/rollback) to ensure both succeed or both fail.
      */
     public boolean createCourseWithPrereq(Course course, int prerequisiteId) {
+        // Get active semester
+        SemesterDAO semesterDAO = new SemesterDAO();
+        com.sems.model.Semester activeSemester = semesterDAO.getActiveSemester();
+        
+        if (activeSemester == null) {
+            LOGGER.warning("Cannot create course - no active semester");
+            return false;
+        }
+        
         Connection conn = null;
         PreparedStatement pstmtCourse = null;
         PreparedStatement pstmtPrereq = null;
@@ -342,7 +351,7 @@ public class CourseDAO {
             conn.setAutoCommit(false); // Start Transaction
 
             // 1. Insert the Course - RETURN_GENERATED_KEYS is needed to get the new Course ID
-            String sqlCourse = "INSERT INTO courses (course_code, course_name, credits, capacity, enrolled_count, course_day, course_time) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String sqlCourse = "INSERT INTO courses (course_code, course_name, credits, capacity, enrolled_count, course_day, course_time, semester_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             pstmtCourse = conn.prepareStatement(sqlCourse, Statement.RETURN_GENERATED_KEYS);
             pstmtCourse.setString(1, course.getCourseCode());
             pstmtCourse.setString(2, course.getCourseName());
@@ -351,6 +360,7 @@ public class CourseDAO {
             pstmtCourse.setInt(5, 0);
             pstmtCourse.setString(6, course.getCourseDay());
             pstmtCourse.setString(7, course.getCourseTime());
+            pstmtCourse.setInt(8, activeSemester.getSemesterId());
 
             int affectedRows = pstmtCourse.executeUpdate();
             if (affectedRows == 0) {
@@ -387,6 +397,78 @@ public class CourseDAO {
             DatabaseConnection.closeResources(rs, pstmtCourse, null);
             DatabaseConnection.closeResources(null, pstmtPrereq, conn);
         }
+    }
+
+    /**
+     * Bulk migrate courses from one semester to another
+     * Creates copies of courses with new semester_id
+     */
+    public int migrateCourses(int sourceSemesterId, int targetSemesterId) {
+        String selectSql = "SELECT * FROM courses WHERE semester_id = ?";
+        String insertSql = "INSERT INTO courses (course_code, course_name, credits, capacity, " +
+                          "enrolled_count, course_day, course_time, semester_id) " +
+                          "VALUES (?, ?, ?, ?, 0, ?, ?, ?)";
+        
+        Connection conn = null;
+        PreparedStatement selectStmt = null;
+        PreparedStatement insertStmt = null;
+        ResultSet rs = null;
+        int migratedCount = 0;
+        
+        try {
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false);
+            
+            // Get courses from source semester
+            selectStmt = conn.prepareStatement(selectSql);
+            selectStmt.setInt(1, sourceSemesterId);
+            rs = selectStmt.executeQuery();
+            
+            // Prepare insert statement
+            insertStmt = conn.prepareStatement(insertSql);
+            
+            while (rs.next()) {
+                insertStmt.setString(1, rs.getString("course_code"));
+                insertStmt.setString(2, rs.getString("course_name"));
+                insertStmt.setInt(3, rs.getInt("credits"));
+                insertStmt.setInt(4, rs.getInt("capacity"));
+                insertStmt.setString(5, rs.getString("course_day"));
+                insertStmt.setString(6, rs.getString("course_time"));
+                insertStmt.setInt(7, targetSemesterId);
+                
+                insertStmt.addBatch();
+                migratedCount++;
+            }
+            
+            if (migratedCount > 0) {
+                insertStmt.executeBatch();
+                conn.commit();
+                LOGGER.info("Migrated " + migratedCount + " courses from semester " + 
+                           sourceSemesterId + " to " + targetSemesterId);
+            }
+            
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.SEVERE, "Error rolling back migration", ex);
+                }
+            }
+            LOGGER.log(Level.SEVERE, "Error migrating courses", e);
+            return 0;
+        } finally {
+            DatabaseConnection.closeResources(rs, selectStmt, conn);
+            if (insertStmt != null) {
+                try {
+                    insertStmt.close();
+                } catch (SQLException e) {
+                    LOGGER.log(Level.SEVERE, "Error closing insert statement", e);
+                }
+            }
+        }
+        
+        return migratedCount;
     }
 
     //mapping template - javas telling SQL which cell to look at

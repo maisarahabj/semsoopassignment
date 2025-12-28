@@ -7,6 +7,7 @@
 <%@page import="java.util.List"%>
 <%@page import="com.sems.model.Course"%>
 <%@page import="com.sems.model.Student"%>
+<%@page import="com.sems.model.Semester"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -25,6 +26,7 @@
 
             Student student = (Student) request.getAttribute("student");
             List<Course> enrolledCourses = (List<Course>) request.getAttribute("enrolledCourses");
+            Semester activeSemester = (Semester) request.getAttribute("activeSemester");
             String fullName = (student != null) ? student.getFirstName() + " " + student.getLastName() : "Student";
         %>
 
@@ -39,6 +41,9 @@
                     <a href="${pageContext.request.contextPath}/DashboardServlet" class="nav-link active">
                         <i class="fas fa-home"></i> Dashboard
                     </a>
+                    <a href="${pageContext.request.contextPath}/AcademicCalendarServlet" class="nav-link">
+                        <i class="fas fa-calendar-check"></i> Academic Calendar
+                    </a>
                     <a href="${pageContext.request.contextPath}/student/MyCourseServlet" class="nav-link">
                         <i class="fas fa-book"></i> My Classes
                     </a>
@@ -47,6 +52,9 @@
                     </a>
                     <a href="${pageContext.request.contextPath}/GradeServlet" class="nav-link">
                         <i class="fas fa-poll-h"></i> My Results
+                    </a>
+                    <a href="${pageContext.request.contextPath}/student/SemesterResultsServlet" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i> Semester Results
                     </a>
                     <a href="${pageContext.request.contextPath}/EvaluationServlet" class="nav-link">
                         <i class="fas fa-star"></i> Course Evaluation
@@ -67,6 +75,12 @@
                     <div class="banner-text">
                         <h1>Welcome back, <span class="highlight-blue"><%= fullName%></span>!</h1>
                         <p>Your academic progress is looking great this semester.</p>
+                        <% if (activeSemester != null) { %>
+                        <p style="margin-top: 10px; font-size: 14px; opacity: 0.9;">
+                            <i class="fas fa-calendar-alt"></i> Current Semester: 
+                            <strong><%= activeSemester.getSemesterName() %></strong>
+                        </p>
+                        <% } %>
                     </div>
                     <div class="banner-icon">
                         <i class="fas fa-graduation-cap"></i>

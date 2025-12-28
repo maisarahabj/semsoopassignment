@@ -225,7 +225,16 @@ public class EnrollmentDAO {
      * Admin manually enrolls a student and increments course count.
      */
     public boolean adminEnrollStudentInCourse(int studentId, int courseId) {
-        String insertSql = "INSERT INTO enrollments (student_id, course_id, status) VALUES (?, ?, 'Enrolled')";
+        // Get active semester
+        SemesterDAO semesterDAO = new SemesterDAO();
+        com.sems.model.Semester activeSemester = semesterDAO.getActiveSemester();
+        
+        if (activeSemester == null) {
+            LOGGER.warning("Cannot enroll student - no active semester");
+            return false;
+        }
+        
+        String insertSql = "INSERT INTO enrollments (student_id, course_id, status, semester_id) VALUES (?, ?, 'Enrolled', ?)";
         String updateCourseSql = "UPDATE courses SET enrolled_count = enrolled_count + 1 "
                 + "WHERE course_id = ? AND enrolled_count < capacity";
 
@@ -237,6 +246,7 @@ public class EnrollmentDAO {
             try (PreparedStatement ps1 = conn.prepareStatement(insertSql)) {
                 ps1.setInt(1, studentId);
                 ps1.setInt(2, courseId);
+                ps1.setInt(3, activeSemester.getSemesterId());
                 ps1.executeUpdate();
             }
 
@@ -453,5 +463,155 @@ public class EnrollmentDAO {
             LOGGER.log(Level.SEVERE, "Error fetching admin transcript for student: " + studentId, e);
         }
         return transcript;
+    }
+
+    /**
+     * Gets enrollments for a specific student in a specific semester
+     */
+    public List<Enrollment> getEnrollmentsBySemester(int studentId, int semesterId) {
+        List<Enrollment> enrollments = new ArrayList<>();
+        String sql = "SELECT e.*, c.course_code, c.course_name, c.credits "
+                + "FROM enrollments e "
+                + "JOIN courses c ON e.course_id = c.course_id "
+                + "WHERE e.student_id = ? AND e.semester_id = ? "
+                + "ORDER BY c.course_code";
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseConnection.getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, studentId);
+            ps.setInt(2, semesterId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Enrollment e = new Enrollment();
+                e.setEnrollmentId(rs.getInt("enrollment_id"));
+                e.setStudentId(rs.getInt("student_id"));
+                e.setCourseId(rs.getInt("course_id"));
+                e.setGrade(rs.getString("grade"));
+                e.setStatus(rs.getString("status"));
+                e.setCourseCode(rs.getString("course_code"));
+                e.setCourseName(rs.getString("course_name"));
+                e.setCredits(rs.getInt("credits"));
+                e.setSemesterId(semesterId);
+                enrollments.add(e);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching enrollments for student " + studentId + 
+                    " in semester " + semesterId, e);
+        } finally {
+            DatabaseConnection.closeResources(rs, ps, conn);
+        }
+        return enrollments;
+    }
+
+    /**
+     * Calculate GPA for a specific semester
+     */
+    public double calculateSemesterGPA(int studentId, int semesterId) {
+        String sql = "SELECT e.grade, c.credits "
+                + "FROM enrollments e "
+                + "JOIN courses c ON e.course_id = c.course_id "
+                + "WHERE e.student_id = ? AND e.semester_id = ? "
+                + "AND e.grade IS NOT NULL AND e.grade != 'N/A'";
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
+        double totalPoints = 0.0;
+        int totalCredits = 0;
+
+        try {
+            conn = DatabaseConnection.getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, studentId);
+            ps.setInt(2, semesterId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String grade = rs.getString("grade");
+                int credits = rs.getInt("credits");
+                
+                double gradePoint = convertGradeToPoint(grade);
+                if (gradePoint >= 0) { // Only count valid grades
+                    totalPoints += gradePoint * credits;
+                    totalCredits += credits;
+                }
+            }
+            
+            if (totalCredits > 0) {
+                return Math.round((totalPoints / totalCredits) * 100.0) / 100.0; // Round to 2 decimals
+            }
+            
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error calculating semester GPA for student " + studentId + 
+                    " in semester " + semesterId, e);
+        } finally {
+            DatabaseConnection.closeResources(rs, ps, conn);
+        }
+        
+        return 0.0;
+    }
+    
+    /**
+     * Convert letter grade to grade point
+     */
+    private double convertGradeToPoint(String grade) {
+        if (grade == null) return -1;
+        
+        switch (grade.toUpperCase()) {
+            case "A": return 4.0;
+            case "A-": return 3.7;
+            case "B+": return 3.3;
+            case "B": return 3.0;
+            case "B-": return 2.7;
+            case "C+": return 2.3;
+            case "C": return 2.0;
+            case "C-": return 1.7;
+            case "D+": return 1.3;
+            case "D": return 1.0;
+            case "FAIL": return 0.0;
+            default: return -1; // N/A or invalid
+        }
+    }
+
+    /**
+     * Get all semester GPAs for a student
+     */
+    public java.util.Map<Integer, Double> getAllSemesterGPAs(int studentId) {
+        java.util.Map<Integer, Double> semesterGPAs = new java.util.HashMap<>();
+        
+        String sql = "SELECT DISTINCT semester_id FROM enrollments WHERE student_id = ?";
+        
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = DatabaseConnection.getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, studentId);
+            rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                int semesterId = rs.getInt("semester_id");
+                if (semesterId > 0) {
+                    double gpa = calculateSemesterGPA(studentId, semesterId);
+                    semesterGPAs.put(semesterId, gpa);
+                }
+            }
+            
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching semester GPAs for student " + studentId, e);
+        } finally {
+            DatabaseConnection.closeResources(rs, ps, conn);
+        }
+        
+        return semesterGPAs;
     }
 }

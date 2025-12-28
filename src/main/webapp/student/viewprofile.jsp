@@ -37,6 +37,9 @@
                     <a href="${pageContext.request.contextPath}/DashboardServlet" class="nav-link">
                         <i class="fas fa-home"></i> Dashboard
                     </a>
+                    <a href="${pageContext.request.contextPath}/AcademicCalendarServlet" class="nav-link">
+                        <i class="fas fa-calendar-check"></i> Academic Calendar
+                    </a>
                     <a href="${pageContext.request.contextPath}/student/MyCourseServlet" class="nav-link">
                         <i class="fas fa-book"></i> My Classes
                     </a>
@@ -46,10 +49,13 @@
                     <a href="${pageContext.request.contextPath}/GradeServlet" class="nav-link">
                         <i class="fas fa-poll-h"></i> My Results
                     </a>
+                    <a href="${pageContext.request.contextPath}/student/SemesterResultsServlet" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i> Semester Results
+                    </a>
                     <a href="${pageContext.request.contextPath}/EvaluationServlet" class="nav-link">
                         <i class="fas fa-star"></i> Course Evaluation
                     </a>
-                    <a href="${pageContext.request.contextPath}/ProfileServlet" class="nav-link active">
+                    <a href="${pageContext.request.contextPath}/ProfileServlet" class="nav-link">
                         <i class="fas fa-user"></i> Profile
                     </a>
                 </nav>
