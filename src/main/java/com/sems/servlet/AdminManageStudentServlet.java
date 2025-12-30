@@ -1,9 +1,17 @@
 /**
  *
+ *  FOR ADMIN VIEW ONLY
+ *  doGet   -   loads list of all approved students n available courses
+ *  doPost  -   ADD: manually add new student and profile without using registration.jsp
+ *              UPDATE: update student's personal details
+ *              DELETE: deletes a student, their enrollments, profile, login account (user table)
+ *
+ *
  * @author maisarahabjalil
  */
 package com.sems.servlet;
 
+import com.sems.dao.ActivityLogDAO;
 import com.sems.dao.StudentDAO;
 import com.sems.dao.CourseDAO;
 import com.sems.model.Student;
@@ -19,6 +27,7 @@ public class AdminManageStudentServlet extends HttpServlet {
 
     private StudentDAO studentDAO = new StudentDAO();
     private CourseDAO courseDAO = new CourseDAO();
+    private ActivityLogDAO logDAO = new ActivityLogDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -42,15 +51,16 @@ public class AdminManageStudentServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session = request.getSession();
+        Integer adminUserId = (Integer) session.getAttribute("userId"); // Identify the Admin performer
         String action = request.getParameter("action");
 
+        // --- ACTION 1: ADD MANUAL ---
         if ("ADD_MANUAL".equals(action)) {
-            // Extract Account Data
             String username = request.getParameter("username");
             String pass = request.getParameter("password");
             int manualId = Integer.parseInt(request.getParameter("studentId"));
 
-            // Extract Profile Data
             Student s = new Student();
             s.setStudentId(manualId);
             s.setFirstName(request.getParameter("firstName"));
@@ -59,22 +69,28 @@ public class AdminManageStudentServlet extends HttpServlet {
             s.setPhone(request.getParameter("phone"));
             s.setAddress(request.getParameter("address"));
 
-            // Convert String date to SQL Date
             try {
-                java.sql.Date dob = java.sql.Date.valueOf(request.getParameter("dob"));
-                s.setDob(dob);
+                String dobStr = request.getParameter("dob");
+                if (dobStr != null && !dobStr.isEmpty()) {
+                    s.setDob(java.sql.Date.valueOf(dobStr));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            // Call the new transactional method
             boolean success = studentDAO.createStudentManually(s, username, pass);
 
             if (success) {
-                // Success! We can add a message attribute if we want
+                // LOG: Admin creates student
+                logDAO.recordLog(adminUserId, s.getStudentId(), "ADMIN_CREATE_STUDENT",
+                        "Admin manually created student profile for: " + s.getFirstName() + " " + s.getLastName());
+
+                response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet?status=addSuccess");
+                return;
             }
         }
 
+        // --- ACTION 2: DELETE STUDENT ---
         if ("DELETE".equals(action)) {
             String studentIdStr = request.getParameter("studentId");
             String userIdStr = request.getParameter("userId");
@@ -87,7 +103,10 @@ public class AdminManageStudentServlet extends HttpServlet {
                     boolean deleted = studentDAO.deleteStudent(sId, uId);
 
                     if (deleted) {
-                        // Redirect immediately on success to prevent further execution
+                        // LOG: Admin deletes student
+                        logDAO.recordLog(adminUserId, sId, "ADMIN_DELETE_STUDENT",
+                                "Admin deleted student ID #" + sId + " and cleared associated account.");
+
                         response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet?status=deleteSuccess");
                         return;
                     }
@@ -96,46 +115,41 @@ public class AdminManageStudentServlet extends HttpServlet {
                 }
             }
         }
+
+        // --- ACTION 3: UPDATE STUDENT ---
         if ("UPDATE_STUDENT".equals(action)) {
             try {
-                // 1. Extract parameters from the Admin Edit Form
                 int studentId = Integer.parseInt(request.getParameter("studentId"));
-                String firstName = request.getParameter("firstName");
-                String lastName = request.getParameter("lastName");
-                String email = request.getParameter("email");
-                String phone = request.getParameter("phone");
-                String address = request.getParameter("address");
-                double gpa = Double.parseDouble(request.getParameter("gpa"));
-
-                // 2. Create Student object and set values
                 Student s = new Student();
                 s.setStudentId(studentId);
-                s.setFirstName(firstName);
-                s.setLastName(lastName);
-                s.setEmail(email);
-                s.setPhone(phone);
-                s.setAddress(address);
-                s.setGpa(gpa);
+                s.setFirstName(request.getParameter("firstName"));
+                s.setLastName(request.getParameter("lastName"));
+                s.setEmail(request.getParameter("email"));
+                s.setPhone(request.getParameter("phone"));
+                s.setAddress(request.getParameter("address"));
+                s.setGpa(Double.parseDouble(request.getParameter("gpa")));
 
-                // Handle Date of Birth conversion
                 String dobStr = request.getParameter("dob");
                 if (dobStr != null && !dobStr.isEmpty()) {
                     s.setDob(java.sql.Date.valueOf(dobStr));
                 }
 
-                // 3. Call the master update method in DAO
                 boolean success = studentDAO.updateStudent(s);
 
-                // Optional: Add a status parameter to show a toast/alert on refresh
                 if (success) {
+                    // LOG: Admin updates profile
+                    logDAO.recordLog(adminUserId, s.getStudentId(), "ADMIN_UPDATE_PROFILE",
+                            "Admin updated profile details (including GPA) for student ID #" + s.getStudentId());
+
                     response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet?status=success");
-                    return; // Important: return after redirect
+                    return;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        // Redirect refreshes the list so the UI stays in sync
+
+        // Default redirect if no specific logic consumes the request
         response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet");
     }
 }

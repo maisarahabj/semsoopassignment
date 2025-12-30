@@ -104,6 +104,12 @@
                         <i class="fas fa-graduation-cap"></i> Grade Management
                     </a>
                     <a href="${pageContext.request.contextPath}/auth/AdminPendingServlet" class="nav-link"><i class="fas fa-clock"></i> Pending Approvals</a>
+                    <a href="${pageContext.request.contextPath}/ActivityServlet" class="nav-link">
+                        <i class="fas fa-history"></i> System Logs
+                    </a>
+                    <a href="${pageContext.request.contextPath}/AdminReportServlet" class="nav-link">
+                        <i class="fas fa-file-alt"></i> Academic Report
+                    </a>
                 </nav>
             </aside>
 

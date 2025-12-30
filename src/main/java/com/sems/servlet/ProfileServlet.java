@@ -5,19 +5,20 @@
 package com.sems.servlet;
 
 import com.sems.dao.StudentDAO;
+import com.sems.dao.ActivityLogDAO; 
 import com.sems.model.Student;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.sql.Date;
 
 @WebServlet("/ProfileServlet")
 public class ProfileServlet extends HttpServlet {
 
-    private StudentDAO studentDAO = new StudentDAO();
+    private final StudentDAO studentDAO = new StudentDAO();
+    private final ActivityLogDAO logDAO = new ActivityLogDAO(); // Added
 
-    // 1. VIEW PROFILE (GET)
+    // 1. VIEW PROFILE (GET) - No logging needed for just viewing
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -34,20 +35,21 @@ public class ProfileServlet extends HttpServlet {
         }
     }
 
-    // 2. EDIT PROFILE (POST)
+    // 2. EDIT PROFILE (POST) - Log the update action
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
+        Integer studentId = (Integer) session.getAttribute("studentId"); // Get studentId for target tracking
 
         if (userId == null) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
 
-        // Get only the fields the student is allowed to change
+        // Get updated fields
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
         String address = request.getParameter("address");
@@ -55,7 +57,14 @@ public class ProfileServlet extends HttpServlet {
         boolean success = studentDAO.updateStudentContactInfo(userId, email, phone, address);
 
         if (success) {
-            // Redirect back to GET to show the updated data
+            // TRIGGER LOG: Record that the student updated their profile
+            logDAO.recordLog(
+                    userId,
+                    studentId,
+                    "UPDATE_PROFILE",
+                    "Student updated their personal contact information (Email/Phone/Address)."
+            );
+
             response.sendRedirect(request.getContextPath() + "/ProfileServlet?status=success");
         } else {
             response.sendRedirect(request.getContextPath() + "/ProfileServlet?error=1");
