@@ -136,3 +136,37 @@ hr {
     border-top: 1px solid #e2e8f0;
     margin-bottom: 20px;
 }
+/* Profile Picture Upload Styles */
+.profile-picture-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+}
+
+.profile-picture-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #3b82f6;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+#profilePicture {
+    display: none;
+}
+
+.upload-btn {
+    background: #3b82f6;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.upload-btn:hover {
+    background: #2563eb;
+}

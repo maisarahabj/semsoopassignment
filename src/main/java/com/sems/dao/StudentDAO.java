@@ -370,6 +370,20 @@ public class StudentDAO {
             return false;
         }
     }
+    
+    // Update student profile picture
+    public boolean updateProfilePicture(int userId, String profilePicturePath) {
+        String sql = "UPDATE students SET profile_picture = ? WHERE user_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, profilePicturePath);
+            pstmt.setInt(2, userId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating profile picture", e);
+            return false;
+        }
+    }
 
     // allows servlet to get student profile - name GPA etc
     public Student getStudentById(int studentId) {
@@ -404,6 +418,7 @@ public class StudentDAO {
         student.setAddress(rs.getString("address"));
         student.setGpa(rs.getDouble("gpa"));
         student.setDob(rs.getDate("dob"));
+        student.setProfilePicture(rs.getString("profile_picture"));
         return student;
     }
 }

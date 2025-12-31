@@ -30,7 +30,7 @@ public class Enrollment {
 
     // Constructors
     public Enrollment() {
-        this.status = "enrolled";
+        this.status = "PENDING";
     }
 
     public Enrollment(int studentId, int courseId) {

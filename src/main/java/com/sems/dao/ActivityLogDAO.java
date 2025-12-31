@@ -44,6 +44,7 @@ public class ActivityLogDAO {
 
     /**
      * Fetches all logs with performer names for the Admin Dashboard.
+     * Evaluations are anonymized to protect student privacy.
      */
     public List<ActivityLog> getAllLogs() {
         List<ActivityLog> logs = new ArrayList<>();
@@ -69,12 +70,18 @@ public class ActivityLogDAO {
                 log.setTimestamp(rs.getTimestamp("timestamp"));
                 log.setPerformerRole(rs.getString("role"));
 
-                // If it's a student, we use their real name; otherwise, we use the username
-                String firstName = rs.getString("first_name");
-                if (firstName != null) {
-                    log.setPerformerName(firstName + " " + rs.getString("last_name"));
+                // Make evaluations anonymous - hide student identity
+                String actionType = rs.getString("action_type");
+                if ("EVALUATE".equals(actionType)) {
+                    log.setPerformerName("Anonymous Student");
                 } else {
-                    log.setPerformerName(rs.getString("username"));
+                    // For non-evaluation actions, show the performer's name
+                    String firstName = rs.getString("first_name");
+                    if (firstName != null) {
+                        log.setPerformerName(firstName + " " + rs.getString("last_name"));
+                    } else {
+                        log.setPerformerName(rs.getString("username"));
+                    }
                 }
                 
                 logs.add(log);

@@ -60,3 +60,16 @@ CREATE TABLE IF NOT EXISTS calendar_events (
 -- - When admin starts a new semester, previous active semester should be ended
 -- - Students can only register for courses in the active semester
 -- - Past semesters remain accessible for viewing results and evaluations
+
+
+-- - 31/Dec/2025 - updates
+
+-- Feature 4: Add profile_picture column to students table
+ALTER TABLE students 
+ADD COLUMN profile_picture VARCHAR(255) DEFAULT NULL
+COMMENT 'Path to profile picture file';
+
+-- Feature 2: Update enrollments status to support PENDING and REJECTED
+ALTER TABLE enrollments 
+MODIFY COLUMN status ENUM('PENDING', 'Enrolled', 'REJECTED', 'Dropped', 'Completed') 
+DEFAULT 'PENDING';

@@ -81,7 +81,30 @@
                 <% }%>
 
                 <div class="profile-card-container">
-                    <form action="${pageContext.request.contextPath}/ProfileServlet" method="POST" class="profile-form">
+                    <form action="${pageContext.request.contextPath}/ProfileServlet" method="POST" 
+                          class="profile-form" enctype="multipart/form-data">
+                        
+                        <!-- Profile Picture Upload Section -->
+                        <div class="form-group full-width">
+                            <label>Profile Picture</label>
+                            <div class="profile-picture-upload">
+                                <% 
+                                    String profilePicture = student.getProfilePicture();
+                                    String displayPicture = (profilePicture != null && !profilePicture.isEmpty()) 
+                                        ? request.getContextPath() + "/" + profilePicture 
+                                        : request.getContextPath() + "/assets/default-profile.png";
+                                %>
+                                <img id="profilePreview" src="<%= displayPicture %>" 
+                                     alt="Profile Picture" class="profile-picture-preview"
+                                     onerror="this.src='${pageContext.request.contextPath}/assets/cat.png'">
+                                <input type="file" name="profilePicture" id="profilePicture" 
+                                       accept="image/*" onchange="previewProfilePicture(this)">
+                                <label for="profilePicture" class="upload-btn">
+                                    <i class="fas fa-camera"></i> Change Photo
+                                </label>
+                            </div>
+                        </div>
+                        
                         <div class="form-grid">
 
                             <div class="form-group">
@@ -157,7 +180,17 @@
 
             <aside class="right-panel">
                 <div class="profile-avatar">
-                    <i class="fas fa-user"></i>
+                    <% 
+                        String profilePicture = student.getProfilePicture();
+                        if (profilePicture != null && !profilePicture.isEmpty()) {
+                    %>
+                        <img src="${pageContext.request.contextPath}/<%= profilePicture %>" 
+                             alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <i class="fas fa-user" style="display: none;"></i>
+                    <% } else { %>
+                        <i class="fas fa-user"></i>
+                    <% } %>
                 </div>
                 <h2 class="profile-name"><%= fullName%></h2>
                 <p class="profile-id">Student ID: #<%= (student != null) ? student.getStudentId() : "N/A"%></p>

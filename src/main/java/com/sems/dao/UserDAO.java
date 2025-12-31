@@ -113,6 +113,28 @@ public class UserDAO {
         }
         return count;
     }
+    
+    /**
+     * Get user by ID
+     */
+    public User getUserById(int userId) {
+        String sql = "SELECT * FROM users WHERE user_id = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, userId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return extractUserFromResultSet(rs);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching user by ID", e);
+        }
+        return null;
+    }
 
     private User extractUserFromResultSet(ResultSet rs) throws SQLException {
         User user = new User();

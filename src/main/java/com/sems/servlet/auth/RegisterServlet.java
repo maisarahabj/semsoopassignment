@@ -18,6 +18,30 @@ import java.sql.*;
 
 @WebServlet("/auth/RegisterServlet")
 public class RegisterServlet extends HttpServlet {
+    
+    /**
+     * Validates password meets requirements:
+     * - At least 8 characters
+     * - Contains uppercase letter
+     * - Contains number
+     * - Contains special character
+     * @return null if valid, error message if invalid
+     */
+    private String validatePassword(String password) {
+        if (password == null || password.length() < 8) {
+            return "Password must be at least 8 characters long.";
+        }
+        if (!password.matches(".*[A-Z].*")) {
+            return "Password must contain at least one uppercase letter.";
+        }
+        if (!password.matches(".*[0-9].*")) {
+            return "Password must contain at least one number.";
+        }
+        if (!password.matches(".*[!@#$%^&*(),.?\"':{}|<>].*")) {
+            return "Password must contain at least one special character.";
+        }
+        return null;
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
@@ -32,6 +56,14 @@ public class RegisterServlet extends HttpServlet {
         String email = request.getParameter("email");
         String dob = request.getParameter("dob");
         String studentRegId = request.getParameter("studentRegId");
+        
+        // Validate password constraints
+        String passwordError = validatePassword(pass);
+        if (passwordError != null) {
+            request.setAttribute("errorMessage", passwordError);
+            request.getRequestDispatcher("/register.jsp").forward(request, response);
+            return;
+        }
 
         String url = "jdbc:mysql://localhost:3306/sems_db?useSSL=false&allowPublicKeyRetrieval=true";
         Connection conn = null;

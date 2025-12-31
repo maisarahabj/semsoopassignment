@@ -17,6 +17,7 @@ public class Student {
     private Date enrollmentDate;
     private String status;      
     private double gpa;         
+    private String profilePicture; // Path to profile picture         
 
     // Constructors
     public Student() {
@@ -66,6 +67,9 @@ public class Student {
 
     public double getGpa() { return gpa; }
     public void setGpa(double gpa) { this.gpa = gpa; }
+    
+    public String getProfilePicture() { return profilePicture; }
+    public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
 
     // Helper Method
     public String getFullName() {

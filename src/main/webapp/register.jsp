@@ -31,12 +31,16 @@
             </p>
             <% }%>
 
-            <form action="${pageContext.request.contextPath}/auth/RegisterServlet" method="POST">
+            <form action="${pageContext.request.contextPath}/auth/RegisterServlet" method="POST" id="registerForm">
 
                 <div class="input-group">
                     <label>Account Info</label>
                     <input type="text" name="username" placeholder="Username" required>
-                    <input type="password" name="password" placeholder="Password" required style="margin-top:10px;">
+                    <input type="password" name="password" id="password" placeholder="Password" required style="margin-top:10px;">
+                    <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+                        Password must be at least 8 characters with uppercase, number, and special character
+                    </small>
+                    <div id="passwordError" style="color: #ff4d4f; font-size: 12px; margin-top: 5px; display: none;"></div>
                 </div>
 
                 <div class="input-group">
@@ -87,5 +91,21 @@
             </footer>
         </div>
         <script src="${pageContext.request.contextPath}/js/main.js"></script>
+        <script>
+            // Password validation on form submit
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                const password = document.getElementById('password').value;
+                const errorDiv = document.getElementById('passwordError');
+                
+                const validationError = validatePassword(password);
+                if (validationError) {
+                    e.preventDefault();
+                    errorDiv.textContent = validationError;
+                    errorDiv.style.display = 'block';
+                    return false;
+                }
+                errorDiv.style.display = 'none';
+            });
+        </script>
     </body>
 </html>

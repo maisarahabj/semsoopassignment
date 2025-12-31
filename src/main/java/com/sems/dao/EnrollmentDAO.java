@@ -47,11 +47,11 @@ public class EnrollmentDAO {
 
             pstmt.setInt(1, studentId);
             pstmt.setInt(2, courseId);
-            pstmt.setString(3, "Enrolled"); // Default status
+            pstmt.setString(3, "PENDING"); // Set to PENDING for admin approval
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
-                LOGGER.info("Student " + studentId + " successfully enrolled in course " + courseId);
+                LOGGER.info("Student " + studentId + " enrollment request submitted for course " + courseId);
                 return true;
             }
         } catch (SQLException e) {
@@ -613,5 +613,76 @@ public class EnrollmentDAO {
         }
         
         return semesterGPAs;
+    }
+    
+    /**
+     * Get all pending enrollment requests for admin approval
+     */
+    public List<Map<String, Object>> getPendingEnrollments() {
+        List<Map<String, Object>> pendingEnrollments = new ArrayList<>();
+        String sql = "SELECT e.enrollment_id, e.student_id, e.course_id, e.enrollment_date, " +
+                     "s.first_name, s.last_name, c.course_code, c.course_name " +
+                     "FROM enrollments e " +
+                     "JOIN students s ON e.student_id = s.student_id " +
+                     "JOIN courses c ON e.course_id = c.course_id " +
+                     "WHERE e.status = 'PENDING' " +
+                     "ORDER BY e.enrollment_date DESC";
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = DatabaseConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                Map<String, Object> enrollment = new java.util.HashMap<>();
+                enrollment.put("enrollmentId", rs.getInt("enrollment_id"));
+                enrollment.put("studentId", rs.getInt("student_id"));
+                enrollment.put("courseId", rs.getInt("course_id"));
+                enrollment.put("enrollmentDate", rs.getTimestamp("enrollment_date"));
+                enrollment.put("firstName", rs.getString("first_name"));
+                enrollment.put("lastName", rs.getString("last_name"));
+                enrollment.put("courseCode", rs.getString("course_code"));
+                enrollment.put("courseName", rs.getString("course_name"));
+                pendingEnrollments.add(enrollment);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching pending enrollments", e);
+        } finally {
+            DatabaseConnection.closeResources(rs, pstmt, conn);
+        }
+        
+        return pendingEnrollments;
+    }
+    
+    /**
+     * Approve or reject an enrollment request
+     */
+    public boolean updateEnrollmentStatus(int enrollmentId, String newStatus) {
+        String sql = "UPDATE enrollments SET status = ? WHERE enrollment_id = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        
+        try {
+            conn = DatabaseConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, newStatus);
+            pstmt.setInt(2, enrollmentId);
+            
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                LOGGER.info("Enrollment \" + enrollmentId + \" status updated to \" + newStatus);
+                return true;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating enrollment status", e);
+        } finally {
+            DatabaseConnection.closeResources(null, pstmt, conn);
+        }
+        
+        return false;
     }
 }

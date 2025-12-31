@@ -1,12 +1,15 @@
 /**
- *
+ * Admin Profile Servlet
+ * Handles viewing and updating admin user profile information
  * @author maisarahabjalil
  */
 package com.sems.servlet;
 
 import com.sems.dao.StudentDAO;
-import com.sems.dao.ActivityLogDAO; 
+import com.sems.dao.UserDAO;
+import com.sems.dao.ActivityLogDAO;
 import com.sems.model.Student;
+import com.sems.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,44 +18,50 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-@WebServlet("/ProfileServlet")
+@WebServlet("/AdminProfileServlet")
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024 * 2,  // 2MB
     maxFileSize = 1024 * 1024 * 10,       // 10MB
     maxRequestSize = 1024 * 1024 * 50     // 50MB
 )
-public class ProfileServlet extends HttpServlet {
+public class AdminProfileServlet extends HttpServlet {
 
     private final StudentDAO studentDAO = new StudentDAO();
-    private final ActivityLogDAO logDAO = new ActivityLogDAO(); // Added
+    private final UserDAO userDAO = new UserDAO();
+    private final ActivityLogDAO logDAO = new ActivityLogDAO();
 
-    // 1. VIEW PROFILE (GET) - No logging needed for just viewing
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
+        String role = (String) session.getAttribute("role");
 
-        if (userId != null) {
-            Student student = studentDAO.getStudentByUserId(userId);
-            request.setAttribute("student", student);
-            request.getRequestDispatcher("/student/viewprofile.jsp").forward(request, response);
-        } else {
-            response.sendRedirect("login.jsp");
+        // Security check - only admins can access
+        if (userId == null || !"admin".equals(role)) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
         }
+
+        // Get admin user information
+        User user = userDAO.getUserById(userId);
+        Student adminProfile = studentDAO.getStudentByUserId(userId);
+
+        request.setAttribute("user", user);
+        request.setAttribute("adminProfile", adminProfile);
+        request.getRequestDispatcher("/admin/adminprofile.jsp").forward(request, response);
     }
 
-    // 2. EDIT PROFILE (POST) - Log the update action
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
-        Integer studentId = (Integer) session.getAttribute("studentId"); // Get studentId for target tracking
+        String role = (String) session.getAttribute("role");
 
-        if (userId == null) {
+        if (userId == null || !"admin".equals(role)) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
@@ -64,9 +73,8 @@ public class ProfileServlet extends HttpServlet {
         if (filePart != null && filePart.getSize() > 0) {
             String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
             String fileExtension = fileName.substring(fileName.lastIndexOf("."));
-            String uniqueFileName = "profile_" + userId + "_" + System.currentTimeMillis() + fileExtension;
+            String uniqueFileName = "admin_profile_" + userId + "_" + System.currentTimeMillis() + fileExtension;
             
-            // Get the real path to the webapp/uploads directory
             String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
@@ -76,18 +84,16 @@ public class ProfileServlet extends HttpServlet {
             String filePath = uploadPath + File.separator + uniqueFileName;
             filePart.write(filePath);
             
-            // Store relative path for database
             profilePicturePath = "uploads/" + uniqueFileName;
             
-            // Update profile picture in database
             boolean pictureUpdated = studentDAO.updateProfilePicture(userId, profilePicturePath);
             if (pictureUpdated) {
-                logDAO.recordLog(userId, studentId, "UPDATE_PROFILE_PICTURE",
-                        "Student updated their profile picture.");
+                logDAO.recordLog(userId, userId, "UPDATE_ADMIN_PROFILE_PICTURE",
+                        "Admin updated their profile picture.");
             }
         }
 
-        // Get updated fields
+        // Get updated contact information
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
         String address = request.getParameter("address");
@@ -95,17 +101,11 @@ public class ProfileServlet extends HttpServlet {
         boolean success = studentDAO.updateStudentContactInfo(userId, email, phone, address);
 
         if (success) {
-            // TRIGGER LOG: Record that the student updated their profile
-            logDAO.recordLog(
-                    userId,
-                    studentId,
-                    "UPDATE_PROFILE",
-                    "Student updated their personal contact information (Email/Phone/Address)."
-            );
-
-            response.sendRedirect(request.getContextPath() + "/ProfileServlet?status=success");
+            logDAO.recordLog(userId, userId, "UPDATE_ADMIN_PROFILE",
+                    "Admin updated their profile information.");
+            response.sendRedirect(request.getContextPath() + "/AdminProfileServlet?status=success");
         } else {
-            response.sendRedirect(request.getContextPath() + "/ProfileServlet?error=1");
+            response.sendRedirect(request.getContextPath() + "/AdminProfileServlet?error=1");
         }
     }
 }

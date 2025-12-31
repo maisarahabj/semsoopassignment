@@ -74,3 +74,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
 });
+/**
+ * Preview profile picture before upload
+ */
+function previewProfilePicture(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('profilePreview').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+        
+        const formActions = document.getElementById('formActions');
+        if (formActions) {
+            formActions.classList.remove('hidden');
+        }
+    }
+}
