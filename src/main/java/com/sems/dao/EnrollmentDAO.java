@@ -11,6 +11,7 @@ import com.sems.util.DatabaseConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -674,7 +675,7 @@ public class EnrollmentDAO {
             
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
-                LOGGER.info("Enrollment \" + enrollmentId + \" status updated to \" + newStatus);
+                LOGGER.info("Enrollment " + enrollmentId + " status updated to " + newStatus);
                 return true;
             }
         } catch (SQLException e) {
