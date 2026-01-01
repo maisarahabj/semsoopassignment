@@ -13,7 +13,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Barfact University | Dashboard</title>
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/studentCSS/dashboard.css">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/studentCSS/dashboard.css?=v2.1">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body>
@@ -123,10 +123,23 @@
             </main>
 
             <aside class="right-panel">
-                <div class="profile-avatar">
+
+                <%
+                    // --- JAVA LOGIC FOR IMAGE CHECKING ---
+                    com.sems.dao.StudentDAO sidebarDao = new com.sems.dao.StudentDAO();
+                    Integer sidebarStudentId = (Integer) session.getAttribute("studentId");
+                    boolean showSidebarPhoto = (sidebarStudentId != null) && sidebarDao.hasProfilePhoto(sidebarStudentId);
+                %>
+
+                <div class="profile-avatar profile-avatar-side">
+                    <% if (showSidebarPhoto) { %>
+                    <img src="${pageContext.request.contextPath}/ImageServlet?userId=${sessionScope.userId}" alt="Profile Photo">
+                    <% } else { %>
                     <i class="fas fa-user"></i>
+                    <% }%>
                 </div>
-                <h2 class="profile-name"><%= fullName%></h2>
+
+                <h2 class="profile-name"><%= (student != null) ? student.getFirstName() + " " + student.getLastName() : "Student"%></h2>
                 <p class="profile-id">Student ID: #<%= (student != null) ? student.getStudentId() : "N/A"%></p>
 
                 <div class="term-info-card">

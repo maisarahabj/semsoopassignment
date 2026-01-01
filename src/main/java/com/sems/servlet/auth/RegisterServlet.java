@@ -1,13 +1,13 @@
 /**
  *
  * @author maisarahabjalil
- * 
+ *
  * ----- NOTE: CHANGE SQL PASSWORD TO YOUR PASS --------
  * conn = DriverManager.getConnection(url, "root", "Rockie.69");
  * find this line and replace "Rockie.69" as your SQL passw
  */
-
 package com.sems.servlet.auth;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,9 +20,9 @@ import java.sql.*;
 public class RegisterServlet extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         // 1. Get parameters
         String user = request.getParameter("username");
         String pass = request.getParameter("password");
@@ -32,6 +32,22 @@ public class RegisterServlet extends HttpServlet {
         String email = request.getParameter("email");
         String dob = request.getParameter("dob");
         String studentRegId = request.getParameter("studentRegId");
+
+        // Regex: 
+        // (?=.*[0-9])       -> At least one number
+        // (?=.*[a-z])       -> At least one lowercase
+        // (?=.*[A-Z])       -> At least one uppercase
+        // (?=.*[@#$%^&+=!]) -> At least one special character
+        // (?=\\S+$)         -> No whitespace allowed
+        // .{8,}             -> At least 8 characters long
+        String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$";
+
+        if (pass == null || !pass.matches(passwordPattern)) {
+            request.setAttribute("errorMessage", "Password too weak! Must be 8+ chars, contain Upper, Lower, Number & Symbol (@#$%^&+=!).");
+            // Send them back to the register page to try again
+            request.getRequestDispatcher("/register.jsp").forward(request, response);
+            return; // STOP EXECUTION so we don't save to DB
+        }
 
         String url = "jdbc:mysql://localhost:3306/sems_db?useSSL=false&allowPublicKeyRetrieval=true";
         Connection conn = null;
@@ -69,7 +85,7 @@ public class RegisterServlet extends HttpServlet {
                 stuSt.setString(4, lName);
                 stuSt.setString(5, email);
                 stuSt.setDate(6, java.sql.Date.valueOf(dob));
-                
+
                 stuSt.executeUpdate();
             }
 
@@ -77,12 +93,18 @@ public class RegisterServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login.jsp?registered=true");
 
         } catch (Exception e) {
-            if (conn != null) try { conn.rollback(); } catch (SQLException ex) {}
+            if (conn != null) try {
+                conn.rollback();
+            } catch (SQLException ex) {
+            }
             e.printStackTrace(); // View this in NetBeans Output
             request.setAttribute("errorMessage", "Registration failed: " + e.getMessage());
             request.getRequestDispatcher("/register.jsp").forward(request, response);
         } finally {
-            if (conn != null) try { conn.close(); } catch (SQLException e) {}
+            if (conn != null) try {
+                conn.close();
+            } catch (SQLException e) {
+            }
         }
     }
 }

@@ -286,3 +286,22 @@
     margin-bottom: 60px;
     flex-shrink: 0;
 }
+
+/* This is your original dashboard size */
+.profile-avatar {
+    width: 80px;  /* Keep this at 80px to match your old JSP */
+    height: 80px;
+    background: #eee;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Critical for the <img> tag to stay round */
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

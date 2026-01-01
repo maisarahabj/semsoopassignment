@@ -114,9 +114,9 @@ public class EvaluationServlet extends HttpServlet {
             boolean success = evalDAO.submitEvaluation(eval);
 
             if (success) {
-                // 2. TRIGGER LOG: Record student evaluation
+                // 2. TRIGGER LOG: Record student evaluation (ANONYMIZED MESSAGE)
                 logDAO.recordLog(userId, courseId, "EVALUATE",
-                        "Student submitted a " + rating + "-star evaluation for course ID: " + courseId);
+                        "An anonymous student submitted a " + rating + "-star evaluation for course ID: " + courseId);
 
                 response.sendRedirect(request.getContextPath() + "/EvaluationServlet?status=success");
             } else {

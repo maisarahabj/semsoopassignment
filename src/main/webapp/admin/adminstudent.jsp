@@ -56,6 +56,9 @@
                     <a href="${pageContext.request.contextPath}/AdminReportServlet" class="nav-link">
                         <i class="fas fa-file-alt"></i> Academic Report
                     </a>
+                    <a href="${pageContext.request.contextPath}/ProfileServlet" class="nav-link">
+                        <i class="fas fa-user-shield"></i> My Account
+                    </a>
                 </nav>
 
             </aside>
@@ -189,6 +192,7 @@
                     <form id="adminEditForm" action="${pageContext.request.contextPath}/AdminManageStudentServlet" method="POST">
                         <input type="hidden" name="action" value="UPDATE_STUDENT">
                         <input type="hidden" name="studentId" id="editStudentId">
+                        <input type="hidden" name="userId" id="editUserId"> 
 
                         <div style="text-align: center; margin-bottom: 25px;">
                             <h3 id="viewFullName" class="view-data" style="margin-bottom: 5px;">Student Profile</h3>
@@ -197,10 +201,21 @@
                                 <input type="text" name="lastName" id="editLName" placeholder="Last Name" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd; width: 140px;">
                             </div>
                             <p id="viewStudentId" style="color: #007bff; font-weight: bold; margin: 0;">#ID</p>
-                            <p id="viewRegisteredOn" style="color: #38a169; font-size: 0.85rem; font-weight: 600; margin-top: 5px;">Registered on: N/A</p>
                         </div>
 
                         <div class="modal-form-grid">
+                            <div class="input-group">
+                                <label>Username</label>
+                                <p id="viewUsername" class="view-data">-</p>
+                                <input type="text" name="username" id="editUsername" class="modal-input hidden">
+                            </div>
+
+                            <div class="input-group">
+                                <label>Reset Password</label>
+                                <p id="viewPassword" class="view-data">••••••••</p>
+                                <input type="password" name="password" id="editPassword" class="modal-input hidden" placeholder="Enter new password">
+                            </div>
+
                             <div class="input-group"><label>Email</label><p id="viewEmail" class="view-data">-</p><input type="email" name="email" id="editEmail" class="modal-input hidden"></div>
                             <div class="input-group"><label>Phone</label><p id="viewPhone" class="view-data">-</p><input type="text" name="phone" id="editPhone" class="modal-input hidden"></div>
                             <div class="input-group"><label>DOB</label><p id="viewDob" class="view-data">-</p><input type="date" name="dob" id="editDob" class="modal-input hidden"></div>

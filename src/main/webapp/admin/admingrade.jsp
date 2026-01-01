@@ -21,6 +21,26 @@
         .sidebar {
             height: 100vh;
         }
+
+        /* to keep avatar*/
+        .profile-avatar {
+            width: 80px;  /* Keep this at 80px to match your old JSP */
+            height: 80px;
+            background: #eee;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Critical for the <img> tag to stay round */
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
     </style>
     <body>
         <%
@@ -59,6 +79,9 @@
                     </a>
                     <a href="${pageContext.request.contextPath}/AdminReportServlet" class="nav-link">
                         <i class="fas fa-file-alt"></i> Academic Report
+                    </a>
+                    <a href="${pageContext.request.contextPath}/ProfileServlet" class="nav-link">
+                        <i class="fas fa-user-shield"></i> My Account
                     </a>
                 </nav>
             </aside>
@@ -179,20 +202,56 @@
             </main>
 
             <aside class="right-panel">
-                <% if (student != null) {%>
-                <div class="profile-avatar"><i class="fas fa-user-graduate"></i></div>
-                <h2 class="profile-name"><%= student.getFirstName()%> <%= student.getLastName()%></h2>
-                <p class="profile-id">ID: #<%= student.getStudentId()%></p>
-                <div class="term-info-card">
-                    <h4><i class="fas fa-chart-line"></i> Summary</h4>
-                    <p>CGPA: <strong><%= String.format("%.2f", cgpa)%></strong></p>
-                    <p>Status: <%= student.getStatus()%></p>
+                <%
+                    com.sems.dao.StudentDAO sidebarDao = new com.sems.dao.StudentDAO();
+                    Integer adminUid = (Integer) session.getAttribute("userId");
+
+                    // 1. Always fetch Admin Profile first so we have the name ready
+                    com.sems.model.Student adminProfile = (adminUid != null) ? sidebarDao.getStudentByUserId(adminUid) : null;
+                    String adminFullName = (adminProfile != null) ? (adminProfile.getFirstName() + " " + adminProfile.getLastName()) : "Administrator";
+
+                    if (student != null) {
+                        // --- MODE A: A Student is being viewed ---
+                        boolean studentHasPhoto = sidebarDao.hasProfilePhotoByUserId(student.getUserId());
+                %>
+                <div class="profile-avatar">
+                    <% if (studentHasPhoto) {%>
+                    <img src="${pageContext.request.contextPath}/ImageServlet?userId=<%= student.getUserId()%>" alt="Student Photo">
+                    <% } else { %>
+                    <i class="fas fa-user-graduate"></i>
+                    <% }%>
                 </div>
-                <% } else {%>
-                <div class="profile-avatar"><i class="fas fa-user-tie"></i></div>
-                <h2 class="profile-name">Admin <%= adminName%></h2>
-                <p class="profile-id">System Manager</p>
+                <h2 class="profile-name"><%= student.getFirstName()%> <%= student.getLastName()%></h2>
+                <p class="profile-id">Student ID: #<%= student.getStudentId()%></p>
+
+                <div class="term-info-card">
+                    <h4><i class="fas fa-chart-line"></i> Academic Status</h4>
+                    <p>CGPA: <strong><%= String.format("%.2f", cgpa)%></strong></p>
+                    <p>Credits: <%= totalCreditsGained%></p>
+                </div>
+                <%
+                } else {
+                    // --- MODE B: No student searched yet, show logged-in Admin ---
+                    boolean adminHasPhoto = (adminUid != null) && sidebarDao.hasProfilePhotoByUserId(adminUid);
+                %>
+                <div class="profile-avatar">
+                    <% if (adminHasPhoto) {%>
+                    <img src="${pageContext.request.contextPath}/ImageServlet?userId=<%= adminUid%>" alt="Admin Photo">
+                    <% } else { %>
+                    <i class="fas fa-user-tie"></i>
+                    <% }%>
+                </div>
+                <h2 class="profile-name"><%= adminFullName%></h2>
+                <p class="profile-id" style="margin-top: 4px;">Role: Admin</p>
+
+                <div class="term-info-card" style="text-align: left;">
+                    <h4><i class="fas fa-info-circle"></i> Instructions</h4>
+                    <p>1. Enter Student ID</p>
+                    <p>2. Click 'Load Profile'</p>
+                    <p>3. Toggle 'Edit Mode' to input grades</p>
+                </div>
                 <% }%>
+
                 <a href="${pageContext.request.contextPath}/auth/LogoutServlet" class="btn-logout">
                     <i class="fas fa-sign-out-alt"></i> Log Out
                 </a>

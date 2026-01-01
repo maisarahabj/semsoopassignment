@@ -15,7 +15,7 @@
         <meta charset="UTF-8">
         <title>Barfact University | Registration Queue</title>
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/admindash.css">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/adminpending.css">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/adminpending.css?v=2.1">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body>
@@ -54,6 +54,9 @@
                     </a>
                     <a href="${pageContext.request.contextPath}/AdminReportServlet" class="nav-link">
                         <i class="fas fa-file-alt"></i> Academic Report
+                    </a>
+                    <a href="${pageContext.request.contextPath}/ProfileServlet" class="nav-link">
+                        <i class="fas fa-user-shield"></i> My Account
                     </a>
                 </nav>
             </aside>
@@ -121,13 +124,42 @@
             </main>
 
             <aside class="right-panel">
-                <div class="profile-avatar"><i class="fas fa-user-tie"></i></div>
-                <h2 class="profile-name">Administrator</h2>
-                <p class="profile-id">Session: <%= adminName%></p>
-                <div class="term-info-card">
-                    <h4><i class="fas fa-shield-alt"></i> Security</h4>
-                    <p>Pending users are blocked from logging in until approved.</p>
+                <%
+                    // 1. Setup DAO and get Admin IDs from session
+                    com.sems.dao.StudentDAO sidebarDao = new com.sems.dao.StudentDAO();
+                    Integer adminUid = (Integer) session.getAttribute("userId");
+
+                    // 2. Fetch the actual Admin Profile to get the first/last name
+                    com.sems.model.Student adminProfile = (adminUid != null) ? sidebarDao.getStudentByUserId(adminUid) : null;
+
+                    String displayFullName = "Administrator";
+                    if (adminProfile != null) {
+                        displayFullName = adminProfile.getFirstName() + " " + adminProfile.getLastName();
+                    }
+
+                    // 3. Check for photo
+                    boolean sideHasPhoto = (adminUid != null) && sidebarDao.hasProfilePhotoByUserId(adminUid);
+                %>
+
+                <div class="profile-avatar">
+                    <% if (sideHasPhoto) {%>
+                    <img src="${pageContext.request.contextPath}/ImageServlet?userId=<%= adminUid%>" alt="Admin Photo">
+                    <% } else { %>
+                    <i class="fas fa-user-tie"></i>
+                    <% }%>
                 </div>
+
+                <%-- Display the real full name here --%>
+                <h2 class="profile-name"><%= displayFullName%></h2>
+                <p class="profile-id" style="margin-top: 4px;">Role: Admin</p>
+
+                <div class="term-info-card" style="text-align: left;">
+                    <h4><i class="fas fa-shield-alt"></i> Security Portal</h4>
+                    <p>Pending users cannot log in.</p>
+                    <p>Rejection deletes the temporary account.</p>
+                    <p>Approval grants immediate access.</p>
+                </div>
+
                 <a href="${pageContext.request.contextPath}/auth/LogoutServlet" class="btn-logout">
                     <i class="fas fa-sign-out-alt"></i> Log Out
                 </a>

@@ -83,6 +83,25 @@
         .btn-add-submit:hover {
             background: #2563eb;
         }
+
+        /* This is your original dashboard size */
+        .profile-avatar {
+            width: 80px;  /* Keep this at 80px to match your old JSP */
+            height: 80px;
+            background: #eee;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Critical for the <img> tag to stay round */
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     </style>
 
     <body>
@@ -108,6 +127,9 @@
                     </a>
                     <a href="${pageContext.request.contextPath}/AdminReportServlet" class="nav-link">
                         <i class="fas fa-file-alt"></i> Academic Report
+                    </a>
+                    <a href="${pageContext.request.contextPath}/ProfileServlet" class="nav-link">
+                        <i class="fas fa-user-shield"></i> My Account
                     </a>
                 </nav>
             </aside>

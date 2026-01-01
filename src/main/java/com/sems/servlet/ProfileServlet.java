@@ -5,7 +5,7 @@
 package com.sems.servlet;
 
 import com.sems.dao.StudentDAO;
-import com.sems.dao.ActivityLogDAO; 
+import com.sems.dao.ActivityLogDAO;
 import com.sems.model.Student;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,40 +16,44 @@ import java.io.IOException;
 public class ProfileServlet extends HttpServlet {
 
     private final StudentDAO studentDAO = new StudentDAO();
-    private final ActivityLogDAO logDAO = new ActivityLogDAO(); // Added
+    private final ActivityLogDAO logDAO = new ActivityLogDAO();
 
-    // 1. VIEW PROFILE (GET) - No logging needed for just viewing
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
+        String role = (String) session.getAttribute("role");
 
         if (userId != null) {
-            Student student = studentDAO.getStudentByUserId(userId);
-            request.setAttribute("student", student);
-            request.getRequestDispatcher("/student/viewprofile.jsp").forward(request, response);
+            Student userDetails = studentDAO.getStudentByUserId(userId);
+            request.setAttribute("student", userDetails);
+
+            if ("admin".equals(role)) {
+                request.getRequestDispatcher("/admin/adminprofile.jsp").forward(request, response);
+            } else {
+                request.getRequestDispatcher("/student/viewprofile.jsp").forward(request, response);
+            }
         } else {
             response.sendRedirect("login.jsp");
         }
     }
 
-    // 2. EDIT PROFILE (POST) - Log the update action
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
-        Integer studentId = (Integer) session.getAttribute("studentId"); // Get studentId for target tracking
+        Integer studentId = (Integer) session.getAttribute("studentId");
+        String role = (String) session.getAttribute("role"); // FIXED: Added this line to define 'role'
 
         if (userId == null) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
 
-        // Get updated fields
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
         String address = request.getParameter("address");
@@ -57,12 +61,16 @@ public class ProfileServlet extends HttpServlet {
         boolean success = studentDAO.updateStudentContactInfo(userId, email, phone, address);
 
         if (success) {
-            // TRIGGER LOG: Record that the student updated their profile
+            // Determine log description based on role
+            String logDesc = "admin".equals(role)
+                    ? "Admin updated their own profile information."
+                    : "Student updated their personal contact information.";
+
             logDAO.recordLog(
                     userId,
-                    studentId,
+                    (studentId != null ? studentId : 0), // Use 0 if admin has no studentId
                     "UPDATE_PROFILE",
-                    "Student updated their personal contact information (Email/Phone/Address)."
+                    logDesc
             );
 
             response.sendRedirect(request.getContextPath() + "/ProfileServlet?status=success");

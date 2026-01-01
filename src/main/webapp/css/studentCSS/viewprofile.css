@@ -1,7 +1,7 @@
 html, body {
     margin: 0 8px;
     padding: 0;
-    height: 100%;    
+    height: 100%;
     overflow: hidden;
 }
 /* 1. Main Content Layout */
@@ -136,3 +136,112 @@ hr {
     border-top: 1px solid #e2e8f0;
     margin-bottom: 20px;
 }
+
+/* --- prof photo -- */
+.main-content {
+    flex: 1;
+    /* Removes forced height to allow natural scrolling */
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    /* Buffer at the bottom so the last table isn't cut off */
+    padding-bottom: 100px;
+}
+
+.profile-card-container {
+    margin-bottom: 100px;
+}
+/* --- BASE PROFILE AVATAR STYLE (Shared) --- */
+.profile-avatar {
+    margin: 0 auto;
+    border-radius: 50%;
+    background-color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* --- VARIATION 1: MAIN CARD (Larger, Shadow, Border) --- */
+.profile-avatar-main {
+    width: 120px;
+    height: 120px;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.profile-avatar-main i {
+    font-size: 3.5rem;
+    color: #cbd5e1;
+}
+
+/* --- VARIATION 2: SIDEBAR (Original Size, No Shadow) --- */
+.profile-avatar-side {
+    width: 100px;
+    height: 100px;
+    /* No extra border or shadow to keep it flush with sidebar design */
+}
+.profile-avatar-side i {
+    font-size: 3rem; /* Slightly smaller icon for sidebar */
+    color: #cbd5e1;
+}
+
+/* --- BUTTONS --- */
+.upload-btn-container {
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-action-photo {
+    cursor: pointer;
+    font-size: 0.9rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-upload {
+    background-color: #f0f9ff;
+    color: #0284c7;
+    border-color: #bae6fd;
+}
+.btn-upload:hover {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    border-color: #7dd3fc;
+}
+
+.btn-remove {
+    background-color: #fef2f2;
+    color: #ef4444;
+    border-color: #fecaca;
+}
+.btn-remove:hover {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border-color: #fca5a5;
+}
+
+#file-upload {
+    display: none;
+}
+.form-inline {
+    display: inline-block;
+    margin: 0;
+}
+/* --- end: prof photo -- */

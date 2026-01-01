@@ -10,7 +10,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Barfact University | Admin Dashboard</title>
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/admindash.css">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/admindash.css?v=2.1">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
 
@@ -144,6 +144,25 @@
             margin-bottom: 60px;
             flex-shrink: 0;
         }
+
+        /* This is your original dashboard size */
+        .profile-avatar {
+            width: 80px;  /* Keep this at 80px to match your old JSP */
+            height: 80px;
+            background: #eee;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Critical for the <img> tag to stay round */
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     </style>
 
     <body>
@@ -186,6 +205,9 @@
                     </a>
                     <a href="${pageContext.request.contextPath}/AdminReportServlet" class="nav-link">
                         <i class="fas fa-file-alt"></i> Academic Report
+                    </a>
+                    <a href="${pageContext.request.contextPath}/ProfileServlet" class="nav-link">
+                        <i class="fas fa-user-shield"></i> My Account
                     </a>
                 </nav>
 
@@ -249,7 +271,7 @@
                         </div>
                         <div class="stat-info">
                             <h3>Active Enrollments</h3>
-                            <a href="${pageContext.request.contextPath}/AcademicReportServlet" class="report-link-text">
+                            <a href="${pageContext.request.contextPath}/AdminReportServlet" class="report-link-text">
                                 Generate Academic Report
                             </a>
                         </div>
@@ -327,11 +349,31 @@
             </main>
 
             <aside class="right-panel">
+                <%
+                    // 1. Setup DAO and get IDs from session
+                    com.sems.dao.StudentDAO sidebarDao = new com.sems.dao.StudentDAO();
+                    Integer sideUid = (Integer) session.getAttribute("userId");
+
+                    // 2. Check for photo using our new DAO helper
+                    boolean sideHasPhoto = (sideUid != null) && sidebarDao.hasProfilePhotoByUserId(sideUid);
+                    com.sems.model.Student adminProfile = (sideUid != null) ? sidebarDao.getStudentByUserId(sideUid) : null;
+                    String fullName = "Administrator";
+                    if (adminProfile != null) {
+                        fullName = adminProfile.getFirstName() + " " + adminProfile.getLastName();
+                    }
+                %>
+
+                <%-- We keep the exact class 'profile-avatar' to use your existing CSS --%>
                 <div class="profile-avatar">
+                    <% if (sideHasPhoto) {%>
+                    <%-- Pointing to ImageServlet using userId --%>
+                    <img src="${pageContext.request.contextPath}/ImageServlet?userId=<%= sideUid%>" alt="Admin Photo">
+                    <% } else { %>
                     <i class="fas fa-user-tie"></i>
+                    <% }%>
                 </div>
-                <h2 class="profile-name">Administrator</h2>
-                <p class="profile-id">Level: Full Access</p>
+                <h2 class="profile-name"><%= fullName%></h2>
+                <p class="profile-id"  style="margin-top: 4px;">Level: Full Access</p>
 
                 <div class="term-info-card">
                     <h4><i class="fas fa-tools"></i> Quick Actions</h4>

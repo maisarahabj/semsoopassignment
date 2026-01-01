@@ -57,6 +57,9 @@
                     <a href="${pageContext.request.contextPath}/AdminReportServlet" class="nav-link">
                         <i class="fas fa-file-alt"></i> Academic Report
                     </a>
+                    <a href="${pageContext.request.contextPath}/ProfileServlet" class="nav-link">
+                        <i class="fas fa-user-shield"></i> My Account
+                    </a>
                 </nav>
             </aside>
 
@@ -100,18 +103,44 @@
                                         <fmt:formatDate value="${log.timestamp}" pattern="HH:mm:ss" var="timePart" />
                                         <strong>${datePart}</strong><br>${timePart}
                                     </td>
-                                    <td><strong>${log.performerName}</strong></td>
-                                    <td>#${log.userId}</td>
+
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${log.actionType == 'EVALUATE'}">
+                                                <span style="font-style: italic; color: #64748b;">
+                                                    <i class="fas fa-user-secret"></i> Anonymous
+                                                </span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <strong>${log.performerName}</strong>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${log.actionType == 'EVALUATE'}">
+                                                <span style="color: #cbd5e1; font-size: 0.85rem;">HIDDEN</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                #${log.userId}
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+
                                     <td>
                                         <span class="role-badge">${log.performerRole}</span>
                                     </td>
+
                                     <td>
                                         <c:set var="pill" value="pill-info" />
                                         <c:if test="${log.actionType.contains('DELETE') || log.actionType.contains('REJECT')}"><c:set var="pill" value="pill-delete" /></c:if>
                                         <c:if test="${log.actionType.contains('ENROLL') || log.actionType.contains('APPROVE')}"><c:set var="pill" value="pill-enroll" /></c:if>
-                                        <c:if test="${log.actionType.contains('GRADE')}"><c:set var="pill" value="pill-grade" /></c:if>
-                                        <span class="action-pill ${pill}">${log.actionType}</span>
+                                        <c:if test="${log.actionType.contains('GRADE') || log.actionType.contains('EVALUATE')}"><c:set var="pill" value="pill-grade" /></c:if>
+
+                                            <span class="action-pill ${pill}">${log.actionType}</span>
                                     </td>
+
                                     <td>${log.description}</td>
                                 </tr>
                             </c:forEach>

@@ -10,13 +10,13 @@
     <head>
         <meta charset="UTF-8">
         <title>Barfact University | My Profile</title>
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/studentCSS/dashboard.css">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/studentCSS/viewprofile.css">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/studentCSS/dashboard.css?v=2.1">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/studentCSS/viewprofile.css?v=2.1">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body>
         <%
-            // Security check
+            // 1. Security check
             if (session.getAttribute("userId") == null) {
                 response.sendRedirect(request.getContextPath() + "/login.jsp");
                 return;
@@ -24,12 +24,17 @@
 
             Student student = (Student) request.getAttribute("student");
             String fullName = (student != null) ? student.getFirstName() + " " + student.getLastName() : "Student";
+
+            // 2. CHECK PHOTO LOGIC (Moved to top so both Main and Sidebar can use it)
+            com.sems.dao.StudentDAO viewDao = new com.sems.dao.StudentDAO();
+            Integer sId = (Integer) session.getAttribute("studentId");
+            boolean hasPhoto = (sId != null) && viewDao.hasProfilePhoto(sId);
         %>
 
         <div class="dashboard-wrapper">
             <aside class="sidebar">
                 <div class="logo-section">
-                    <img src="${pageContext.request.contextPath}/assets/cat.png" class="logo-img"style="width: 50px; height: 50px; ">
+                    <img src="${pageContext.request.contextPath}/assets/cat.png" class="logo-img" style="width: 50px; height: 50px; ">
                     <span class="logo-text">Barfact Uni</span>
                 </div>
 
@@ -72,60 +77,86 @@
                 <div class="alert success-alert" id="successAlert">
                     <i class="fas fa-check-circle"></i> Profile updated successfully!
                 </div>
-                <% }%>
+                <% } else if ("img_success".equals(request.getParameter("status"))) { %>
+                <div class="alert success-alert">
+                    <i class="fas fa-camera"></i> Photo updated!
+                </div>
+                <% } else if ("img_removed".equals(request.getParameter("status"))) { %>
+                <div class="alert success-alert" style="color: #c2410c; background-color: #fff7ed; border-color: #fdba74;">
+                    <i class="fas fa-trash-alt"></i> Photo removed.
+                </div>
+                <% } %>
 
                 <div class="profile-card-container">
+
+                    <div class="profile-avatar profile-avatar-main">
+                        <% if (hasPhoto) { %>
+                        <img src="${pageContext.request.contextPath}/ImageServlet?userId=${sessionScope.userId}" alt="Profile Photo">
+                        <% } else { %>
+                        <i class="fas fa-user"></i>
+                        <% } %>
+                    </div>
+
+                    <div class="upload-btn-container">
+                        <form action="${pageContext.request.contextPath}/UploadPhotoServlet" method="post" enctype="multipart/form-data" class="form-inline">
+                            <label for="file-upload" class="btn-action-photo btn-upload" title="Upload Photo">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                            <input id="file-upload" type="file" name="photo" accept="image/*" onchange="this.form.submit()">
+                        </form>
+
+                        <% if (hasPhoto) { %>
+                        <form action="${pageContext.request.contextPath}/UploadPhotoServlet" method="post" class="form-inline">
+                            <input type="hidden" name="action" value="delete">
+                            <button type="submit" class="btn-action-photo btn-remove" title="Remove Photo" onclick="return confirm('Remove profile photo?');">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                        <% }%>
+                    </div>
+
                     <form action="${pageContext.request.contextPath}/ProfileServlet" method="POST" class="profile-form">
                         <div class="form-grid">
-
                             <div class="form-group">
                                 <label>First Name</label>
                                 <p class="view-text"><%= student.getFirstName()%></p>
                             </div>
-
                             <div class="form-group">
                                 <label>Last Name</label>
                                 <p class="view-text"><%= student.getLastName()%></p>
                             </div>
-
                             <div class="form-group">
                                 <label>Date of Birth</label>
                                 <p class="view-text"><%= student.getDob()%></p>
                             </div>
-
                             <div class="form-group">
                                 <label>Registered On</label>
                                 <p class="view-text">
                                     <%= (student.getEnrollmentDate() != null) ? student.getEnrollmentDate() : "N/A"%>
                                 </p>
                             </div>
-
                             <div class="form-group">
                                 <label>Email Address</label>
                                 <div class="editable-input-group">
                                     <p class="display-value"><%= student.getEmail()%></p>
-                                    <input type="email" name="email" value="<%= student.getEmail()%>" 
-                                           class="edit-field hidden" required>
+                                    <input type="email" name="email" value="<%= student.getEmail()%>" class="edit-field hidden" required>
                                     <button type="button" class="inline-edit-btn" onclick="toggleFieldEdit(this)">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                 </div>
                             </div>
-
                             <div class="form-group">
                                 <label>Phone Number</label>
                                 <div class="editable-input-group">
                                     <p class="display-value">
                                         <%= (student.getPhone() != null && !student.getPhone().isEmpty()) ? student.getPhone() : "Not set"%>
                                     </p>
-                                    <input type="text" name="phone" value="<%= (student.getPhone() != null) ? student.getPhone() : ""%>" 
-                                           class="edit-field hidden">
+                                    <input type="text" name="phone" value="<%= (student.getPhone() != null) ? student.getPhone() : ""%>" class="edit-field hidden">
                                     <button type="button" class="inline-edit-btn" onclick="toggleFieldEdit(this)">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                 </div>
                             </div>
-
                             <div class="form-group full-width">
                                 <label>Home Address</label>
                                 <div class="editable-input-group">
@@ -139,7 +170,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div id="formActions" class="form-actions hidden">
                             <hr>
                             <button type="submit" class="btn-save-profile">Save Changes</button>
@@ -150,9 +180,14 @@
             </main>
 
             <aside class="right-panel">
-                <div class="profile-avatar">
+                <div class="profile-avatar profile-avatar-side">
+                    <% if (hasPhoto) { %>
+                    <img src="${pageContext.request.contextPath}/ImageServlet?userId=${sessionScope.userId}" alt="Profile Photo">
+                    <% } else { %>
                     <i class="fas fa-user"></i>
+                    <% }%>
                 </div>
+
                 <h2 class="profile-name"><%= fullName%></h2>
                 <p class="profile-id">Student ID: #<%= (student != null) ? student.getStudentId() : "N/A"%></p>
 

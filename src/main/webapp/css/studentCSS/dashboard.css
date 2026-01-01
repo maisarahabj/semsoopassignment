@@ -6,15 +6,15 @@
 html, body {
     margin: 0 8px;
     padding: 0;
-    height: 100%;    
+    height: 100%;
     overflow: hidden;
 }
 
 /* Layout Components */
 .dashboard-wrapper {
     display: flex;
-    height: 100vh; 
-    overflow: hidden; 
+    height: 100vh;
+    overflow: hidden;
     background: linear-gradient(135deg, #f0f2f5 0%, #e6f7ff 25%, #fff0f6 50%, #f6ffed 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0
@@ -22,13 +22,13 @@ html, body {
 
 .sidebar {
     width: 260px;
-    height: 92vh; 
+    height: 92vh;
     background: white;
     padding: 30px 20px;
     display: flex;
     flex-direction: column;
     border-right: 1px solid #eef2f6;
-    flex-shrink: 0; 
+    flex-shrink: 0;
     overflow-y: hidden;
 }
 
@@ -149,8 +149,8 @@ html, body {
 
 .timetable-grid {
     display: grid;
-    grid-template-columns: 100px repeat(5, 1fr); 
-    grid-template-rows: 50px repeat(11, 80px); 
+    grid-template-columns: 100px repeat(5, 1fr);
+    grid-template-rows: 50px repeat(11, 80px);
     border: 1px solid #eef2f6;
     border-radius: 12px;
     overflow: hidden;
@@ -265,4 +265,36 @@ html, body {
     opacity: 0.9;
 }
 
-.bg-java { background: #e7f3ff; border-left: 4px solid #007bff; }
+.bg-java {
+    background: #e7f3ff;
+    border-left: 4px solid #007bff;
+}
+
+/* --- RIGHT PANEL AVATAR STYLES --- */
+.profile-avatar {
+    margin: 0 auto;
+    border-radius: 50%;
+    background-color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Specific style for the Right Panel Avatar */
+.profile-avatar-side {
+    width: 100px;
+    height: 100px;
+    /* No border or shadow for the sidebar version */
+}
+
+.profile-avatar-side i {
+    font-size: 3rem;
+    color: #cbd5e1;
+}
