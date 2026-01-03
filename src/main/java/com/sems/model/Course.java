@@ -17,6 +17,7 @@ public class Course {
     private String courseTime;
     private boolean hasPrereq;
     private String prerequisiteName;
+    private String courseEnd;
 
     // Constructors
     public Course() {
@@ -70,6 +71,9 @@ public class Course {
     public String getPrerequisiteName() { return prerequisiteName; }
     public void setPrerequisiteName(String prerequisiteName) { this.prerequisiteName = prerequisiteName; }
 
+    public String getCourseEnd() { return courseEnd; }
+    public void setCourseEnd(String courseEnd) { this.courseEnd = courseEnd; }
+    
     @Override
     public String toString() {
         return "Course [" + courseCode + " - " + courseName + "]";

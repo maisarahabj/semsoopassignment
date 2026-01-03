@@ -143,14 +143,16 @@ html, body {
     padding: 25px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.02);
     margin-top: 30px;
-    height: auto !important; /* Allow it to grow with the table */
-    min-height: fit-content;
+    margin-bottom: 40px;
+    display: block;
+    height: fit-content; /* Tells container to expand to its content */
+    overflow: hidden;
 }
 
 .timetable-grid {
     display: grid;
     grid-template-columns: 100px repeat(5, 1fr);
-    grid-template-rows: 50px repeat(11, 80px);
+    grid-template-rows: 50px repeat(11, 40px);
     border: 1px solid #eef2f6;
     border-radius: 12px;
     overflow: hidden;
@@ -183,14 +185,17 @@ html, body {
 
 .course-entry {
     border-radius: 8px;
-    margin: 5px;
-    padding: 10px;
+    margin: 2px; /* Reduced margin slightly to prevent overlap gaps */
+    padding: 12px;
     font-size: 11px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     z-index: 2;
+    /* Ensure the text stays inside the 2-hour block */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .course-time-meta {

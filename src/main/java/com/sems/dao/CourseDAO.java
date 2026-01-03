@@ -25,14 +25,15 @@ public class CourseDAO {
 
     private static final String BASE_COURSE_QUERY
             = "SELECT c.*, "
-            + "       p_table.prereq_name as prerequisite_name, "
-            + "       CASE WHEN p_table.course_id IS NOT NULL THEN 1 ELSE 0 END as has_prereq "
-            + "FROM courses c "
-            + "LEFT JOIN ("
+            + " ADDTIME(c.course_time, '02:00:00') as course_end, "
+            + " p_table.prereq_name as prerequisite_name, "
+            + " CASE WHEN p_table.course_id IS NOT NULL THEN 1 ELSE 0 END as has_prereq "
+            + " FROM courses c "
+            + " LEFT JOIN ("
             + "    SELECT p.course_id, c2.course_name as prereq_name "
             + "    FROM prerequisites p "
             + "    JOIN courses c2 ON p.prerequisite_course_id = c2.course_id"
-            + ") p_table ON c.course_id = p_table.course_id ";
+            + " ) p_table ON c.course_id = p_table.course_id ";
 
     private static final String SELECT_ALL_COURSES
             = BASE_COURSE_QUERY + " ORDER BY c.course_code";
@@ -145,23 +146,18 @@ public class CourseDAO {
     }
 
     // STU VIEW: dashboard schedule - getting courses enrolled by specific student
+    // INSIDE CourseDAO.java
     public List<Course> getCoursesByStudentId(int studentId) {
         List<Course> enrolledCourses = new ArrayList<>();
-
-        String sql = "SELECT c.*, p_table.prereq_name as prerequisite_name, "
-                + "CASE WHEN p_table.course_id IS NOT NULL THEN 1 ELSE 0 END as has_prereq "
-                + "FROM courses c "
-                + "LEFT JOIN (SELECT p.course_id, c2.course_name as prereq_name "
-                + "           FROM prerequisites p "
-                + "           JOIN courses c2 ON p.prerequisite_course_id = c2.course_id) p_table "
-                + "ON c.course_id = p_table.course_id "
-                + "JOIN enrollments e ON c.course_id = e.course_id "
-                + "WHERE e.student_id = ? AND e.status = 'enrolled'";
+        // Use the BASE_COURSE_QUERY here to get the 'course_end' calculation
+        String sql = BASE_COURSE_QUERY + " JOIN enrollments e ON c.course_id = e.course_id "
+                + " WHERE e.student_id = ? AND e.status = 'enrolled'";
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, studentId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
+                // This helper now handles all the fields for you!
                 enrolledCourses.add(extractCourseFromResultSet(rs));
             }
         } catch (SQLException e) {
@@ -272,24 +268,16 @@ public class CourseDAO {
     //ADMIMN dash todays course
     public List<Course> getTodayCourses(String dayName) {
         List<Course> list = new ArrayList<>();
-
-        String sql = "SELECT * FROM courses WHERE course_day = ? ORDER BY course_time ASC";
+        // We add the WHERE clause to our base query
+        String sql = BASE_COURSE_QUERY + " WHERE c.course_day = ? ORDER BY c.course_time ASC";
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, dayName);
-
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Course c = new Course();
-                    c.setCourseId(rs.getInt("course_id"));
-                    c.setCourseCode(rs.getString("course_code"));
-                    c.setCourseName(rs.getString("course_name"));
-                    c.setCapacity(rs.getInt("capacity"));
-                    c.setEnrolledCount(rs.getInt("enrolled_count")); // Matches your DB column
-                    c.setCourseDay(rs.getString("course_day"));
-                    c.setCourseTime(rs.getString("course_time"));
-                    list.add(c);
+                    // This calls your helper which now includes course_end!
+                    list.add(extractCourseFromResultSet(rs));
                 }
             }
         } catch (Exception e) {
@@ -400,6 +388,7 @@ public class CourseDAO {
         course.setEnrolledCount(rs.getInt("enrolled_count"));
         course.setCourseDay(rs.getString("course_day"));
         course.setCourseTime(rs.getString("course_time"));
+        course.setCourseEnd(rs.getString("course_end"));
 
         try {
             course.setHasPrereq(rs.getInt("has_prereq") == 1);

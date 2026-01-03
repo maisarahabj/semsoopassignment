@@ -104,14 +104,19 @@
                                         col = 6;
                                     }
 
+                                    // 1. Get Start Hour (e.g. 08 from "08:00:00")
                                     int startHour = Integer.parseInt(c.getCourseTime().substring(0, 2));
-                                    int row = startHour - 6;
+                                    // 2. Calculate row (8:00 AM is row 2, header is row 1)
+                                    int startRow = startHour - 6;
                         %>
-                        <div class="course-entry bg-java" style="grid-column: <%= col%>; grid-row: <%= row%>;">
+                        <div class="course-entry bg-java" 
+                             style="grid-column: <%= col%>; grid-row: <%= startRow%> / span 2;">
                             <strong><%= c.getCourseCode()%></strong>
                             <span><%= c.getCourseName()%></span>
                             <span class="course-time-meta">
-                                <i class="fas fa-clock"></i> <%= c.getCourseTime().substring(0, 5)%>
+                                <i class="fas fa-clock"></i> 
+                                <%= c.getCourseTime().substring(0, 5)%> - 
+                                <%= (c.getCourseEnd() != null) ? c.getCourseEnd().substring(0, 5) : "N/A"%>
                             </span>
                         </div>
                         <%
