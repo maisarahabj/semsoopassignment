@@ -135,23 +135,11 @@
         </style>
     </head>
     <body>
+        <%
+            request.setAttribute("activePage", "report");
+        %>
         <div class="dashboard-wrapper">
-            <aside class="sidebar">
-                <div class="logo-section">
-                    <img src="${pageContext.request.contextPath}/assets/cat.png" style="width: 50px; height: 50px;">
-                    <span class="logo-text">Barfact Admin</span>
-                </div>
-                <nav class="nav-menu">
-                    <a href="${pageContext.request.contextPath}/DashboardServlet" class="nav-link"><i class="fas fa-chart-line"></i> Overview</a>
-                    <a href="${pageContext.request.contextPath}/CourseServlet?action=manage" class="nav-link"><i class="fas fa-book-open"></i> Manage Courses</a>
-                    <a href="${pageContext.request.contextPath}/AdminManageStudentServlet" class="nav-link"><i class="fas fa-user-graduate"></i> Manage Students</a>
-                    <a href="${pageContext.request.contextPath}/GradeServlet" class="nav-link"><i class="fas fa-graduation-cap"></i> Grade Management</a>
-                    <a href="${pageContext.request.contextPath}/auth/AdminPendingServlet" class="nav-link"><i class="fas fa-clock"></i> Pending Approvals</a>
-                    <a href="${pageContext.request.contextPath}/ActivityServlet" class="nav-link"><i class="fas fa-history"></i> System Logs</a>
-                    <a href="${pageContext.request.contextPath}/AdminReportServlet" class="nav-link active"><i class="fas fa-file-alt"></i> Academic Report</a>
-                </nav>
-               
-            </aside>
+            <%@ include file="/includes/adminSidebar.jsp" %>
 
             <main class="main-content">
                 <div class="welcome-banner" style="display: flex; justify-content: space-between; align-items: center;">

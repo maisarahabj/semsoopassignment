@@ -112,45 +112,11 @@
             List<Semester> allSemesters = (List<Semester>) request.getAttribute("allSemesters");
             String successMessage = (String) request.getAttribute("successMessage");
             String errorMessage = (String) request.getAttribute("errorMessage");
+            request.setAttribute("activePage", "migration");
         %>
 
         <div class="dashboard-wrapper">
-            <aside class="sidebar">
-                <div class="logo-section">
-                    <img src="${pageContext.request.contextPath}/assets/cat.png" class="logo-img" style="width: 50px; height: 50px;">
-                    <span class="logo-text">Barfact Admin</span>
-                </div>
-
-                <nav class="nav-menu">
-                    <a href="${pageContext.request.contextPath}/DashboardServlet" class="nav-link">
-                        <i class="fas fa-chart-line"></i> Overview
-                    </a>
-                    <a href="${pageContext.request.contextPath}/SemesterServlet" class="nav-link">
-                        <i class="fas fa-calendar-alt"></i> Manage Semesters
-                    </a>
-                    <a href="${pageContext.request.contextPath}/admin/BulkCourseMigrationServlet" class="nav-link active">
-                        <i class="fas fa-exchange-alt"></i> Course Migration
-                    </a>
-                    <a href="${pageContext.request.contextPath}/CourseServlet" class="nav-link">
-                        <i class="fas fa-book-open"></i> Manage Courses
-                    </a>
-                    <a href="${pageContext.request.contextPath}/AdminManageStudentServlet" class="nav-link">
-                        <i class="fas fa-user-graduate"></i> Manage Students
-                    </a>
-                    <a href="${pageContext.request.contextPath}/GradeServlet" class="nav-link">
-                        <i class="fas fa-graduation-cap"></i> Grade Management
-                    </a>
-                    <a href="${pageContext.request.contextPath}/auth/AdminPendingServlet" class="nav-link">
-                        <i class="fas fa-clock"></i> Pending Approvals
-                    </a>
-                </nav>
-                
-                <div class="logout-section">
-                    <a href="${pageContext.request.contextPath}/auth/LogoutServlet" class="logout-link">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
-                </div>
-            </aside>
+            <%@ include file="/includes/adminSidebar.jsp" %>
 
             <main class="main-content">
                 <div class="welcome-banner">

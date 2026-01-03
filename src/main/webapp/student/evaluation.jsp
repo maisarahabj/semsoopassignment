@@ -23,45 +23,11 @@
             String fullName = (student != null) ? student.getFirstName() + " " + student.getLastName() : "Student";
             List<Enrollment> transcript = (List<Enrollment>) request.getAttribute("transcript");
             List<Integer> submittedIds = (List<Integer>) request.getAttribute("submittedCourseIds");
+            request.setAttribute("activePage", "evaluation");
         %>
 
         <div class="dashboard-wrapper">
-            <aside class="sidebar">
-                <div class="logo-section">
-                    <img src="${pageContext.request.contextPath}/assets/cat.png" class="logo-img" style="width: 50px; height: 50px;">
-                    <span class="logo-text">Barfact Uni</span>
-                </div>
-                <nav class="nav-menu">
-                    <a href="${pageContext.request.contextPath}/DashboardServlet" class="nav-link">
-                        <i class="fas fa-home"></i> Dashboard
-                    </a>
-                    <a href="${pageContext.request.contextPath}/AcademicCalendarServlet" class="nav-link">
-                        <i class="fas fa-calendar-check"></i> Academic Calendar
-                    </a>
-                    <a href="${pageContext.request.contextPath}/student/MyCourseServlet" class="nav-link">
-                        <i class="fas fa-book"></i> My Classes
-                    </a>
-                    <a href="${pageContext.request.contextPath}/student/AddCourseServlet" class="nav-link">
-                        <i class="fas fa-plus-square"></i> Add Subjects
-                    </a>
-                    <a href="${pageContext.request.contextPath}/GradeServlet" class="nav-link">
-                        <i class="fas fa-poll-h"></i> My Results
-                    </a>
-                    <a href="${pageContext.request.contextPath}/student/SemesterResultsServlet" class="nav-link">
-                        <i class="fas fa-calendar-alt"></i> Semester Results
-                    </a>
-                    <a href="${pageContext.request.contextPath}/EvaluationServlet" class="nav-link active">
-                        <i class="fas fa-star"></i> Course Evaluation
-                    </a>
-                    <a href="${pageContext.request.contextPath}/ProfileServlet" class="nav-link">
-                        <i class="fas fa-user"></i> Profile
-                    </a>
-                </nav>
-                <div class="cgpa-container">
-                    <div class="cgpa-value"><%= (student != null) ? student.getGpa() : "0.00"%></div>
-                    <p class="cgpa-label">Current CGPA</p>
-                </div>
-            </aside>
+            <%@ include file="/includes/studentSidebar.jsp" %>
 
             <main class="main-content">
                 <div class="welcome-banner">
