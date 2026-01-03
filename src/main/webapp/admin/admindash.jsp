@@ -14,157 +14,6 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
 
-    <style>
-        /* Layout: 2 Columns with fixed height cards */
-        .admin-stats-grid-2x2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr !important;
-            gap: 20px;
-            margin-top: 25px;
-            width: 100%;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 15px 25px; /* Reduced vertical padding for shorter height */
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
-            height: 100px; /* Reduced height as requested */
-            box-sizing: border-box;
-        }
-
-        /* 2. Circular GPA Progress Bar */
-        .circular-progress {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .inner-circle {
-            width: 48px;
-            height: 48px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .inner-circle span {
-            font-size: 13px;
-            font-weight: 800;
-            color: #007bff;
-        }
-
-        /* 3. Star Highlight - Centered Rating Font */
-        .star-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 60px;
-            height: 60px;
-        }
-
-        .gold-star {
-            font-size: 55px !important;
-            color: #facc15 !important;
-            background: none !important;
-            padding: 0 !important;
-        }
-
-        .rating-text {
-            position: absolute;
-            /* Perfect centering logic */
-            top: 52%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 11px;
-            font-weight: 900;
-            color: #854d0e;
-        }
-
-        /* 4. Active Enrollment Styling */
-        .enrollment-count {
-            font-size: 36px;
-            font-weight: 800;
-            color: #6366f1;
-            min-width: 60px;
-            text-align: center;
-        }
-
-        .report-link-text {
-            text-decoration: none;
-            color: #6366f1;
-            font-weight: 700;
-            font-size: 0.85rem;
-            border-bottom: 2px solid #e0e7ff;
-            transition: all 0.2s ease;
-        }
-
-        .report-link-text:hover {
-            color: #4338ca;
-            border-bottom-color: #4338ca;
-        }
-
-        /* Text Consistency */
-        .stat-info h3 {
-            font-size: 0.85rem;
-            margin: 0;
-        }
-        .stat-info p {
-            margin-top: 2px;
-            font-size: 0.75rem;
-            color: #64748b;
-        }
-        .course-highlight {
-            font-weight: 700;
-            color: #475569;
-            font-size: 0.85rem;
-        }
-
-        .main-content {
-            flex: 1;
-            overflow-y: auto; /* Internal scrolling only */
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            height: 100vh;
-        }
-
-        .schedule-container {
-            margin-bottom: 60px;
-            flex-shrink: 0;
-        }
-
-        /* This is your original dashboard size */
-        .profile-avatar {
-            width: 80px;  /* Keep this at 80px to match your old JSP */
-            height: 80px;
-            background: #eee;
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden; /* Critical for the <img> tag to stay round */
-        }
-
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-    </style>
-
     <body>
         <%
             // Security Check: Ensure only Admins can see this
@@ -375,10 +224,19 @@
                 <h2 class="profile-name"><%= fullName%></h2>
                 <p class="profile-id"  style="margin-top: 4px;">Level: Full Access</p>
 
+                <%
+                    // Retrieve the values set by the Servlet
+                    Integer pendingCountObj = (Integer) request.getAttribute("pendingCount");
+                    int pendingCount = (pendingCountObj != null) ? pendingCountObj : 0;
+
+                    Double campusAvgObj = (Double) request.getAttribute("campusAvg");
+                    double campusAvg = (campusAvgObj != null) ? campusAvgObj : 0.0;
+                %>
                 <div class="term-info-card">
-                    <h4><i class="fas fa-tools"></i> Quick Actions</h4>
-                    <p>Register New Student</p>
-                    <p>Generate Report</p>
+                    <h4><i class="fas fa-info-circle"></i> System Notice</h4>
+                    <p style="font-size: 13px; color: #475569; line-height: 1.5;">
+                        Welcome back! There are currently <strong><%= pendingCount%></strong> pending student applications requiring your review. 
+                    </p>
                 </div>
 
                 <a href="${pageContext.request.contextPath}/auth/LogoutServlet" class="btn-logout">

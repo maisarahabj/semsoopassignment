@@ -181,8 +181,14 @@
                                 <label>Password</label>
                                 <div class="editable-input-group">
                                     <p class="display-value">••••••••</p>
-                                    <input type="password" name="password" placeholder="Enter new password" class="edit-field hidden">
-                                    <button type="button" class="inline-edit-btn" onclick="toggleFieldEdit(this)"><i class="fas fa-key"></i></button>
+                                    <input type="password" name="password" id="passwordInput" 
+                                           placeholder="New password (8+ chars, 1 Upper, 1 Digit)" 
+                                           class="edit-field hidden"
+                                           pattern="(?=.*\d)(?=.*[A-Z]).{8,}"
+                                           title="Must contain at least 8 characters, one number, and one uppercase letter">
+                                    <button type="button" class="inline-edit-btn" onclick="toggleFieldEdit(this)">
+                                        <i class="fas fa-key"></i>
+                                    </button>
                                 </div>
                             </div>
 

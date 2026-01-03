@@ -13,23 +13,9 @@
         <meta charset="UTF-8">
         <title>Barfact Admin | Manage Students</title>
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/admindash.css">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/adminstudent.css?v=1.2">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/adminstudent.css?v=2.1">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
-    <style>
-        .nav-menu {
-            display: flex;
-            flex-direction: column;
-            height: calc(100% - 100px); /* Adjust based on logo section height */
-        }
-
-        .logout-container {
-            display: flex;
-            justify-items: center;
-            margin-top: auto;
-            padding: 10px 0;
-        }
-    </style>
     <body>
         <div class="dashboard-wrapper">
             <aside class="sidebar">
@@ -70,6 +56,27 @@
                         <p>Manage academic profiles, contact information, and GPA records.</p>
                     </div>
                 </div>
+
+                <%-- Error: Duplicate ID --%>
+                <% if ("error_duplicate_id".equals(request.getParameter("status"))) { %>
+                <div style="background: #fff5f5; color: #c53030; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #feb2b2;">
+                    <i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> This Student ID is already assigned to another record.
+                </div>
+                <% } %>
+
+                <%-- Error: Duplicate Username/Email --%>
+                <% if ("error_duplicate_user".equals(request.getParameter("status"))) { %>
+                <div style="background: #fff5f5; color: #c53030; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #feb2b2;">
+                    <i class="fas fa-user-times"></i> <strong>Error:</strong> The Username or Email is already taken.
+                </div>
+                <% } %>
+
+                <%-- Error: Weak Password --%>
+                <% if ("weak_password".equals(request.getParameter("status"))) { %>
+                <div style="background: #fff5f5; color: #c53030; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #feb2b2;">
+                    <i class="fas fa-lock"></i> <strong>Weak Password:</strong> Must be 8+ chars, 1 Uppercase, 1 Number.
+                </div>
+                <% } %>
 
                 <%-- Status Message --%>
                 <% if ("success".equals(request.getParameter("status"))) { %>
@@ -117,7 +124,7 @@
                                 <td><span class="role-badge"><%= String.format("%.2f", s.getGpa())%></span></td>
                                 <td style="text-align: center;">
                                     <div class="action-form">
-                                        
+
                                         <button type="button" class="btn-approve" 
                                                 onclick="showProfileModal('<%= s.getStudentId()%>', '<%= s.getUserId()%>', '<%= s.getFirstName()%>', '<%= s.getLastName()%>', '<%= s.getEmail()%>', '<%= s.getPhone()%>', '<%= s.getAddress()%>', '<%= s.getDob()%>', '<%= s.getGpa()%>', '<%= s.getEnrollmentDate()%>', '<%= s.getUsername()%>')">
                                             <i class="fas fa-eye"></i> View
@@ -146,7 +153,12 @@
                     <div class="modal-form-grid">
                         <div class="input-group full-width"><label>Student ID</label><input type="text" name="studentId" required class="modal-input"></div>
                         <div class="input-group"><label>Username</label><input type="text" name="username" required class="modal-input"></div>
-                        <div class="input-group"><label>Password</label><input type="password" name="password" required class="modal-input"></div>
+                        <div class="input-group">
+                            <label>Password</label>
+                            <input type="password" name="password" required class="modal-input"
+                                   pattern="(?=.*\d)(?=.*[A-Z]).{8,}" 
+                                   title="Security Requirement: Minimum 8 characters, at least 1 uppercase letter and 1 number.">
+                        </div>
                         <div class="input-group"><label>First Name</label><input type="text" name="firstName" required class="modal-input"></div>
                         <div class="input-group"><label>Last Name</label><input type="text" name="lastName" required class="modal-input"></div>
                         <div class="input-group full-width"><label>Email</label><input type="email" name="email" required class="modal-input"></div>
@@ -214,7 +226,10 @@
                             <div class="input-group">
                                 <label>Reset Password</label>
                                 <p id="viewPassword" class="view-data">••••••••</p>
-                                <input type="password" name="password" id="editPassword" class="modal-input hidden" placeholder="Enter new password">
+                                <input type="password" name="password" id="editPassword" class="modal-input hidden" 
+                                       placeholder="New password (8+ chars, 1 Upper, 1 Digit)"
+                                       pattern="(?=.*\d)(?=.*[A-Z]).{8,}"
+                                       title="Security Requirement: Minimum 8 characters, at least 1 uppercase letter and 1 number.">
                             </div>
 
                             <div class="input-group"><label>Email</label><p id="viewEmail" class="view-data">-</p><input type="email" name="email" id="editEmail" class="modal-input hidden"></div>

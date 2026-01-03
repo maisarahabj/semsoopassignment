@@ -13,8 +13,11 @@ public class StudentDAO {
     private static final Logger LOGGER = Logger.getLogger(StudentDAO.class.getName());
 
     // SQL Constants
-    private static final String INSERT_STUDENT = "INSERT INTO students (user_id, first_name, last_name, email, phone, address, gpa, dob) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String SELECT_STUDENT_WITH_USER_DATA = "SELECT s.*, u.created_at FROM students s JOIN users u ON s.user_id = u.user_id WHERE s.user_id = ?";
+    private static final String INSERT_STUDENT
+            = "INSERT INTO students (user_id, first_name, last_name, email, phone, address, gpa, dob) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String SELECT_STUDENT_WITH_USER_DATA
+            = "SELECT s.*, u.username, u.created_at FROM students s "
+            + "JOIN users u ON s.user_id = u.user_id WHERE s.user_id = ?";
     private static final String SELECT_APPROVED_STUDENTS
             = "SELECT s.*, u.username, u.created_at FROM students s "
             + "JOIN users u ON s.user_id = u.user_id "
@@ -228,18 +231,26 @@ public class StudentDAO {
     }
 
     // --- 3. EXISTING HELPERS ---
-    public boolean isUserExists(String username, String email) {
-        String sql = "SELECT (SELECT count(*) FROM users WHERE username = ?) + (SELECT count(*) FROM students WHERE email = ?)";
+    public boolean isUserExists(String username, String email, int currentUserId) {
+        // We check if username exists AND is not the current user's ID
+        // We check if email exists AND is not the current user's ID
+        String sql = "SELECT (SELECT COUNT(*) FROM users WHERE username = ? AND user_id != ?) "
+                + "+ (SELECT COUNT(*) FROM students WHERE email = ? AND user_id != ?)";
+
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, username);
-            pstmt.setString(2, email);
+            pstmt.setInt(2, currentUserId);
+            pstmt.setString(3, email);
+            pstmt.setInt(4, currentUserId);
+
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1) > 0;
                 }
             }
         } catch (SQLException e) {
-            return false;
+            LOGGER.log(Level.SEVERE, "Error checking user existence", e);
         }
         return false;
     }
@@ -308,6 +319,18 @@ public class StudentDAO {
         }
     }
 
+    public boolean isStudentIdExists(int studentId) {
+        String sql = "SELECT 1 FROM students WHERE student_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, studentId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next(); // Returns true if ID is found
+            }
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
     private Student extractStudentFromResultSet(ResultSet rs) throws SQLException {
         Student student = new Student();
         student.setStudentId(rs.getInt("student_id"));
@@ -328,5 +351,27 @@ public class StudentDAO {
         }
 
         return student;
-    } // <-- This was the missing brace!
+    }
+
+    public boolean updateFullProfile(int userId, String fName, String lName, String email, String phone, String address, String dob) {
+        String sql = "UPDATE students SET first_name=?, last_name=?, email=?, phone=?, address=?, dob=? WHERE user_id=?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, fName);
+            pstmt.setString(2, lName);
+            pstmt.setString(3, email);
+            pstmt.setString(4, phone);
+            pstmt.setString(5, address);
+            // Handle potential null/empty DOB
+            if (dob == null || dob.trim().isEmpty() || dob.equals("null")) {
+                pstmt.setNull(6, java.sql.Types.DATE);
+            } else {
+                pstmt.setDate(6, java.sql.Date.valueOf(dob));
+            }
+            pstmt.setInt(7, userId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

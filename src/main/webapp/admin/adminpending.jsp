@@ -74,52 +74,86 @@
 
                 <div class="schedule-container">
                     <div class="table-header-flex">
-                        <h3 style="margin-bottom: 20px;">Waiting for Approval</h3>
-                        <span class="badge-count"><%= (request.getAttribute("pendingUsers") != null) ? ((List) request.getAttribute("pendingUsers")).size() : 0%> Requests</span>
+                        <div class="view-toggle-container">
+                            <button class="toggle-btn active" id="btnPending" onclick="switchView('pending')">
+                                <i class="fas fa-clock"></i> Pending Requests
+                                <span class="badge-count"><%= ((List) request.getAttribute("pendingUsers")).size()%></span>
+                            </button>
+                            <button class="toggle-btn" id="btnRejected" onclick="switchView('rejected')">
+                                <i class="fas fa-user-times"></i> Rejected List
+                                <span class="badge-count" style="background: #fff5f5; color: #e53e3e;">
+                                    <%= ((List) request.getAttribute("rejectedUsers")).size()%>
+                                </span>
+                            </button>
+                        </div>
                     </div>
 
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th> <th>Username</th>
-                                <th>Role</th>
-                                <th style="text-align: center;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <%
-                                List<Map<String, Object>> users = (List<Map<String, Object>>) request.getAttribute("pendingUsers");
-                                if (users != null && !users.isEmpty()) {
-                                    for (Map<String, Object> u : users) {
-                            %>
-                            <tr>
-                                <td>#<%= u.get("studentId")%></td> <td><div class="user-info-cell"><strong><%= u.get("username")%></strong></div></td>
-                                <td><span class="role-badge"><%= u.get("role")%></span></td>
-                                <td style="text-align: center;">
-                                    <form action="${pageContext.request.contextPath}/auth/AdminPendingServlet" method="POST" class="action-form">
-                                        <input type="hidden" name="userId" value="<%= u.get("userId")%>">
-                                        <button name="action" value="APPROVE" class="btn-approve">
-                                            <i class="fas fa-check"></i> Approve
-                                        </button>
-                                        <button name="action" value="REJECT" class="btn-reject">
-                                            <i class="fas fa-times"></i> Reject
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            <%
-                                }
-                            } else {
-                            %>
-                            <tr>
-                                <td colspan="4" class="empty-state">
-                                    <i class="fas fa-check-circle"></i>
-                                    <p>All clear! No pending registrations.</p>
-                                </td>
-                            </tr>
-                            <% }%>
-                        </tbody>
-                    </table>
+                    <div id="pendingView">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th> <th>Username</th> <th>Role</th> <th style="text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <%
+                                    List<Map<String, Object>> pUsers = (List<Map<String, Object>>) request.getAttribute("pendingUsers");
+                                    if (pUsers != null && !pUsers.isEmpty()) {
+                                        for (Map<String, Object> u : pUsers) {
+                                %>
+                                <tr>
+                                    <td>#<%= u.get("studentId")%></td>
+                                    <td><strong><%= u.get("username")%></strong></td>
+                                    <td><span class="role-badge"><%= u.get("role")%></span></td>
+                                    <td style="text-align: center;">
+                                        <form action="${pageContext.request.contextPath}/auth/AdminPendingServlet" method="POST" class="action-form">
+                                            <input type="hidden" name="userId" value="<%= u.get("userId")%>">
+                                            <button name="action" value="APPROVE" class="btn-approve"><i class="fas fa-check"></i> Approve</button>
+                                            <button type="button" class="btn-reject" onclick="openRejectModal('<%= u.get("userId")%>')"><i class="fas fa-times"></i> Reject</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% }
+                                } else { %>
+                                <tr><td colspan="4" class="empty-state"><p>No pending requests.</p></td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="rejectedView" class="hidden-view">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th> <th>Username</th> <th>Rejection Reason</th> <th style="text-align: center;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <%
+                                    List<Map<String, Object>> rUsers = (List<Map<String, Object>>) request.getAttribute("rejectedUsers");
+                                    if (rUsers != null && !rUsers.isEmpty()) {
+                                        for (Map<String, Object> u : rUsers) {
+                                %>
+                                <tr>
+                                    <td>#<%= u.get("studentId")%></td>
+                                    <td><strong><%= u.get("username")%></strong></td>
+                                    <td><span class="reason-text" title="<%= u.get("reason")%>"><%= u.get("reason")%></span></td>
+                                    <td style="text-align: center;">
+                                        <form action="${pageContext.request.contextPath}/auth/AdminPendingServlet" method="POST" class="action-form">
+                                            <input type="hidden" name="userId" value="<%= u.get("userId")%>">
+                                            <button name="action" value="APPROVE" class="btn-approve" style="background: #f0fdf4;">
+                                                <i class="fas fa-undo"></i> Restore
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% }
+                                } else { %>
+                                <tr><td colspan="4" class="empty-state"><p>No rejected accounts.</p></td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </main>
 
@@ -164,6 +198,59 @@
                     <i class="fas fa-sign-out-alt"></i> Log Out
                 </a>
             </aside>
+            <div id="rejectModal" class="modal-overlay" style="display:none;">
+                <div class="modal-box" style="width: 400px;">
+                    <div class="modal-icon" style="color: #e53e3e; background: #fff5f5;">
+                        <i class="fas fa-comment-slash"></i>
+                    </div>
+                    <h3>Rejection Reason</h3>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                        Please provide a brief reason why this application is being rejected.
+                    </p>
+
+                    <form action="${pageContext.request.contextPath}/auth/AdminPendingServlet" method="POST">
+                        <input type="hidden" name="action" value="REJECT">
+                        <input type="hidden" name="userId" id="rejectUserId">
+
+                        <textarea name="reason" required class="modal-input" 
+                                  placeholder="e.g. Invalid Student ID provided, Duplicate account..."
+                                  style="width: 100%; height: 100px; padding: 10px; border-radius: 8px; border: 1px solid #eef2f6;"></textarea>
+
+                        <div class="modal-actions" style="margin-top: 20px; justify-content: flex-end;">
+                            <button type="button" onclick="closeRejectModal()" class="btn-cancel">Cancel</button>
+                            <button type="submit" class="btn-reject" style="margin: 0;">Submit Rejection</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
+        <script>
+            function openRejectModal(userId) {
+                document.getElementById('rejectUserId').value = userId;
+                document.getElementById('rejectModal').style.display = 'flex';
+            }
+
+            function closeRejectModal() {
+                document.getElementById('rejectModal').style.display = 'none';
+            }
+            function switchView(view) {
+                const pendingView = document.getElementById('pendingView');
+                const rejectedView = document.getElementById('rejectedView');
+                const btnPending = document.getElementById('btnPending');
+                const btnRejected = document.getElementById('btnRejected');
+
+                if (view === 'pending') {
+                    pendingView.classList.remove('hidden-view');
+                    rejectedView.classList.add('hidden-view');
+                    btnPending.classList.add('active');
+                    btnRejected.classList.remove('active');
+                } else {
+                    pendingView.classList.add('hidden-view');
+                    rejectedView.classList.remove('hidden-view');
+                    btnPending.classList.remove('active');
+                    btnRejected.classList.add('active');
+                }
+            }
+        </script>
     </body>
 </html>

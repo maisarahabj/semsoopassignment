@@ -14,6 +14,7 @@ public class User {
     private Timestamp createdAt;
     private boolean isActive;
     private String status;
+    private String rejectionReason;
 
     // Constructors
    
@@ -50,6 +51,9 @@ public class User {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    
+    public String getRejectionReason() { return rejectionReason; }
+    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
     
     // Checks if user is admin - used for Role-Based Access Control
     public boolean isAdmin() {

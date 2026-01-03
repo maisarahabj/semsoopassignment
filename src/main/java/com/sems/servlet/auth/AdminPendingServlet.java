@@ -25,11 +25,13 @@ public class AdminPendingServlet extends HttpServlet {
             throws ServletException, IOException {
 
         List<Map<String, Object>> pendingData = new ArrayList<>();
+        List<Map<String, Object>> rejectedData = new ArrayList<>();
 
-        String sql = "SELECT u.user_id, u.username, u.role, s.student_id "
+        // Query both statuses
+        String sql = "SELECT u.user_id, u.username, u.role, u.status, u.rejection_reason, s.student_id "
                 + "FROM users u "
                 + "JOIN students s ON u.user_id = s.user_id "
-                + "WHERE u.status = 'PENDING'";
+                + "WHERE u.status IN ('PENDING', 'REJECTED')";
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
@@ -38,16 +40,22 @@ public class AdminPendingServlet extends HttpServlet {
                 row.put("userId", rs.getInt("user_id"));
                 row.put("username", rs.getString("username"));
                 row.put("role", rs.getString("role"));
+                row.put("status", rs.getString("status"));
+                row.put("reason", rs.getString("rejection_reason"));
                 row.put("studentId", rs.getInt("student_id"));
-                pendingData.add(row);
+
+                if ("PENDING".equals(rs.getString("status"))) {
+                    pendingData.add(row);
+                } else {
+                    rejectedData.add(row);
+                }
             }
 
             request.setAttribute("pendingUsers", pendingData);
+            request.setAttribute("rejectedUsers", rejectedData);
             request.getRequestDispatcher("/admin/adminpending.jsp").forward(request, response);
-
         } catch (SQLException e) {
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -61,23 +69,20 @@ public class AdminPendingServlet extends HttpServlet {
 
         String userIdStr = request.getParameter("userId");
         String action = request.getParameter("action");
+        String reason = request.getParameter("reason");
 
         if (userIdStr != null && action != null && adminUserId != null) {
             int targetUserId = Integer.parseInt(userIdStr);
 
             if ("APPROVE".equalsIgnoreCase(action)) {
-                boolean success = userDAO.updateUserStatus(targetUserId, "ACTIVE");
-                if (success) {
-                    // 4. Log the approval
-                    logDAO.recordLog(adminUserId, targetUserId, "APPROVE_USER",
-                            "Admin approved registration for User ID #" + targetUserId);
-                }
+                userDAO.updateUserStatus(targetUserId, "ACTIVE");
+                logDAO.recordLog(adminUserId, targetUserId, "APPROVE_USER", "Admin approved User #" + targetUserId);
             } else if ("REJECT".equalsIgnoreCase(action)) {
-                boolean success = userDAO.updateUserStatus(targetUserId, "REJECTED");
+                // Use the new DAO method with reason
+                boolean success = userDAO.rejectUserWithReason(targetUserId, reason);
                 if (success) {
-                    // 5. Log the rejection
                     logDAO.recordLog(adminUserId, targetUserId, "REJECT_USER",
-                            "Admin rejected registration for User ID #" + targetUserId);
+                            "Admin rejected User #" + targetUserId + ". Reason: " + reason);
                 }
             }
         }

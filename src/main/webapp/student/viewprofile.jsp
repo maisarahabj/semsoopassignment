@@ -87,6 +87,23 @@
                 </div>
                 <% } %>
 
+                <%-- Status and Error Alerts --%>
+                <% String status = request.getParameter("status"); %>
+
+                <% if ("success".equals(status)) { %>
+                <div class="alert success-alert"><i class="fas fa-check-circle"></i> Profile updated successfully!</div>
+                <% } else if ("weak_password".equals(status)) { %>
+                <div class="alert error-alert" style="background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                    <i class="fas fa-exclamation-triangle"></i> <strong>Weak Password:</strong> Must be 8+ chars, 1 Uppercase, and 1 Number.
+                </div>
+                <% } else if ("duplicate".equals(status)) { %>
+                <div class="alert error-alert" style="background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                    <i class="fas fa-user-times"></i> <strong>Update Failed:</strong> That Username or Email is already taken by another user.
+                </div>
+                <% } else if ("error".equals(status)) { %>
+                <div class="alert error-alert"><i class="fas fa-times-circle"></i> An unexpected error occurred. Please try again.</div>
+                <% } %>
+
                 <div class="profile-card-container">
 
                     <div class="profile-avatar profile-avatar-main">
@@ -118,57 +135,59 @@
                     <form action="${pageContext.request.contextPath}/ProfileServlet" method="POST" class="profile-form">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label>First Name</label>
-                                <p class="view-text"><%= student.getFirstName()%></p>
+                                <label>Username</label>
+                                <div class="editable-input-group">
+                                    <p class="display-value"><%= (student.getUsername() != null) ? student.getUsername() : "Not set"%></p>
+                                    <input type="text" name="username" value="<%= (student.getUsername() != null) ? student.getUsername() : ""%>" class="edit-field hidden" required>
+                                    <button type="button" class="inline-edit-btn" onclick="toggleFieldEdit(this)"><i class="fas fa-edit"></i></button>
+                                </div>
                             </div>
+
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <div class="editable-input-group">
+                                    <p class="display-value">••••••••</p>
+                                    <input type="password" name="password" placeholder="Leave blank to keep current" class="edit-field hidden">
+                                    <button type="button" class="inline-edit-btn" onclick="toggleFieldEdit(this)"><i class="fas fa-edit"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>First Name</label>
+                                <div class="editable-input-group">
+                                    <p class="display-value"><%= student.getFirstName()%></p>
+                                    <input type="text" name="firstName" value="<%= student.getFirstName()%>" class="edit-field hidden" required>
+                                    <button type="button" class="inline-edit-btn" onclick="toggleFieldEdit(this)"><i class="fas fa-edit"></i></button>
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 <label>Last Name</label>
-                                <p class="view-text"><%= student.getLastName()%></p>
+                                <div class="editable-input-group">
+                                    <p class="display-value"><%= student.getLastName()%></p>
+                                    <input type="text" name="lastName" value="<%= student.getLastName()%>" class="edit-field hidden" required>
+                                    <button type="button" class="inline-edit-btn" onclick="toggleFieldEdit(this)"><i class="fas fa-edit"></i></button>
+                                </div>
                             </div>
+
                             <div class="form-group">
                                 <label>Date of Birth</label>
-                                <p class="view-text"><%= student.getDob()%></p>
+                                <div class="editable-input-group">
+                                    <p class="display-value"><%= student.getDob()%></p>
+                                    <input type="date" name="dob" value="<%= student.getDob()%>" class="edit-field hidden">
+                                    <button type="button" class="inline-edit-btn" onclick="toggleFieldEdit(this)"><i class="fas fa-edit"></i></button>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>Registered On</label>
-                                <p class="view-text">
-                                    <%= (student.getEnrollmentDate() != null) ? student.getEnrollmentDate() : "N/A"%>
-                                </p>
-                            </div>
+
                             <div class="form-group">
                                 <label>Email Address</label>
                                 <div class="editable-input-group">
                                     <p class="display-value"><%= student.getEmail()%></p>
                                     <input type="email" name="email" value="<%= student.getEmail()%>" class="edit-field hidden" required>
-                                    <button type="button" class="inline-edit-btn" onclick="toggleFieldEdit(this)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
+                                    <button type="button" class="inline-edit-btn" onclick="toggleFieldEdit(this)"><i class="fas fa-edit"></i></button>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label>Phone Number</label>
-                                <div class="editable-input-group">
-                                    <p class="display-value">
-                                        <%= (student.getPhone() != null && !student.getPhone().isEmpty()) ? student.getPhone() : "Not set"%>
-                                    </p>
-                                    <input type="text" name="phone" value="<%= (student.getPhone() != null) ? student.getPhone() : ""%>" class="edit-field hidden">
-                                    <button type="button" class="inline-edit-btn" onclick="toggleFieldEdit(this)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="form-group full-width">
-                                <label>Home Address</label>
-                                <div class="editable-input-group">
-                                    <p class="display-value">
-                                        <%= (student.getAddress() != null && !student.getAddress().isEmpty()) ? student.getAddress() : "Not set"%>
-                                    </p>
-                                    <textarea name="address" rows="2" class="edit-field hidden"><%= (student.getAddress() != null) ? student.getAddress() : ""%></textarea>
-                                    <button type="button" class="inline-edit-btn" onclick="toggleFieldEdit(this)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </div>
-                            </div>
+
                         </div>
                         <div id="formActions" class="form-actions hidden">
                             <hr>

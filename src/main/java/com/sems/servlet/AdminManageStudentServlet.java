@@ -28,6 +28,7 @@ public class AdminManageStudentServlet extends HttpServlet {
     private StudentDAO studentDAO = new StudentDAO();
     private CourseDAO courseDAO = new CourseDAO();
     private ActivityLogDAO logDAO = new ActivityLogDAO();
+    private static final String PASS_REGEX = "^(?=.*[A-Z])(?=.*\\d).{8,}$";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -59,6 +60,7 @@ public class AdminManageStudentServlet extends HttpServlet {
         if ("ADD_MANUAL".equals(action)) {
             String username = request.getParameter("username");
             String pass = request.getParameter("password");
+            String email = request.getParameter("email");
             int manualId = Integer.parseInt(request.getParameter("studentId"));
 
             Student s = new Student();
@@ -69,6 +71,26 @@ public class AdminManageStudentServlet extends HttpServlet {
             s.setPhone(request.getParameter("phone"));
             s.setAddress(request.getParameter("address"));
 
+            // 1. Check for Duplicate Student ID
+            if (studentDAO.isStudentIdExists(manualId)) {
+                response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet?status=error_duplicate_id");
+                return;
+            }
+
+            // 2. Check for Duplicate Username or Email
+            // Pass -1 as the third argument because we are creating a brand new user
+// and don't need to exclude any current ID from the duplicate check.
+            if (studentDAO.isUserExists(username, email, -1)) {
+                response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet?status=error_duplicate_user");
+                return;
+            }
+
+            // 3. Password Regex (Keep your existing check)
+            if (pass == null || !pass.matches(PASS_REGEX)) {
+                response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet?status=weak_password");
+                return;
+            }
+
             try {
                 String dobStr = request.getParameter("dob");
                 if (dobStr != null && !dobStr.isEmpty()) {
@@ -76,6 +98,11 @@ public class AdminManageStudentServlet extends HttpServlet {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+
+            if (pass == null || !pass.matches(PASS_REGEX)) {
+                response.sendRedirect(request.getContextPath() + "/AdminManageStudentServlet?status=weak_password");
+                return;
             }
 
             boolean success = studentDAO.createStudentManually(s, username, pass);

@@ -12,36 +12,11 @@
         <meta charset="UTF-8">
         <title>Barfact Admin | Grade Management</title>
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/admindash.css">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/admingrade.css">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adminCSS/admingrade.css?v=2.1">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/studentCSS/viewgrades.css">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/studentCSS/dashboard.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
-    <style>
-        .sidebar {
-            height: 100vh;
-        }
-
-        /* to keep avatar*/
-        .profile-avatar {
-            width: 80px;  /* Keep this at 80px to match your old JSP */
-            height: 80px;
-            background: #eee;
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden; /* Critical for the <img> tag to stay round */
-        }
-
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-    </style>
     <body>
         <%
             // 1. Security & Session Check

@@ -8,12 +8,25 @@
 @import url("admincourse.css"); /* Reusing the modal styles we just perfected */
 
 /* Specific Grid Layout for Student Table */
-.admin-table th:nth-child(1) { width: 8%; }  /* ID */
-.admin-table th:nth-child(2) { width: 25%; } /* Full Name */
-.admin-table th:nth-child(3) { width: 25%; } /* Email */
-.admin-table th:nth-child(4) { width: 15%; } /* Phone */
-.admin-table th:nth-child(5) { width: 10%; } /* GPA */
-.admin-table th:nth-child(6) { width: 17%; text-align: center; } /* Action */
+.admin-table th:nth-child(1) {
+    width: 8%;
+}  /* ID */
+.admin-table th:nth-child(2) {
+    width: 25%;
+} /* Full Name */
+.admin-table th:nth-child(3) {
+    width: 25%;
+} /* Email */
+.admin-table th:nth-child(4) {
+    width: 15%;
+} /* Phone */
+.admin-table th:nth-child(5) {
+    width: 10%;
+} /* GPA */
+.admin-table th:nth-child(6) {
+    width: 17%;
+    text-align: center;
+} /* Action */
 
 .main-content {
     padding-bottom: 80px; /* Fixing the awkward cut-off at the bottom */
@@ -43,9 +56,9 @@
 
 /* Form Layout inside the Modal */
 .modal-form-grid {
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    gap: 15px; 
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
     text-align: left;
 }
 
@@ -326,7 +339,6 @@
 /* 7. Directory Table (Main Page) */
 .schedule-container {
     background: white;
-    margin-top: 15px;
     padding: 25px;
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.03);
@@ -416,7 +428,7 @@
 }
 
 /* 2. Prevent any internal containers from scrolling */
-.course-list-container, 
+.course-list-container,
 .modal-body-scroll {
     overflow: visible !important;
     max-height: none !important;
@@ -463,4 +475,18 @@ body.modal-open {
     width: 320px;
     background: #ffffff;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* NEW */
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 100px); /* Adjust based on logo section height */
+}
+
+.logout-container {
+    display: flex;
+    justify-items: center;
+    margin-top: auto;
+    padding: 10px 0;
 }

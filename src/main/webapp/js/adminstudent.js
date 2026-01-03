@@ -261,3 +261,19 @@ function closePrereqModal() {
     const newUrl = window.location.pathname + window.location.search.replace(/[\?&]error=missing_prereq/, '').replace(/&studentId=\d+/, '');
     window.history.replaceState({}, document.title, newUrl);
 }
+
+// Intercept the Admin Edit Form submission to validate reset passwords
+document.getElementById('adminEditForm').addEventListener('submit', function(e) {
+    const passInput = document.getElementById('editPassword').value;
+    
+    // We only validate if the admin is actually trying to change the password
+    if (passInput.length > 0) {
+        const regex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+        if (!regex.test(passInput)) {
+            alert("⚠️ Password too weak!\n\nRequirements:\n- At least 8 characters\n- One Uppercase letter\n- One Number");
+            e.preventDefault(); // Stop the form from submitting
+            return false;
+        }
+    }
+    return true;
+});

@@ -404,3 +404,89 @@
 }
 
 /* --- END: EVAL COLUMN ---- */
+
+
+.add-course-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 12px;
+}
+
+.add-course-form input, .add-course-form select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.add-course-form input:focus, .add-course-form select:focus {
+    border-color: #3b82f6;
+}
+
+/* Fixed Widths for specific small data */
+.input-small {
+    width: 80px;
+}
+.input-tiny {
+    width: 60px;
+}
+.input-day {
+    width: 110px;
+}
+.input-time {
+    width: 120px;
+}
+
+/* Flexible Widths for Name and Prerequisite */
+.input-flex-large {
+    flex: 2;
+    min-width: 150px;
+}
+.input-flex-medium {
+    flex: 1.5;
+    min-width: 140px;
+    background-color: #ffffff;
+    color: #475569;
+    font-style: italic; /* Visual cue that it's different/optional */
+}
+
+.btn-add-submit {
+    background: #3b82f6;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-add-submit:hover {
+    background: #2563eb;
+}
+
+/* This is your original dashboard size */
+.profile-avatar {
+    width: 80px;  /* Keep this at 80px to match your old JSP */
+    height: 80px;
+    background: #eee;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Critical for the <img> tag to stay round */
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

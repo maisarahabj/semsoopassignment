@@ -137,3 +137,145 @@
     height: 100%;
     object-fit: cover;
 }
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    display: none; /* Controlled by JS flex/none */
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px); /* Modern blur effect */
+}
+
+/* Modal Box Styling */
+.modal-box {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+    animation: slideDown 0.3s ease-out;
+}
+
+/* Icon at the top of the modal */
+.modal-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 24px;
+}
+
+/* Textarea Styling */
+.modal-input {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    margin-top: 10px;
+    resize: none;
+    transition: border-color 0.2s;
+}
+
+.modal-input:focus {
+    outline: none;
+    border-color: #e53e3e; /* Red focus to match rejection theme */
+}
+
+/* Action Buttons in Modal */
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-cancel {
+    background: #f7fafc;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    flex: 1;
+}
+
+.btn-cancel:hover {
+    background: #edf2f7;
+}
+
+/* Smooth animation for the pop-up */
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+/* REJECT LIST */
+
+.view-toggle-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.toggle-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #64748b;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toggle-btn.active {
+    background: #f0f7ff;
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.toggle-btn:hover:not(.active) {
+    background: #f8fafc;
+}
+
+.hidden-view {
+    display: none;
+}
+
+/* Style for the reason column in rejected list */
+.reason-text {
+    font-style: italic;
+    color: #64748b;
+    font-size: 13px;
+    display: block;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.reason-text:hover {
+    white-space: normal;
+    overflow: visible;
+}

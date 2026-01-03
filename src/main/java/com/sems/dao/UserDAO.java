@@ -95,6 +95,18 @@ public class UserDAO {
         }
     }
 
+    public boolean rejectUserWithReason(int userId, String reason) {
+        String sql = "UPDATE users SET status = 'REJECTED', rejection_reason = ? WHERE user_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, reason);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     /**
      * Counts the total number of students with an 'ACTIVE' status
      *
@@ -110,6 +122,47 @@ public class UserDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error counting active students", e);
+        }
+        return count;
+    }
+
+    public boolean updateAccountSecurity(int userId, String username, String newPassword) {
+        boolean updatingPassword = (newPassword != null && !newPassword.trim().isEmpty());
+
+        StringBuilder sql = new StringBuilder("UPDATE users SET username = ?");
+        if (updatingPassword) {
+            sql.append(", password_hash = ?");
+        }
+        sql.append(" WHERE user_id = ?");
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+
+            pstmt.setString(1, username);
+
+            if (updatingPassword) {
+                pstmt.setString(2, newPassword);
+                pstmt.setInt(3, userId);
+            } else {
+                pstmt.setInt(2, userId);
+            }
+
+            int rows = pstmt.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating user security credentials for ID: " + userId, e);
+            return false;
+        }
+    }
+
+    public int getPendingUserCount() {
+        int count = 0;
+        String sql = "SELECT COUNT(*) FROM users WHERE status = 'PENDING'";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return count;
     }

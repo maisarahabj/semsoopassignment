@@ -5,6 +5,7 @@
 package com.sems.servlet;
 
 import com.sems.dao.StudentDAO;
+import com.sems.dao.UserDAO;
 import com.sems.dao.ActivityLogDAO;
 import com.sems.model.Student;
 import jakarta.servlet.ServletException;
@@ -46,36 +47,59 @@ public class ProfileServlet extends HttpServlet {
 
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
-        Integer studentId = (Integer) session.getAttribute("studentId");
-        String role = (String) session.getAttribute("role"); // FIXED: Added this line to define 'role'
-
         if (userId == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect("login.jsp");
             return;
         }
 
+        // 1. Get ALL parameters
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
         String address = request.getParameter("address");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String fName = request.getParameter("firstName");
+        String lName = request.getParameter("lastName");
+        String dob = request.getParameter("dob");
 
-        boolean success = studentDAO.updateStudentContactInfo(userId, email, phone, address);
+        // 2. Fetch current student data for fallback (Important for Admin)
+        Student current = studentDAO.getStudentByUserId(userId);
 
-        if (success) {
-            // Determine log description based on role
-            String logDesc = "admin".equals(role)
-                    ? "Admin updated their own profile information."
-                    : "Student updated their personal contact information.";
+        // Safety check: if inputs are missing from JSP, use existing data
+        if (fName == null) {
+            fName = current.getFirstName();
+        }
+        if (lName == null) {
+            lName = current.getLastName();
+        }
+        if (dob == null) {
+            dob = (current.getDob() != null) ? current.getDob().toString() : "";
+        }
 
-            logDAO.recordLog(
-                    userId,
-                    (studentId != null ? studentId : 0), // Use 0 if admin has no studentId
-                    "UPDATE_PROFILE",
-                    logDesc
-            );
+        // 3. DUPLICATE CHECK (Using the new userId-aware method)
+        if (studentDAO.isUserExists(username, email, userId)) {
+            response.sendRedirect(request.getContextPath() + "/ProfileServlet?status=duplicate");
+            return;
+        }
 
+        // 4. PASSWORD VALIDATION
+        if (password != null && !password.isEmpty()) {
+            if (!password.matches("^(?=.*[A-Z])(?=.*\\d).{8,}$")) {
+                response.sendRedirect(request.getContextPath() + "/ProfileServlet?status=weak_password");
+                return;
+            }
+        }
+
+        // 5. DATABASE UPDATES
+        UserDAO userDAO = new UserDAO();
+        boolean securitySuccess = userDAO.updateAccountSecurity(userId, username, password);
+        boolean profileSuccess = studentDAO.updateFullProfile(userId, fName, lName, email, phone, address, dob);
+
+        if (securitySuccess && profileSuccess) {
+            session.setAttribute("username", username);
             response.sendRedirect(request.getContextPath() + "/ProfileServlet?status=success");
         } else {
-            response.sendRedirect(request.getContextPath() + "/ProfileServlet?error=1");
+            response.sendRedirect(request.getContextPath() + "/ProfileServlet?status=error");
         }
     }
 }

@@ -7,7 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map; 
+import java.util.Map;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
@@ -18,7 +18,9 @@ public class DashboardServlet extends HttpServlet {
     private StudentDAO studentDAO = new StudentDAO();
     private CourseDAO courseDAO = new CourseDAO();
     private UserDAO userDAO = new UserDAO();
-    private SummaryDAO summaryDAO = new SummaryDAO(); 
+    private SummaryDAO summaryDAO = new SummaryDAO();
+    int pendingCount = userDAO.getPendingUserCount();
+    double campusAvg = summaryDAO.getCampusAvgGPA();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,7 +41,7 @@ public class DashboardServlet extends HttpServlet {
             // --- ADMIN LOGIC: Get Today's Classes ---
             String currentDay = LocalDate.now()
                     .getDayOfWeek()
-                    .getDisplayName(TextStyle.FULL, Locale.ENGLISH); 
+                    .getDisplayName(TextStyle.FULL, Locale.ENGLISH);
 
             // Fetch the list using the day name string
             List<Course> todayClasses = courseDAO.getTodayCourses(currentDay);
@@ -62,6 +64,8 @@ public class DashboardServlet extends HttpServlet {
             request.setAttribute("topCourseRating", topCourse.getOrDefault("rating", "0.0"));
 
             // Forward to Admin Dashboard
+            request.setAttribute("pendingCount", pendingCount);
+            request.setAttribute("campusAvg", campusAvg);
             request.getRequestDispatcher("/admin/admindash.jsp").forward(request, response);
 
         } else if ("student".equalsIgnoreCase(role)) {
