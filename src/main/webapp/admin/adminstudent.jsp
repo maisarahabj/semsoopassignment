@@ -73,7 +73,7 @@
 
                 <%-- Status Message --%>
                 <% if ("success".equals(request.getParameter("status"))) { %>
-                <div style="background: #c6f6d5; color: #22543d; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #9ae6b4;">
+                <div style="background: #c6f6d5; color: #22543d; padding: 12px; border-radius: 8px; margin-bottom: 0px; border: 1px solid #9ae6b4;">
                     <i class="fas fa-check-circle"></i> Update successful!
                 </div>
                 <% }%>
@@ -117,8 +117,9 @@
                                 <td><span class="role-badge"><%= String.format("%.2f", s.getGpa())%></span></td>
                                 <td style="text-align: center;">
                                     <div class="action-form">
+                                        
                                         <button type="button" class="btn-approve" 
-                                                onclick="showProfileModal('<%= s.getStudentId()%>', '<%= s.getFirstName()%>', '<%= s.getLastName()%>', '<%= s.getEmail()%>', '<%= s.getPhone()%>', '<%= s.getAddress()%>', '<%= s.getDob()%>', '<%= s.getGpa()%>', '<%= s.getEnrollmentDate()%>')">
+                                                onclick="showProfileModal('<%= s.getStudentId()%>', '<%= s.getUserId()%>', '<%= s.getFirstName()%>', '<%= s.getLastName()%>', '<%= s.getEmail()%>', '<%= s.getPhone()%>', '<%= s.getAddress()%>', '<%= s.getDob()%>', '<%= s.getGpa()%>', '<%= s.getEnrollmentDate()%>', '<%= s.getUsername()%>')">
                                             <i class="fas fa-eye"></i> View
                                         </button>
                                         <button type="button" class="btn-reject" 

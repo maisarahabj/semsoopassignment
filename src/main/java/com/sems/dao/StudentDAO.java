@@ -15,7 +15,11 @@ public class StudentDAO {
     // SQL Constants
     private static final String INSERT_STUDENT = "INSERT INTO students (user_id, first_name, last_name, email, phone, address, gpa, dob) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SELECT_STUDENT_WITH_USER_DATA = "SELECT s.*, u.created_at FROM students s JOIN users u ON s.user_id = u.user_id WHERE s.user_id = ?";
-    private static final String SELECT_APPROVED_STUDENTS = "SELECT s.*, u.created_at FROM students s JOIN users u ON s.user_id = u.user_id WHERE u.status = 'ACTIVE' AND u.role = 'student' ORDER BY s.last_name, s.first_name";
+    private static final String SELECT_APPROVED_STUDENTS
+            = "SELECT s.*, u.username, u.created_at FROM students s "
+            + "JOIN users u ON s.user_id = u.user_id "
+            + "WHERE u.status = 'ACTIVE' AND u.role = 'student' "
+            + "ORDER BY s.last_name, s.first_name";
 
     // --- 1. CORE STUDENT MANAGEMENT (Restoring missing methods) ---
     public boolean updateStudent(Student student) {
@@ -261,8 +265,13 @@ public class StudentDAO {
     public List<Student> getAllStudents() {
         List<Student> list = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(SELECT_APPROVED_STUDENTS); ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 Student s = extractStudentFromResultSet(rs);
+
+                // We store the username in the REQUEST later, 
+                // but for now, we just need to make sure the query includes it.
+                // (Make sure SELECT_APPROVED_STUDENTS has "u.username" in it!)
                 Timestamp ts = rs.getTimestamp("created_at");
                 if (ts != null) {
                     s.setEnrollmentDate(new java.sql.Date(ts.getTime()));
@@ -270,6 +279,7 @@ public class StudentDAO {
                 list.add(s);
             }
         } catch (SQLException e) {
+            e.printStackTrace();
         }
         return list;
     }
@@ -309,6 +319,14 @@ public class StudentDAO {
         student.setAddress(rs.getString("address"));
         student.setGpa(rs.getDouble("gpa"));
         student.setDob(rs.getDate("dob"));
+
+        // Extract username from JOINed users table
+        try {
+            student.setUsername(rs.getString("username"));
+        } catch (SQLException e) {
+            // If "username" column isn't in the result set, we ignore it
+        }
+
         return student;
-    }
+    } // <-- This was the missing brace!
 }

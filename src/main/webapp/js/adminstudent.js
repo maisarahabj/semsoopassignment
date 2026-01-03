@@ -51,85 +51,68 @@ function showDeleteModal(studentId, userId, firstName, lastName) {
 /**
  * Opens the profile modal and populates student details
  */
-function showProfileModal(id, fName, lName, email, phone, address, dob, gpa, regOn) {
+function showProfileModal(id, userId, fName, lName, email, phone, address, dob, gpa, regOn, username) {
     currentViewedStudentId = id;
 
-    // Populate Header Info (Viewing Mode)
+    // 1. Populate View Mode (Text Labels)
     document.getElementById('viewFullName').innerText = fName + " " + lName;
     document.getElementById('viewStudentId').innerText = "Student ID: #" + id;
-
-    // Populate Registered On Date
-    const regElement = document.getElementById('viewRegisteredOn');
-    if (regElement) {
-        regElement.innerText = "Registered on: " + (regOn && regOn !== "null" ? regOn : "N/A");
-    }
-
-    // Populate Body Data (Viewing Mode)
+    document.getElementById('viewUsername').innerText = (username && username !== "null") ? username : "-";
     document.getElementById('viewEmail').innerText = email;
     document.getElementById('viewPhone').innerText = (phone && phone !== "null") ? phone : "Not Provided";
     document.getElementById('viewDob').innerText = dob;
     document.getElementById('viewGpa').innerText = parseFloat(gpa).toFixed(2);
-    document.getElementById('viewAddress').innerText = (address && address !== "null") ? address : "No address on file";
+    document.getElementById('viewAddress').innerText = (address && address !== "null") ? address : "No address";
 
-    // --- PRE-FILL INPUT FIELDS (Editing Mode) ---
+    // 2. Populate Edit Mode (Form Inputs)
     document.getElementById('editStudentId').value = id;
+    document.getElementById('editUserId').value = userId;
     document.getElementById('editFName').value = fName;
     document.getElementById('editLName').value = lName;
+    document.getElementById('editUsername').value = (username && username !== "null") ? username : "";
     document.getElementById('editEmail').value = email;
     document.getElementById('editPhone').value = (phone && phone !== "null") ? phone : "";
     document.getElementById('editDob').value = dob;
-    document.getElementById('editGpa').value = gpa;
     document.getElementById('editAddress').value = (address && address !== "null") ? address : "";
 
-    // Reset UI to view-only mode
-    resetAdminModalState();
+    // GPA hidden value (needed for form submit) but we won't show the input to user
+    document.getElementById('editGpa').value = gpa;
+    document.getElementById('editPassword').value = "";
 
-    // Fetch live course data
-    loadEnrolledCourses(id);
+    resetAdminModalState();
+    loadEnrolledCourses(id); // Enrollment logic
 
     document.getElementById('profileOverlay').style.display = 'flex';
-    document.body.style.overflow = 'hidden'; // Lock background
+    document.body.style.overflow = 'hidden';
 }
 
 /**
- * Swaps between the Header Title and the First/Last Name Inputs
+ * Swaps between the View (Text) and Edit (Inputs) states
  */
 function toggleAdminEdit() {
-    console.log("Pencil clicked! Toggling mode...");
+    // Toggle standard elements
+    document.getElementById('viewFullName').classList.toggle('hidden');
+    document.getElementById('editNameContainer').classList.toggle('hidden');
+    document.getElementById('adminSaveActions').classList.toggle('hidden');
 
-    const nameHeading = document.getElementById('viewFullName');
-    const nameInputs = document.getElementById('editNameContainer');
-    const actions = document.getElementById('adminSaveActions');
-
-    if (!nameHeading || !nameInputs) {
-        console.error("Error: Could not find nameHeading or nameInputs IDs in the JSP!");
-        return;
-    }
-
-    // Toggle Header
-    nameHeading.classList.toggle('hidden');
-    nameInputs.classList.toggle('hidden');
-
-    // Toggle the rest of the form fields
     const viewData = document.querySelectorAll('#profileOverlay .view-data');
     const inputs = document.querySelectorAll('#profileOverlay .modal-input');
 
     viewData.forEach(el => {
-        if (el.id !== 'viewFullName')
+        // LOCK GPA: Do not hide viewGpa text so it stays visible while editing
+        if (el.id !== 'viewGpa' && el.id !== 'viewFullName') {
             el.classList.toggle('hidden');
+        }
     });
 
-    inputs.forEach(el => el.classList.toggle('hidden'));
-
-    if (actions)
-        actions.classList.toggle('hidden');
-
-    console.log("Toggle complete.");
+    inputs.forEach(el => {
+        // LOCK GPA: Never show the GPA input field
+        if (el.id !== 'editGpa') {
+            el.classList.toggle('hidden');
+        }
+    });
 }
 
-/**
- * Returns modal to View Mode
- */
 function resetAdminModalState() {
     const actions = document.getElementById('adminSaveActions');
     const nameHeading = document.getElementById('viewFullName');
@@ -177,14 +160,11 @@ function enrollStudentAction() {
     })
             .then(response => response.text())
             .then(data => {
-                const trimmedData = data.trim(); // Clean any whitespace
-
+                const trimmedData = data.trim();
                 if (trimmedData === "prereq_missing") {
-                    // This links to the <div> ID in your JSP
                     document.getElementById('prereqErrorModal').style.display = 'flex';
                 } else if (trimmedData === "success") {
                     showToast("Student Enrolled Successfully!");
-                    // Refresh the list inside the modal
                     loadEnrolledCourses(studentId);
                 } else {
                     showToast("Error: Enrollment failed.", true);
@@ -240,7 +220,7 @@ window.onclick = function (event) {
     overlays.forEach(overlay => {
         if (event.target == overlay) {
             overlay.style.display = 'none';
-            document.body.style.overflow = 'auto'; // Unlock scroll
+            document.body.style.overflow = 'auto';
             if (overlay.id === 'profileOverlay')
                 resetAdminModalState();
             if (overlay.id === 'unenrollConfirmOverlay')
@@ -259,22 +239,13 @@ function showToast(message) {
     }, 3000);
 }
 
-/**
- * Filter student directory table based on search input
- */
 function filterStudents() {
     const input = document.getElementById('studentSearch').value.toLowerCase();
     const tableRows = document.querySelectorAll('.admin-table tbody tr');
 
     tableRows.forEach(row => {
-        // We get the text content of the whole row (ID, Name, Email, etc.)
         const rowText = row.textContent.toLowerCase();
-
-        if (rowText.includes(input)) {
-            row.style.display = ""; // Show row
-        } else {
-            row.style.display = "none"; // Hide row
-        }
+        row.style.display = rowText.includes(input) ? "" : "none";
     });
 }
 
@@ -287,7 +258,6 @@ window.onload = function () {
 
 function closePrereqModal() {
     document.getElementById('prereqErrorModal').style.display = 'none';
-    // Optional: Clean the URL so the popup doesn't keep appearing on refresh
     const newUrl = window.location.pathname + window.location.search.replace(/[\?&]error=missing_prereq/, '').replace(/&studentId=\d+/, '');
     window.history.replaceState({}, document.title, newUrl);
 }
